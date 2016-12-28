@@ -1,0 +1,67 @@
+####################
+## DOMAIN ROUTES ###
+####################
+
+settings_domain_index:
+    path: /domains
+    methods: [GET]
+    defaults:
+        _controller: HelisSettingsManagerBundle:Domain:index
+
+settings_domain_quick_edit:
+    path: /domains/{domainName}/{providerName}
+    methods: [PUT]
+    defaults:
+        _controller: HelisSettingsManagerBundle:Domain:quickEdit
+
+settings_domain_copy:
+    path: /domains/{domainName}/copy/{providerName}
+    methods: [POST]
+    defaults:
+        _controller: HelisSettingsManagerBundle:Domain:copy
+
+settings_domain_delete:
+    path: /domains/{domainName}/{providerName}
+    methods: [DELETE]
+    defaults:
+        _controller: HelisSettingsManagerBundle:Domain:delete
+        providerName: ~
+
+#####################
+## SETTING ROUTES ###
+#####################
+
+settings_index:
+    path: /{domainName}
+    methods: [GET]
+    defaults:
+        _controller: HelisSettingsManagerBundle:Settings:index
+        domainName: default
+
+settings_quick_edit:
+    path: /{domainName}/{settingName}
+    methods: [PUT]
+    defaults:
+        _controller: HelisSettingsManagerBundle:Settings:quickEdit
+    options:
+        expose: true
+
+settings_edit:
+    path: /{domainName}/{settingName}
+    methods: [GET, POST]
+    defaults:
+        _controller: HelisSettingsManagerBundle:Settings:edit
+
+settings_delete:
+    path: /{domainName}/{settingName}
+    methods: [DELETE]
+    defaults:
+        _controller: HelisSettingsManagerBundle:Settings:delete
+
+settings_duplicate:
+    path: /{domainName}/{settingName}/duplicate/{toDomainName}
+    methods: [POST]
+    defaults:
+        _controller: HelisSettingsManagerBundle:Settings:duplicate
+    options:
+        expose: true

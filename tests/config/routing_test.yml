@@ -1,0 +1,3 @@
+seo_helis_settings_manager:
+    resource: "@SeoHelisSettingsManagerBundle/Resources/config/routing.yml"
+    prefix:   /

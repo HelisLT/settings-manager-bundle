@@ -1,0 +1,201 @@
+{% extends '@HelisSettingsManager/layout.html.twig' %}
+
+{% trans_default_domain 'HelisSettingsManager' %}
+
+{% block contents %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>{{ 'list.table.header.name' | trans() }}</th>
+                        <th>{{ 'list.table.header.type' | trans() }}</th>
+                        <th>{{ 'list.table.header.domain' | trans() }}</th>
+                        <th>{{ 'list.table.header.value' | trans() }}</th>
+                        <th>{{ 'list.table.header.actions' | trans() }}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for setting in settings %}
+                        <tr>
+                            <td>
+                                {{ setting.getName() }}
+                                {% if setting.getDescription() is not empty %}
+                                    <p style="margin-bottom: 0px"><small class="text-muted">{{ setting.getDescription() }}</small></p>
+                                {% endif %}
+                                <p style="margin-bottom: 0px">
+                                    <span class="badge badge-primary" style="display: inline-block; margin-right: 5px">{{ setting.getProviderName() }}</span>
+                                    {% for tag in setting.getTags %}
+                                        <span class="badge badge-secondary" style="display: inline-block; margin-right: 5px">{{ tag.getName() }}</span>
+                                    {% endfor %}
+                                </p>
+                            </td>
+                            <td>{{ ('type.'~setting.getType().getValue()) | lower | trans() }}</td>
+                            <td>{{ setting.getDomain().getName() }}</td>
+                            <td width="30%">
+                                {% if setting.getType.getValue is constant('Helis\\SettingsManagerBundle\\Model\\Type::BOOL') %}
+                                    <input
+                                            type="checkbox"
+                                            name="{{ setting.getName() | lower }}"
+                                            data-url-quick-edit="{{ path('settings_quick_edit', {domainName: setting.getDomain().getName(), settingName: setting.getName()}) }}"
+                                            {% if setting.getData is same as(true) %}checked{% endif %}>
+                                {% elseif setting.getType.getValue is constant('Helis\\SettingsManagerBundle\\Model\\Type::YAML')  %}
+                                    {{ setting.getData() | json_encode }}
+                                {% else %}
+                                    {{ setting.getData() }}
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a
+                                        href="{{ path('settings_edit', {domainName: setting.getDomain().getName(), settingName: setting.getName()}) }}"
+                                        class="btn btn-outline-primary btn-sm">
+                                    {{ 'list.table.actions.edit' | trans() }}
+                                </a>
+                                <button
+                                        class="btn btn-outline-primary btn-sm"
+                                        data-toggle="modal"
+                                        data-target="#duplicate-modal"
+                                        data-setting="{{ setting.getName() }}"
+                                        data-domain="{{ setting.getDomain().getName() }}">
+                                    {{ 'list.table.actions.duplicate' | trans() }}
+                                </button>
+                                {% if not providers[setting.getProviderName()].isReadOnly() %}
+                                    <button
+                                            class="btn btn-outline-danger btn-sm js-delete-setting"
+                                            data-url="{{ path('settings_delete', {domainName: setting.getDomain().getName(), settingName: setting.getName()}) }}">
+                                        {{ 'list.table.actions.delete' | trans() }}
+                                    </button>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {{ block('modals') }}
+{% endblock %}
+
+{% block modals %}
+    <div class="modal fade" id="duplicate-modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">{{ 'list.table.actions.duplicate' | trans() }}</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="duplicate-modal-form">
+                        <div class="form-group">
+                            <label for="duplicate-modal-to-domain-name">{{ 'list.modal.duplicate.message' | trans({'%settingName%': '<span id="duplicate-modal-setting-name" class="badge badge-primary"></span>', '%domainName%': '<span id="duplicate-modal-domain-name" class="badge badge-primary"></span>'}) | raw }}</label>
+                            <input type="text" class="form-control" name="toDomainName" id="duplicate-modal-to-domain-name" placeholder="Domain name">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="duplicate-modal-submit">{{ 'list.modal.duplicate.actions.submit' | trans }}</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">{{ 'list.modal.duplicate.actions.close' | trans }}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {# Quick edit script #}
+    <script>
+        (function () {
+            $("input[type='checkbox']").bootstrapSwitch({
+                size: 'mini',
+                animate: false,
+                onColor: 'success',
+                offColor: 'danger',
+                onText: 'On',
+                offText: 'Off',
+                onSwitchChange: function (event, state) {
+                    $.ajax({
+                        method: 'PUT',
+                        url: $(this).data('url-quick-edit'),
+                        data: {
+                            value: state
+                        }
+                    });
+                }
+            });
+        })();
+    </script>
+    {# Delete setting script #}
+    <script>
+        (function () {
+            $('.js-delete-setting').on('click', function (e) {
+                e.preventDefault();
+                var $button = $(this);
+                if (confirm('Are you sure?')) {
+                    $.ajax({
+                        method: 'DELETE',
+                        url: $button.data('url')
+                    }).done(function () {
+                        window.location.reload();
+                    });
+                }
+            });
+        })();
+    </script>
+    {# Duplicate modal script #}
+    <script>
+        (function () {
+            var settingName, domainName = undefined;
+
+            $('#duplicate-modal').on('show.bs.modal', function (event) {
+                var $button = $(event.relatedTarget);
+
+                settingName = $button.data('setting');
+                domainName = $button.data('domain');
+
+                $('#duplicate-modal-setting-name').text(settingName);
+                $('#duplicate-modal-domain-name').text(domainName);
+            });
+
+            $('#duplicate-modal-submit').on('click', function () {
+                var toDomainName = $('#duplicate-modal-to-domain-name').val();
+                if (!toDomainName) {
+                    alert('Please fill domain name input');
+                    return null;
+                }
+
+                var url = Routing.generate('settings_duplicate', {
+                    settingName: settingName,
+                    domainName: domainName,
+                    toDomainName: toDomainName
+                });
+
+                $.ajax({
+                    method: 'POST',
+                    url: Routing.generate('settings_duplicate', {
+                        settingName: settingName,
+                        domainName: domainName,
+                        toDomainName: toDomainName
+                    }),
+                    success: function () {
+                        window.location.reload();
+                    },
+                    error: function () {
+                        alert('Whoops! maybe it already exists in that domain?');
+                    }
+                });
+            });
+
+            $('#duplicate-modal-to-domain-name').on('keydown', function (e) {
+                if (e.keyCode === 13) {
+                    e.preventDefault();
+                    $('#duplicate-modal-submit').click();
+                }
+            })
+        })();
+    </script>
+{% endblock %}

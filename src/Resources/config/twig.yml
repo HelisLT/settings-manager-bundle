@@ -1,0 +1,14 @@
+services:
+    _defaults:
+        public: false
+        autowire: true
+        autoconfigure: true
+
+    _instanceof:
+        \Twig_Extension:
+            tags:
+                - { name: twig.extension }
+
+    Helis\SettingsManagerBundle\Twig\SettingsExtension:
+        arguments:
+            - '@Helis\SettingsManagerBundle\Settings\SettingsRouter'

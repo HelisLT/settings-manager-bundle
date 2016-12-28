@@ -1,0 +1,101 @@
+{% extends '@HelisSettingsManager/layout.html.twig' %}
+
+{% trans_default_domain 'HelisSettingsManager' %}
+
+{% form_theme form 'bootstrap_4_layout.html.twig' %}
+
+{% block contents %}
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6 offset-lg-3 col-md-8 offset-md-2 col-sm-8 offset-sm-2 col-xs-10 offset-xs-1">
+                <br>
+                <h1 class="display-4">{{ 'edit.title' | trans }}</h1>
+                {{ form_start(form) }}
+                    {{ form_errors(form) }}
+
+                    {{ form_row(form.name) }}
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-12">
+                            {{ form_row(form.domain) }}
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-12">
+                            {{ form_row(form.type) }}
+                        </div>
+                    </div>
+                    {{ form_row(form.description) }}
+
+                    <div>
+                        <span id="data-status"></span>
+                    </div>
+
+                    {{ form_row(form.data) }}
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-success" id="submit-button">Save</button>
+                        <a href="{{ path('settings_index', {domainName: domainName}) }}" class="btn btn-outline-danger">Back</a>
+                    </div>
+                    {{ form_rest(form) }}
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/3.10.0/js-yaml.min.js"></script>
+    <script>
+        (function () {
+            var settingType = '{{ settingType}}';
+
+            if (settingType === 'yaml') {
+                var $textarea = $('#setting_form_data');
+                var $statusSpan = $('#data-status');
+                var $submitButton = $('#submit-button');
+                var indent = 4;
+
+                var yamlDump = jsyaml.safeDump(JSON.parse($textarea.val()), {
+                    indent: indent
+                });
+
+                $textarea.val(yamlDump);
+
+                // ensure tabs are correct
+                $textarea.on('keydown', function (event) {
+                    switch (event.keyCode) {
+                        case 9:
+                            event.preventDefault();
+                            var val = event.target.value,
+                                start = event.target.selectionStart,
+                                end = event.target.selectionEnd;
+
+                            event.target.value = val.substring(0, start) + "    " + val.substring(end);
+                            event.target.selectionStart = event.target.selectionEnd = start + indent;
+
+                            return false;
+                    }
+                });
+
+                //validation
+                $textarea.on('keyup', function(event) {
+                    try {
+                        jsyaml.safeLoad($textarea.val());
+                        $statusSpan.html('Syntax is correct.');
+                        $submitButton.removeAttr('disabled');
+                    }
+                    catch (err) {
+                        $statusSpan.html(err.message);
+                        $submitButton.attr('disabled', 'disabled');
+                    }
+                });
+
+                // on submit back to string
+                $submitButton.on('click', function (e) {
+                    e.preventDefault();
+                    $textarea.val(JSON.stringify(jsyaml.safeLoad($textarea.val())));
+                    $('form[name="setting_form"]').submit();
+                })
+            }
+        })();
+    </script>
+{% endblock %}

@@ -1,0 +1,10 @@
+Helis\SettingsManagerBundle\Model\SettingModel:
+    constraints:
+        - Helis\SettingsManagerBundle\Validator\Constraints\UniqueSettingDomain: { groups: [duplication] }
+    properties:
+        name:
+            - NotBlank: { message: 'Setting name should not be blank', groups: [Default] }
+        domain:
+            - NotNull: { message: 'Setting should have a domain', groups: [Default] }
+        type:
+            - NotNull: { message: 'Setting should have a type', groups: [Default] }

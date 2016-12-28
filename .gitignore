@@ -1,0 +1,6 @@
+/vendor
+/tests/var
+/.idea
+/coverage
+composer.lock
+.php_cs.cache

@@ -1,0 +1,7 @@
+#!/bin/bash
+
+docker run --rm --interactive \
+    --volume "$PWD":/app \
+    --workdir /app \
+    --user $(id -u):$(id -g) \
+    php:7.2-cli vendor/bin/phpunit -c .

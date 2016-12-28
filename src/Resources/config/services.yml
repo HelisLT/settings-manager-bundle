@@ -1,0 +1,18 @@
+services:
+    _defaults:
+        public: false
+        autowire: true
+        autoconfigure: true
+
+    Helis\SettingsManagerBundle\Controller\:
+        resource: '../../Controller'
+        public: true
+
+    Helis\SettingsManagerBundle\Settings\SettingsAwareServiceFactory:
+        arguments:
+            - '@Helis\SettingsManagerBundle\Settings\SettingsRouter'
+        calls:
+            - [setLogger, ['@?settings_manager.logger']]
+
+    Helis\SettingsManagerBundle\Settings\SettingsStore: ~
+    Helis\SettingsManagerBundle\Settings\ProvidersManager: ~

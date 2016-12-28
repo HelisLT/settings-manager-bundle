@@ -1,0 +1,8 @@
+- name: fix
+  description: 'fix desc'
+  domain:
+      name: omg
+      enabled: false
+      read_only: true
+  type: bool
+  data: true

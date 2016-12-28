@@ -1,0 +1,49 @@
+layout:
+    title: Settings manager dashboard
+
+navbar:
+    title: Settings Manager
+    domain: Domain
+    settings_list: Settings
+    domain_list: Domains
+
+list:
+    table:
+        header:
+            name: Name
+            type: Type
+            domain: Domain
+            value: Value
+            actions: Actions
+            provider: 'Provider: %providerName%'
+        actions:
+            create: Create
+            edit: Edit
+            duplicate: Duplicate
+            delete: Delete
+            settings_list: Settings
+    modal:
+        duplicate:
+            message: 'Duplicate setting %settingName% from domain %domainName% to'
+            actions:
+                close: Close
+                submit: Duplicate
+
+type:
+    bool: Bool
+    string: String
+    int: Integer
+    float: Float
+    yaml: Yaml
+
+edit:
+    back: Back to list
+    title: Setting edit
+    form:
+        name: Name
+        domain: Domain
+        description: Description
+        type: Type
+        is_enabled: Enabled
+        value: Value
+

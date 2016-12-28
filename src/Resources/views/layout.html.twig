@@ -1,0 +1,75 @@
+{% trans_default_domain 'HelisSettingsManager' %}
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>{{ 'layout.title' | trans() }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    {% block stylesheets %}
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2-bootstrap-theme/0.1.0-beta.10/select2-bootstrap.min.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.4/css/bootstrap3/bootstrap-switch.min.css" />
+    {% endblock %}
+
+    <script defer src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>
+</head>
+<body>
+{% block body %}
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="{{ path('settings_index') }}">{{ "navbar.title" | trans }}</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            {{ knp_menu_render('settings_manager_top_menu', {'currentClass': 'active', template: "@HelisSettingsManager/menu/menu.html.twig"}) }}
+            {% block navbar %}
+                {% if activeDomain is defined %}
+                    <form class="navbar-form form-inline navbar-right">
+                        <div class="form-group">
+                            <label for="domain-select">{{ 'navbar.domain' | trans }}:</label>
+                            <select type="text" class="form-control" id="domain-select">
+                                {% for domain in domains %}
+                                    <option value="{{ path('settings_index', {domainName: domain.getName()}) }}" {% if domain.getName() is same as(activeDomain) %}selected{% endif %}>{{ domain.getName() }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </form>
+                {% endif %}
+            {% endblock %}
+        </div>
+    </nav>
+    {% block contents %}{% endblock %}
+{% endblock %}
+{% block javascripts %}
+    {# BOOTSTRAP4 #}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    {# END BOOTSTRAP4 #}
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.4/js/bootstrap-switch.min.js"></script>
+
+    {% block javascripts_fosjsrouting %}
+        <script src="{{ asset('bundles/fosjsrouting/js/router.js') }}"></script>
+        <script src="{{ path('fos_js_routing_js', { callback: 'fos.Router.setData' }) }}"></script>
+    {% endblock %}
+
+    <script>
+        (function () {
+            $('#domain-select').select2({
+                multiple: false,
+                theme: 'bootstrap',
+                width: '150px'
+            }).on('select2:select', function (e) {
+                window.location.href = $(this).val();
+            });
+        })();
+    </script>
+{% endblock %}
+</body>
+</html>

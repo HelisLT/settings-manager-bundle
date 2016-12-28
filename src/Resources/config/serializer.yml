@@ -1,0 +1,28 @@
+services:
+    _defaults:
+        public: false
+        autowire: false
+        autoconfigure: false
+
+    settings_manager.serializer:
+        class: Symfony\Component\Serializer\Serializer
+        arguments:
+            $normalizers:
+                - '@settings_manager.normalizer.array'
+                - '@Helis\SettingsManagerBundle\Serializer\Normalizer\SettingModelNormalizer'
+                - '@Helis\SettingsManagerBundle\Serializer\Normalizer\DomainModelNormalizer'
+                - '@Helis\SettingsManagerBundle\Serializer\Normalizer\TagModelNormalizer'
+            $encoders:
+                - '@settings_manager.encoder.json'
+
+    settings_manager.encoder.json:
+        class: Symfony\Component\Serializer\Encoder\JsonEncoder
+
+    settings_manager.normalizer.array:
+        class: Symfony\Component\Serializer\Normalizer\ArrayDenormalizer
+
+    Helis\SettingsManagerBundle\Serializer\Normalizer\SettingModelNormalizer: ~
+
+    Helis\SettingsManagerBundle\Serializer\Normalizer\DomainModelNormalizer: ~
+
+    Helis\SettingsManagerBundle\Serializer\Normalizer\TagModelNormalizer: ~

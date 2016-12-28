@@ -1,0 +1,14 @@
+services:
+    _defaults:
+        public: false
+        autowire: true
+        autoconfigure: true
+
+    _instanceof:
+        Symfony\Component\Validator\ConstraintValidator:
+            tags:
+                - { name: validator.constraint_validator }
+
+    Helis\SettingsManagerBundle\Validator\Constraints\UniqueSettingDomainValidator:
+        arguments:
+            - '@Helis\SettingsManagerBundle\Settings\SettingsManager'
