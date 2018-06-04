@@ -6,6 +6,8 @@ Provides a nice way to define variables and inject them into application parts.
  - Multiple providers.
  - User interface.
 
+[![Build Status](https://travis-ci.org/HelisLT/settings-manager-bundle.svg?branch=master)](https://travis-ci.org/HelisLT/settings-manager-bundle)
+
 ## Jump to
 
  - [Quick start](#quick-start)
