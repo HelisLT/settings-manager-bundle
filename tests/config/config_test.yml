@@ -26,8 +26,6 @@ security:
 liip_functional_test:
     cache_sqlite_db: true
     command_verbosity: normal
-    query:
-        max_query_count: 17
 
 doctrine:
     dbal:
