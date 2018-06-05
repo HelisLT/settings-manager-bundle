@@ -18,7 +18,7 @@ class RedisDoctrineOrmSettingsProviderTest extends DecoratingPredisSettingsProvi
 
         $this->redis = new \Redis();
 
-        if (@$this->redis->connect(getenv('REDIS_HOST'), (int) getenv('REDIS_PORT')) === false) {
+        if (@$this->redis->connect(getenv('REDIS_HOST'), (int) getenv('REDIS_PORT'), 1.0) === false) {
             $this->markTestSkipped('Running redis server required');
         }
 

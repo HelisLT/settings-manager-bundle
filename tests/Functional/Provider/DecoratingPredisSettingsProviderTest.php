@@ -30,7 +30,7 @@ class DecoratingPredisSettingsProviderTest extends WebTestCase
 
         $this->redis = new Client(
             ['host' => getenv('REDIS_HOST'), 'port' => getenv('REDIS_PORT')],
-            ['parameters' => ['database' => 0]]
+            ['parameters' => ['database' => 0, 'timeout' => 1.0]]
         );
 
         try {
@@ -173,7 +173,14 @@ class DecoratingPredisSettingsProviderTest extends WebTestCase
     {
         $this->loadFixtures([LoadSettingsData::class]);
 
+        $sortCallback = function (SettingModel $a, SettingModel$b) {
+            $v = $a->getName() <=> $b->getName();
+            return $v !== 0 ? $v * -1 : $v;
+        };
+
         $settings = $this->provider->getSettings(['default']);
+        usort($settings, $sortCallback);
+
         $this->assertCount(2, $settings);
         $settingToDelete = end($settings);
         $this->assertEquals('bazinga', $settingToDelete->getName());
@@ -183,6 +190,7 @@ class DecoratingPredisSettingsProviderTest extends WebTestCase
         $domains = $this->buildDomainMap(...$this->provider->getDomains());
         $this->assertArrayHasKey('default', $domains);
         $settings = $this->provider->getSettings(['default']);
+        usort($settings, $sortCallback);
         $this->assertCount(1, $settings);
 
         /** @var SettingModel $setting */
