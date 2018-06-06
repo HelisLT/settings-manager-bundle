@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace Helis\SettingsManagerBundle\Provider;
 
+use ParagonIE\Paseto\Builder;
 use ParagonIE\Paseto\Exception\PasetoException;
-use ParagonIE\Paseto\JsonToken;
-use ParagonIE\Paseto\Keys\AsymmetricPublicKey;
-use ParagonIE\Paseto\Keys\AsymmetricSecretKey;
+use ParagonIE\Paseto\Keys\SymmetricKey;
 use ParagonIE\Paseto\Parser;
-use ParagonIE\Paseto\Protocol\Version1;
+use ParagonIE\Paseto\Protocol\Version2;
+use ParagonIE\Paseto\ProtocolCollection;
+use ParagonIE\Paseto\Purpose;
 use ParagonIE\Paseto\Rules\IssuedBy;
 use ParagonIE\Paseto\Rules\NotExpired;
 use ParagonIE\Paseto\Rules\Subject;
@@ -18,11 +19,8 @@ use Psr\Log\LoggerAwareTrait;
 use Helis\SettingsManagerBundle\Model\DomainModel;
 use Helis\SettingsManagerBundle\Model\SettingModel;
 use Helis\SettingsManagerBundle\Provider\Traits\WritableProviderTrait;
-use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Cookie;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -32,23 +30,31 @@ class CookieSettingsProvider implements SettingsProviderInterface, EventSubscrib
 {
     use LoggerAwareTrait, WritableProviderTrait;
 
-    private const COOKIE_NAME = 'stn';
-    private const COOKIE_ID = 'sti';
-
     private $serializer;
-    private $adapter;
+    private $symmetricKeyMaterial;
+    private $cookieName;
+    private $symmetricKey;
     private $ttl;
-    private $issuer = 'settings_manager';
-    private $subject = 'cookie_provider';
+    private $issuer;
+    private $subject;
+    private $footer;
 
-    private $changed = false;
+    private $changed;
     private $domains;
 
-    public function __construct(SerializerInterface $serializer, AdapterInterface $adapter)
-    {
+    public function __construct(
+        SerializerInterface $serializer,
+        string $symmetricKeyMaterial = 'GuxH2igWOvGBSk3cpeL300Fzv9JiAtvC',
+        string $cookieName = 'stn'
+    ) {
         $this->serializer = $serializer;
-        $this->adapter = $adapter;
+        $this->symmetricKeyMaterial = $symmetricKeyMaterial;
+        $this->cookieName = $cookieName;
         $this->ttl = 86400;
+        $this->issuer = 'settings_manager';
+        $this->subject = 'cookie_provider';
+
+        $this->changed = false;
         $this->domains = [];
     }
 
@@ -81,17 +87,13 @@ class CookieSettingsProvider implements SettingsProviderInterface, EventSubscrib
     public function save(SettingModel $settingModel): bool
     {
         $this->domains[$settingModel->getDomain()->getName()] = $settingModel->getDomain();
-        $this->changed = true;
-
-        return true;
+        return $this->changed = true;
     }
 
     public function updateDomain(DomainModel $domainModel): bool
     {
         $this->domains[$domainModel->getName()] = $domainModel;
-        $this->changed = true;
-
-        return true;
+        return $this->changed = true;
     }
 
     public function deleteDomain(string $domainName): bool
@@ -101,9 +103,7 @@ class CookieSettingsProvider implements SettingsProviderInterface, EventSubscrib
         }
 
         unset($this->domains[$domainName]);
-        $this->changed = true;
-
-        return true;
+        return $this->changed = true;
     }
 
     public static function getSubscribedEvents(): array
@@ -117,26 +117,19 @@ class CookieSettingsProvider implements SettingsProviderInterface, EventSubscrib
     public function onKernelRequest(GetResponseEvent $event): void
     {
         if (!$event->isMasterRequest()
-            || ($rawToken = $event->getRequest()->cookies->get(self::COOKIE_NAME)) === null
+            || ($rawToken = $event->getRequest()->cookies->get($this->cookieName)) === null
         ) {
             return;
         }
 
-        $id = $this->tryGetCookieId($event->getRequest());
-        if ($id === null) {
-            return;
-        }
-
-        $item = $this->adapter->getItem($id);
-        if (!$item->isHit()) {
-            return;
-        }
-
-        $parser = Parser::getPublic(new AsymmetricPublicKey($item->get(), 'v1'));
+        $parser = Parser::getLocal($this->getSharedKey(), ProtocolCollection::v2());
         $parser
             ->addRule(new IssuedBy($this->issuer))
             ->addRule(new Subject($this->subject))
-            ->addRule(new NotExpired());
+            ->addRule(new NotExpired())
+            ->setKey($this->getSharedKey())
+            ->setPurpose(Purpose::local())
+            ->setAllowedVersions(ProtocolCollection::v2());
 
         try {
             $token = $parser->parse($rawToken);
@@ -166,45 +159,39 @@ class CookieSettingsProvider implements SettingsProviderInterface, EventSubscrib
             return;
         }
 
-        $currentTime = time();
-        $id = $this->getCookieId($event->getRequest(), $event->getResponse(), $currentTime);
-        $item = $this->adapter->getItem($id);
-
         // cache is still warm
-        if (!$this->changed && $item->isHit()) {
+        if (!$this->changed) {
             return;
         }
 
         // no settings to save
         if (empty($this->domains)) {
             // also check for a cookie if needs to be cleared
-            if ($event->getRequest()->cookies->has(self::COOKIE_NAME)) {
-                $event->getResponse()->headers->clearCookie(self::COOKIE_NAME);
+            if ($event->getRequest()->cookies->has($this->cookieName)) {
+                $event->getResponse()->headers->clearCookie($this->cookieName);
             }
 
             return;
         }
 
-        $keypair = Version1::getRsa()->createKey(2048);
-
-        // cookie setup
-        $privateKey = new AsymmetricSecretKey($keypair['privatekey'], Version1::HEADER);
-        $token = JsonToken::getPublic($privateKey, 'v1');
+        $now = new \DateTime();
+        $token = Builder::getLocal($this->getSharedKey(), new Version2());
         $token
-            ->setIssuedAt(new \DateTime())
-            ->setNotBefore(new \DateTime())
+            ->setIssuedAt($now)
+            ->setNotBefore($now)
             ->setIssuer($this->issuer)
             ->setSubject($this->subject)
-            ->set('dt', $this->serializer->serialize($this->domains, 'json'))
-            ->setExpiration((new \DateTime())->add(new \DateInterval('PT' . $this->ttl . 'S')));
+            ->setExpiration($now->add(new \DateInterval('PT' . $this->ttl . 'S')))
+            ->setClaims([
+                'dt' => $this->serializer->serialize($this->domains, 'json')
+            ]);
+
+        $this->footer !== null && $token->setFooter($this->footer);
 
         $event
             ->getResponse()
             ->headers
-            ->setCookie(new Cookie(self::COOKIE_NAME, (string) $token, $currentTime + $this->ttl));
-
-        $item->set($keypair['publickey'])->expiresAfter($this->ttl);
-        $this->adapter->save($item);
+            ->setCookie(new Cookie($this->cookieName, (string) $token, time() + $this->ttl));
     }
 
     public function setTtl(int $ttl): void
@@ -222,22 +209,17 @@ class CookieSettingsProvider implements SettingsProviderInterface, EventSubscrib
         $this->subject = $subject;
     }
 
-    private function tryGetCookieId(Request $request): ?string
+    public function setFooter(string $footer): void
     {
-        return $request->cookies->get(self::COOKIE_ID, null);
+        $this->footer = $footer;
     }
 
-    private function getCookieId(Request $request, Response $response, int $currentTime): string
+    private function getSharedKey(): SymmetricKey
     {
-        $id = $this->tryGetCookieId($request);
-
-        if ($id === null) {
-            $id = bin2hex(random_bytes(6));
-            $response
-                ->headers
-                ->setCookie(new Cookie(self::COOKIE_ID, (string) $id, $currentTime + $this->ttl));
+        if ($this->symmetricKey === null) {
+            $this->symmetricKey = new SymmetricKey($this->symmetricKeyMaterial);
         }
 
-        return $id;
+        return $this->symmetricKey;
     }
 }

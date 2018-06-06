@@ -49,7 +49,7 @@
         "friendsofsymfony/jsrouting-bundle": "^2.1",
         "knplabs/knp-menu-bundle": "^2.2",
         "liip/functional-test-bundle": "^1.9",
-        "paragonie/paseto": "^0.4.0",
+        "paragonie/paseto": "^1.0",
         "phpunit/phpunit": "^6.5",
         "predis/predis": "^1.1",
         "symfony/monolog-bundle": "^3.1",
