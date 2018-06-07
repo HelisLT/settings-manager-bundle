@@ -268,31 +268,22 @@ Helis\SettingsManagerBundle\Provider\DoctrineOrmSettingsProvider:
 
 `Helis\SettingsManagerBundle\Provider\CookieSettingsProvider`
 
-This is a provider, which only enables existing settings by using a cookie. Cookies are encoded and signed, so that they could not be randomly enabled by users.
+This is a provider, which only enables existing settings by using a cookie. Cookies are encoded, so that they could not be randomly enabled by users.
 
 Required libraries:
 
  - [paragonie/paseto](https://github.com/paragonie/paseto)
- - [symfony/cache](https://github.com/symfony/cache)
 
- > `composer require paragonie/paseto symfony/cache`
+ > `composer require paragonie/paseto`
 
- `Paseto` is used to generate keys and sign cookies. Then, `AdapterInterface` stores keys for parsing cookies during requests.
+ `Paseto` is used to encrypt cookies.
 
  Configuration example:
 
 ```yaml
-cache.settings.cookie_key_pool:
-    class: Symfony\Component\Cache\Adapter\FilesystemAdapter
-    arguments:
-        $namespace: 'cookie_public_key_pool'
-        $defaultLifetime: 0
-        $directory: '%kernel.cache_dir%/pools'
-
 Helis\SettingsManagerBundle\Provider\CookieSettingsProvider:
     arguments:
         $serializer: '@settings_manager.serializer'
-        $adapter: '@cache.settings.cookie_key_pool'
     tags:
         - { name: settings_manager.provider, provider: cookie, priority: 30 }
         - { name: kernel.event_subscriber }
