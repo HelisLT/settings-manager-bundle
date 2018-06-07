@@ -2,6 +2,8 @@ language: php
 
 sudo: false
 
+dist: trusty
+
 cache:
   directories:
     - $HOME/.composer/cache/files
@@ -18,10 +20,19 @@ env:
   - SYMFONY_VERSION=4.0.*@dev
   - SYMFONY_VERSION=4.1.*@dev
 
+addons:
+  apt:
+    sources:
+    - sourceline: 'ppa:ondrej/php'
+    packages:
+    - libsodium-dev
+
 before_install:
-  - if [ "$SYMFONY_VERSION" != "" ]; then composer require "symfony/symfony:${SYMFONY_VERSION}" --no-update; fi;
+  - pecl install libsodium
   - pecl info redis
   - echo "extension = redis.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+  - php -m
+  - if [ "$SYMFONY_VERSION" != "" ]; then composer require "symfony/symfony:${SYMFONY_VERSION}" --no-update; fi;
 
 install: composer update $COMPOSER_FLAGS
 
