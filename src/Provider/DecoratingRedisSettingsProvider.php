@@ -4,13 +4,16 @@ declare(strict_types=1);
 
 namespace Helis\SettingsManagerBundle\Provider;
 
-use Redis;
 use Helis\SettingsManagerBundle\Model\DomainModel;
 use Helis\SettingsManagerBundle\Model\SettingModel;
+use Helis\SettingsManagerBundle\Settings\Traits\DomainNameExtractTrait;
+use Redis;
 use Symfony\Component\Serializer\SerializerInterface;
 
 class DecoratingRedisSettingsProvider implements SettingsProviderInterface
 {
+    use DomainNameExtractTrait;
+
     private const DOMAIN_KEY = 'domain';
     private const HASHMAP_KEY = 'hashmap';
 
@@ -198,16 +201,14 @@ class DecoratingRedisSettingsProvider implements SettingsProviderInterface
     {
         $key = $this->getHashMapKey();
         $isBuilt = $this->redis->get($key);
-        if ((int) $isBuilt === 1 && $force === false) {
+        if ((int)$isBuilt === 1 && $force === false) {
             return;
         }
 
         if ($domainName !== null) {
             $domains = [$domainName];
         } else {
-            $domains = array_map(function (DomainModel $model) {
-                return $model->getName();
-            }, array_values($this->decoratingProvider->getDomains()));
+            $domains = $this->extractDomainNames($this->decoratingProvider->getDomains());
         }
 
         $settings = $this->decoratingProvider->getSettings($domains);
@@ -222,12 +223,12 @@ class DecoratingRedisSettingsProvider implements SettingsProviderInterface
                 );
             }
 
-            if ($isBuilt === false || (int) $isBuilt === 0) {
+            if ($isBuilt === false || (int)$isBuilt === 0) {
                 $pipe->setex($key, $this->ttl, 1);
             }
             $pipe->exec();
         } else {
-            if ($isBuilt === false || (int) $isBuilt === 0) {
+            if ($isBuilt === false || (int)$isBuilt === 0) {
                 $this->redis->setex($key, $this->ttl, 1);
             }
         }

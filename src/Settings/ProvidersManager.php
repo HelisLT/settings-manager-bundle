@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace Helis\SettingsManagerBundle\Settings;
 
-use Helis\SettingsManagerBundle\Model\DomainModel;
 use Helis\SettingsManagerBundle\Model\SettingModel;
 use Helis\SettingsManagerBundle\Provider\SettingsProviderInterface;
+use Helis\SettingsManagerBundle\Settings\Traits\DomainNameExtractTrait;
 
 class ProvidersManager
 {
+    use DomainNameExtractTrait;
+
     /**
      * @var SettingsManager
      */
@@ -46,9 +48,7 @@ class ProvidersManager
         $configProvider = $this->settingsManager->getProvider($provider);
 
         if (empty($domains)) {
-            $domainNames = array_map(function (DomainModel $model) {
-                return $model->getName();
-            }, $configProvider->getDomains());
+            $domainNames = $this->extractDomainNames($configProvider->getDomains());
         }
 
         return $configProvider->getSettings($domainNames ?? $domains);
@@ -59,7 +59,8 @@ class ProvidersManager
      */
     private function warmUpProvider(SettingsProviderInterface $provider, array $sourceSettings): void
     {
-        $settings = $provider->getSettings($provider->getDomains());
+        $domainNames = $this->extractDomainNames($provider->getDomains());
+        $settings = $provider->getSettings($domainNames);
 
         $missingSettings = $this->getDiff($sourceSettings, $settings);
 
