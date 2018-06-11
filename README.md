@@ -45,19 +45,19 @@ class AppKernel extends Kernel
 helis_settings_manager:
     settings:
         - name: foo
-            description: 'foo desc'
-            type: bool
-            data: false
-            tags:
-                - 'super_switch'
+          description: 'foo desc'
+          type: bool
+          data: false
+          tags:
+              - 'super_switch'
 
         - name: baz
-            description: 'master toggle for awesome new feature'
-            type: string
-            data: fish
-            tags:
-                - 'experimental'
-                - 'poo'
+          description: 'master toggle for awesome new feature'
+          type: string
+          data: fish
+          tags:
+              - 'experimental'
+              - 'poo'
 ```
 
  4. Now, the easiest way to get settings in your services is by using `SettingsRouterAwareTrait`. The service will be automatically injected by [autowire](https://symfony.com/doc/current/service_container/autowiring.html#autowiring-other-methods-e-g-setters). Then just ask for setting:
@@ -375,9 +375,9 @@ helis_settings_manager:
 
 User interface can be used to change setting values, enable or disable domains.
 
- 1. Bundled user interface requires `knp-menu-bundle`.
+ 1. Bundled user interface requires [knp-menu-bundle](https://github.com/KnpLabs/KnpMenu), [jsrouting-bundle](https://github.com/FriendsOfSymfony/FOSJsRoutingBundle).
 
-    `composer require knplabs/knp-menu-bundle`
+    `composer require knplabs/knp-menu-bundle friendsofsymfony/jsrouting-bundle`
 
  2. Include routing file.
 
