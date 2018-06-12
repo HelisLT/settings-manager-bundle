@@ -55,14 +55,14 @@ class SimpleSettingsProvider implements SettingsProviderInterface
         $out = [];
 
         foreach ($this->settings as $setting) {
-            if (!isset($domains[$setting->getDomain()->getName()])
+            if (!isset($out[$setting->getDomain()->getName()])
                 && (!$onlyEnabled || ($onlyEnabled && $setting->getDomain()->isEnabled()))
             ) {
-                $out[] = $setting->getDomain();
+                $out[$setting->getDomain()->getName()] = $setting->getDomain();
             }
         }
 
-        return $out;
+        return array_values($out);
     }
 
     public function save(SettingModel $settingModel): bool
