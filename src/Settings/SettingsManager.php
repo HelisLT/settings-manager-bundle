@@ -4,13 +4,16 @@ declare(strict_types=1);
 
 namespace Helis\SettingsManagerBundle\Settings;
 
+use Helis\SettingsManagerBundle\Event\SettingChangeEvent;
 use Helis\SettingsManagerBundle\Exception\ProviderNotFoundException;
 use Helis\SettingsManagerBundle\Exception\ReadOnlyProviderException;
 use Helis\SettingsManagerBundle\Model\DomainModel;
 use Helis\SettingsManagerBundle\Model\SettingModel;
 use Helis\SettingsManagerBundle\Provider\SettingsProviderInterface;
+use Helis\SettingsManagerBundle\SettingsManagerEvents;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class SettingsManager implements LoggerAwareInterface
 {
@@ -20,13 +23,15 @@ class SettingsManager implements LoggerAwareInterface
      * @var SettingsProviderInterface[]
      */
     private $providers;
+    private $eventDispatcher;
 
     /**
      * @param SettingsProviderInterface[] $providers
      */
-    public function __construct(array $providers)
+    public function __construct(array $providers, EventDispatcherInterface $eventDispatcher)
     {
         $this->providers = $providers;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -184,6 +189,10 @@ class SettingsManager implements LoggerAwareInterface
                         'sDomainEnabled' => $settingModel->getDomain()->isReadOnly(),
                         'sProviderName' => $settingModel->getProviderName(),
                     ]);
+                    $this->eventDispatcher->dispatch(
+                        SettingsManagerEvents::DUPLICATE_SETTING,
+                        new SettingChangeEvent($settingModel)
+                    );
 
                     return true;
                 }
@@ -220,6 +229,10 @@ class SettingsManager implements LoggerAwareInterface
                     'sDomainEnabled' => $settingModel->getDomain()->isReadOnly(),
                     'sProviderName' => $settingModel->getProviderName(),
                 ]);
+                $this->eventDispatcher->dispatch(
+                    SettingsManagerEvents::UPDATE_SETTING,
+                    new SettingChangeEvent($settingModel)
+                );
 
                 return $result;
             }
@@ -236,9 +249,16 @@ class SettingsManager implements LoggerAwareInterface
     public function delete(SettingModel $settingModel): bool
     {
         if ($settingModel->getProviderName()) {
-            return $this
+            $result = $this
                 ->providers[$settingModel->getProviderName()]
                 ->delete($settingModel);
+
+            $this->eventDispatcher->dispatch(
+                SettingsManagerEvents::DELETE_SETTING,
+                new SettingChangeEvent($settingModel)
+            );
+
+            return $result;
         }
 
         $atleastOne = false;
@@ -247,6 +267,12 @@ class SettingsManager implements LoggerAwareInterface
             if ($provider->delete($settingModel)) {
                 $atleastOne = true;
             }
+        }
+        if ($atleastOne) {
+            $this->eventDispatcher->dispatch(
+                SettingsManagerEvents::DELETE_SETTING,
+                new SettingChangeEvent($settingModel)
+            );
         }
 
         return $atleastOne;
