@@ -9,9 +9,6 @@ framework:
     session:
         storage_id: session.storage.mock_file
     validation: ~
-    profiler:
-        enabled: true
-        collect: true
 
 security:
     providers:
@@ -24,8 +21,9 @@ security:
             anonymous: ~
 
 liip_functional_test:
-    cache_sqlite_db: true
     command_verbosity: normal
+    cache_db:
+        sqlite: liip_functional_test.services_database_backup.sqlite
 
 doctrine:
     dbal:
@@ -116,3 +114,7 @@ services:
         tags:
             - { name: settings_manager.provider, provider: cookie, priority: 30 }
             - { name: kernel.event_subscriber }
+
+    test.settings_manager.serializer:
+        alias: 'settings_manager.serializer'
+        public: true
