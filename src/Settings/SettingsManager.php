@@ -248,34 +248,26 @@ class SettingsManager implements LoggerAwareInterface
      */
     public function delete(SettingModel $settingModel): bool
     {
+        $changed = false;
         if ($settingModel->getProviderName()) {
-            $result = $this
+            $changed = $this
                 ->providers[$settingModel->getProviderName()]
                 ->delete($settingModel);
-
-            $this->eventDispatcher->dispatch(
-                SettingsManagerEvents::DELETE_SETTING,
-                new SettingChangeEvent($settingModel)
-            );
-
-            return $result;
-        }
-
-        $atleastOne = false;
-
-        foreach ($this->providers as $provider) {
-            if ($provider->delete($settingModel)) {
-                $atleastOne = true;
+        } else {
+            foreach ($this->providers as $provider) {
+                if ($provider->delete($settingModel)) {
+                    $changed = true;
+                }
             }
         }
-        if ($atleastOne) {
+        if ($changed) {
             $this->eventDispatcher->dispatch(
                 SettingsManagerEvents::DELETE_SETTING,
                 new SettingChangeEvent($settingModel)
             );
         }
 
-        return $atleastOne;
+        return $changed;
     }
 
     /**
