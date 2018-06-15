@@ -18,6 +18,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Yaml\Yaml;
@@ -79,6 +80,7 @@ class HelisSettingsManagerExtension extends Extension
     {
         $container
             ->register(SettingsManager::class, SettingsManager::class)
+            ->setArgument('$eventDispatcher', new Reference(EventDispatcherInterface::class))
             ->setPublic(true)
             ->setLazy(true)
             ->addMethodCall('setLogger', [
