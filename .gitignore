@@ -1,5 +1,5 @@
 /vendor
-/tests/var
+/tests/app/var
 /.idea
 /coverage
 composer.lock

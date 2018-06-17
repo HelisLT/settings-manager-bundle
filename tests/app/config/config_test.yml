@@ -40,7 +40,7 @@ doctrine:
             settings_manager_test:
                 type: annotation
                 is_bundle: false
-                dir: "%kernel.root_dir%/Functional/Entity"
+                dir: "%kernel.root_dir%/../src/Functional/Entity"
                 alias: HelisSettingsManagerTestBundle
                 prefix: Helis\SettingsManagerBundle\Tests\Functional
             HelisSettingsManagerBundle:

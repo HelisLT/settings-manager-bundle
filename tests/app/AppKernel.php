@@ -1,7 +1,5 @@
 <?php
 
-namespace Helis\SettingsManagerBundle\Tests;
-
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\HttpKernel\Kernel;
 
@@ -35,12 +33,12 @@ class AppKernel extends Kernel
 
     public function getCacheDir()
     {
-        return dirname(__DIR__).'/tests/var/cache/'.$this->getEnvironment();
+        return dirname(__DIR__).'/app/var/cache/'.$this->getEnvironment();
     }
 
     public function getLogDir()
     {
-        return dirname(__DIR__).'/tests/var/logs';
+        return dirname(__DIR__).'/app/var/logs';
     }
 
     public function registerContainerConfiguration(LoaderInterface $loader)
