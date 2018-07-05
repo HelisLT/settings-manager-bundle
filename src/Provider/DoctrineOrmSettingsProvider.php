@@ -34,7 +34,7 @@ class DoctrineOrmSettingsProvider implements SettingsProviderInterface
 
         $this->settingsEntityClass = $settingsEntityClass;
 
-        if ($this->tagEntityClass !== null) {
+        if ($tagEntityClass !== null) {
             if (!is_subclass_of($tagEntityClass, TagModel::class)) {
                 throw new \UnexpectedValueException(
                     $tagEntityClass . ' is not part of the model ' . TagModel::class
