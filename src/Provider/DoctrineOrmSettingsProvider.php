@@ -127,7 +127,7 @@ class DoctrineOrmSettingsProvider implements SettingsProviderInterface
             $entity->setData($settingModel->getData());
         } else {
             $entity = $settingModel instanceof $this->settingsEntityClass
-                ?: $this->transformModelToEntity($settingModel);
+                ? $settingModel : $this->transformModelToEntity($settingModel);
         }
 
         $this->entityManager->persist($entity);
