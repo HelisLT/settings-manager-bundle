@@ -98,7 +98,11 @@ helis_settings_manager:
               damn: 5
 services:
     _defaults:
-        public: false
+        public: true
+
+    Helis\SettingsManagerBundle\Tests\Functional\DataFixtures\:
+        resource: '%kernel.root_dir%/../src/Functional/DataFixtures/*'
+        tags: [doctrine.fixture.orm]
 
     Helis\SettingsManagerBundle\Provider\DoctrineOrmSettingsProvider:
         arguments:
