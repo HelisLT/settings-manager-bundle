@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Helis\SettingsManagerBundle\Tests\Unit\Provider;
 
 use Helis\SettingsManagerBundle\Model\DomainModel;
+use Helis\SettingsManagerBundle\Model\SettingModel;
 use Helis\SettingsManagerBundle\Provider\CookieSettingsProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Cookie;
@@ -26,7 +27,6 @@ class CookieSettingsProviderTest extends TestCase
         $this->serializer = $this->getMockBuilder(SerializerInterface::class)->getMock();
         $this->symmetricKeyMaterial = 'YELLOW SUBMARINE, BLACK WIZARDRY';
         $this->cookieName = 'Orange';
-
         $this->provider = new CookieSettingsProvider($this->serializer, $this->symmetricKeyMaterial, $this->cookieName);
     }
 
@@ -46,27 +46,21 @@ class CookieSettingsProviderTest extends TestCase
 
     public function testOnKernelResponse()
     {
-        $eventMock = $this
-            ->getMockBuilder(FilterResponseEvent::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $eventMock = $this->createMock(FilterResponseEvent::class);
         $eventMock->expects($this->once())->method('isMasterRequest')->willReturn(true);
         $eventMock->expects($this->exactly(2))->method('getResponse')->willReturn($response = new Response());
         $eventMock->expects($this->never())->method('getRequest');
         
-        $domain = new DomainModel();
-        $domain->setName('woo');
-        $domain->setEnabled(true);
+        $settingStub = $this->createMock(SettingModel::class);
 
         $this
             ->serializer
             ->expects($this->once())
             ->method('serialize')
-            ->with([$domain->getName() => $domain], 'json')
-            ->willReturn('serialized_domains');
+            ->with([$settingStub], 'json')
+            ->willReturn('serialized_settings');
 
-        $this->provider->updateDomain($domain);
+        $this->provider->save($settingStub);
         $this->provider->onKernelResponse($eventMock);
 
         $this->assertCount(1, $cookies = $response->headers->getCookies());
@@ -91,9 +85,13 @@ class CookieSettingsProviderTest extends TestCase
             ->getMock();
 
         $request = new Request([], [], [], [$cookie->getName() => $cookie->getValue()]);
-        $domain = new DomainModel();
-        $domain->setName('woo');
-        $domain->setEnabled(true);
+
+        $domainStub = $this->createMock(DomainModel::class);
+        $domainStub->method('getName')->willReturn('woo');
+        $domainStub->method('isEnabled')->willReturn(true);
+
+        $settingStub = $this->createMock(SettingModel::class);
+        $settingStub->method('getDomain')->willReturn($domainStub);
 
         $eventMock->expects($this->once())->method('isMasterRequest')->willReturn(true);
         $eventMock->expects($this->once())->method('getRequest')->willReturn($request);
@@ -101,14 +99,13 @@ class CookieSettingsProviderTest extends TestCase
             ->serializer
             ->expects($this->once())
             ->method('deserialize')
-            ->with('serialized_domains', DomainModel::class . '[]', 'json')
-            ->willReturn([$domain->getName() => $domain]);
+            ->with('serialized_settings', SettingModel::class . '[]', 'json')
+            ->willReturn([$settingStub]);
 
         $this->provider->onKernelRequest($eventMock);
 
         $this->assertCount(1, $domains = $this->provider->getDomains());
-        $this->assertArrayHasKey('woo', $domains);
-        $this->assertEquals('woo', $domains['woo']->getName());
+        $this->assertEquals('woo', $domains[0]->getName());
     }
 
     public function testOnKernelRequestWithoutCookie()

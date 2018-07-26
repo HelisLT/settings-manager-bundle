@@ -26,7 +26,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Serializer\SerializerInterface;
 
-class CookieSettingsProvider implements SettingsProviderInterface, EventSubscriberInterface, LoggerAwareInterface
+class CookieSettingsProvider extends SimpleSettingsProvider implements EventSubscriberInterface, LoggerAwareInterface
 {
     use LoggerAwareTrait, WritableProviderTrait;
 
@@ -40,7 +40,6 @@ class CookieSettingsProvider implements SettingsProviderInterface, EventSubscrib
     private $footer;
 
     private $changed;
-    private $domains;
 
     public function __construct(
         SerializerInterface $serializer,
@@ -55,55 +54,31 @@ class CookieSettingsProvider implements SettingsProviderInterface, EventSubscrib
         $this->subject = 'cookie_provider';
 
         $this->changed = false;
-        $this->domains = [];
-    }
-
-    public function getSettings(array $domainNames): array
-    {
-        return [];
-    }
-
-    public function getSettingsByName(array $domainNames, array $settingNames): array
-    {
-        return [];
-    }
-
-    public function delete(SettingModel $settingModel): bool
-    {
-        return false;
-    }
-
-    public function getDomains(bool $onlyEnabled = false): array
-    {
-        if ($onlyEnabled) {
-            return array_filter($this->domains, function (DomainModel $model) {
-                return $model->isEnabled();
-            });
-        }
-
-        return $this->domains;
+        parent::__construct([]);
     }
 
     public function save(SettingModel $settingModel): bool
     {
-        $this->domains[$settingModel->getDomain()->getName()] = $settingModel->getDomain();
-        return $this->changed = true;
+        $output = parent::save($settingModel);
+        $output && $this->changed = true;
+
+        return $output;
     }
 
     public function updateDomain(DomainModel $domainModel): bool
     {
-        $this->domains[$domainModel->getName()] = $domainModel;
-        return $this->changed = true;
+        $output = parent::updateDomain($domainModel);
+        $output && $this->changed = true;
+
+        return $output;
     }
 
     public function deleteDomain(string $domainName): bool
     {
-        if (!isset($this->domains[$domainName])) {
-            return false;
-        }
+        $output = parent::deleteDomain($domainName);
+        $output && $this->changed = true;
 
-        unset($this->domains[$domainName]);
-        return $this->changed = true;
+        return $output;
     }
 
     public static function getSubscribedEvents(): array
@@ -143,9 +118,9 @@ class CookieSettingsProvider implements SettingsProviderInterface, EventSubscrib
         }
 
         try {
-            $this->domains = $this
+            $this->settings = $this
                 ->serializer
-                ->deserialize($token->get('dt'), DomainModel::class . '[]', 'json');
+                ->deserialize($token->get('dt'), SettingModel::class . '[]', 'json');
         } catch (PasetoException $e) {
             $this->logger && $this->logger->warning('CookieSettingsProvider: ' . strtolower($e), [
                 'sRawToken' => $rawToken,
@@ -165,7 +140,7 @@ class CookieSettingsProvider implements SettingsProviderInterface, EventSubscrib
         }
 
         // no settings to save
-        if (empty($this->domains)) {
+        if (empty($this->settings)) {
             // also check for a cookie if needs to be cleared
             if ($event->getRequest()->cookies->has($this->cookieName)) {
                 $event->getResponse()->headers->clearCookie($this->cookieName);
@@ -183,7 +158,7 @@ class CookieSettingsProvider implements SettingsProviderInterface, EventSubscrib
             ->setSubject($this->subject)
             ->setExpiration($now->add(new \DateInterval('PT' . $this->ttl . 'S')))
             ->setClaims([
-                'dt' => $this->serializer->serialize($this->domains, 'json')
+                'dt' => $this->serializer->serialize($this->settings, 'json')
             ]);
 
         $this->footer !== null && $token->setFooter($this->footer);
