@@ -91,7 +91,9 @@ class SettingsController extends AbstractController
             throw $this->createAccessDeniedException();
         }
 
-        $form = $this->createForm(SettingFormType::class, $setting);
+        $form = $this->createForm(SettingFormType::class, $setting, [
+            'validation_groups' => ['setting.'.$domainName],
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
