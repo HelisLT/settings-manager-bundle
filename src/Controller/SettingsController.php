@@ -92,7 +92,11 @@ class SettingsController extends AbstractController
         }
 
         $form = $this->createForm(SettingFormType::class, $setting, [
-            'validation_groups' => ['setting.'.$domainName],
+            'validation_groups' => [
+                'Default',
+                'domain.' . $domainName,
+                'setting.' . $settingName,
+            ],
         ]);
         $form->handleRequest($request);
 
