@@ -167,6 +167,29 @@ class AwsSsmSettingsProviderTest extends TestCase
         $settingsProvider->getSettings([DomainModel::DEFAULT_NAME]);
     }
 
+    public function testSave(): void
+    {
+        $settingsProvider = $this->createSettingsProvider([]);
+
+        $setting = (new SettingModel())
+            ->setName('Parameter A Name')
+            ->setData('a_value');
+
+        $this->awsSsmClientMock
+            ->expects($this->once())
+            ->method('putParameter')
+            ->with(
+                [
+                    'Name'      => 'Parameter A Name',
+                    'Overwrite' => true,
+                    'Type'      => 'String',
+                    'Value'     => 'a_value',
+                ]
+            );
+
+        $settingsProvider->save($setting);
+    }
+
     private function createSettingsProvider(array $parameterNames): AwsSsmSettingsProvider
     {
         return new AwsSsmSettingsProvider(
