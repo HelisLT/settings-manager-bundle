@@ -145,6 +145,28 @@ class AwsSsmSettingsProviderTest extends TestCase
         $this->assertSame('b_value', $settings[1]->getData());
     }
 
+    public function testGetSettingsMultipleTimesFetchesOnlyOnce(): void
+    {
+        $settingsProvider = $this->createSettingsProvider([]);
+
+        $awsResult = $this->createConfiguredMock(
+            Result::class,
+            [
+                'get' => [],
+            ]
+        );
+
+        $this->awsSsmClientMock
+            ->expects($this->once())
+            ->method('getParameters')
+            ->willReturnMap([
+                [['Names' => []], $awsResult],
+            ]);
+
+        $settingsProvider->getSettings([DomainModel::DEFAULT_NAME]);
+        $settingsProvider->getSettings([DomainModel::DEFAULT_NAME]);
+    }
+
     private function createSettingsProvider(array $parameterNames): AwsSsmSettingsProvider
     {
         return new AwsSsmSettingsProvider(
