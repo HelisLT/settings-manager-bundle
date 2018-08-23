@@ -157,7 +157,7 @@ class AwsSsmSettingsProviderTest extends TestCase
         );
 
         $this->awsSsmClientMock
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('getParameters')
             ->willReturnMap([
                 [['Names' => []], $awsResult],

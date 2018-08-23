@@ -18,7 +18,6 @@ class AwsSsmSettingsProvider extends SimpleSettingsProvider
     private $ssmClient;
     private $denormalizer;
     private $parameterNames;
-    private $fetched;
 
     public function __construct(SsmClient $ssmClient, DenormalizerInterface $denormalizer, array $parameterNames)
     {
@@ -27,7 +26,6 @@ class AwsSsmSettingsProvider extends SimpleSettingsProvider
         $this->ssmClient = $ssmClient;
         $this->denormalizer = $denormalizer;
         $this->parameterNames = $parameterNames;
-        $this->fetched = false;
     }
 
     public function getSettings(array $domainNames): array
@@ -65,10 +63,6 @@ class AwsSsmSettingsProvider extends SimpleSettingsProvider
 
     private function fetch(): void
     {
-        if ($this->fetched === true) {
-            return;
-        }
-
         $result = $this->ssmClient->getParameters(['Names' => $this->parameterNames]);
         foreach ($result->get('Parameters') as $parameter) {
             $setting = $this->denormalizer->denormalize(
@@ -87,7 +81,5 @@ class AwsSsmSettingsProvider extends SimpleSettingsProvider
             );
             $this->settings[] = $setting;
         }
-
-        $this->fetched = true;
     }
 }
