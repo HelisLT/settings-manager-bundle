@@ -9,23 +9,23 @@ use Helis\SettingsManagerBundle\Model\DomainModel;
 use Helis\SettingsManagerBundle\Model\SettingModel;
 use Helis\SettingsManagerBundle\Model\Type;
 use Helis\SettingsManagerBundle\Provider\Traits\ReadOnlyProviderTrait;
-use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 class AwsSsmSettingsProvider extends SimpleSettingsProvider
 {
     use ReadOnlyProviderTrait;
 
     private $ssmClient;
-    private $serializer;
+    private $denormalizer;
     private $parameterNames;
     private $fetched;
 
-    public function __construct(SsmClient $ssmClient, SerializerInterface $serializer, array $parameterNames)
+    public function __construct(SsmClient $ssmClient, DenormalizerInterface $denormalizer, array $parameterNames)
     {
         parent::__construct([]);
 
         $this->ssmClient = $ssmClient;
-        $this->serializer = $serializer;
+        $this->denormalizer = $denormalizer;
         $this->parameterNames = $parameterNames;
         $this->fetched = false;
     }
@@ -71,7 +71,7 @@ class AwsSsmSettingsProvider extends SimpleSettingsProvider
 
         $result = $this->ssmClient->getParameters(['Names' => $this->parameterNames]);
         foreach ($result->get('Parameters') as $parameter) {
-            $setting = $this->serializer->denormalize(
+            $setting = $this->denormalizer->denormalize(
                 [
                     'name' => $parameter['Name'],
                     'domain' => [

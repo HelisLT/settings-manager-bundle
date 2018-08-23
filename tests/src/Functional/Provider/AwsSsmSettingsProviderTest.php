@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Helis\SettingsManagerBundle\Tests\Unit\Provider;
+namespace Helis\SettingsManagerBundle\Tests\Functional\Provider;
 
 use Aws\Result;
 use Aws\Ssm\SsmClient;
@@ -10,9 +10,14 @@ use Helis\SettingsManagerBundle\Model\DomainModel;
 use Helis\SettingsManagerBundle\Model\SettingModel;
 use Helis\SettingsManagerBundle\Model\Type;
 use Helis\SettingsManagerBundle\Provider\AwsSsmSettingsProvider;
+use Helis\SettingsManagerBundle\Serializer\Normalizer\DomainModelNormalizer;
+use Helis\SettingsManagerBundle\Serializer\Normalizer\SettingModelNormalizer;
+use Helis\SettingsManagerBundle\Serializer\Normalizer\TagModelNormalizer;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
+use Symfony\Component\Serializer\Serializer;
 
 class AwsSsmSettingsProviderTest extends TestCase
 {
@@ -22,14 +27,24 @@ class AwsSsmSettingsProviderTest extends TestCase
     private $awsSsmClientMock;
 
     /**
-     * @var SerializerInterface|MockObject
+     * @var Serializer
      */
-    private $serializerMock;
+    private $serializer;
 
     protected function setUp()
     {
         $this->awsSsmClientMock = $this->createPartialMock(SsmClient::class, ['getParameters', 'putParameter']);
-        $this->serializerMock = $this->createMock(SerializerInterface::class);
+        $this->serializer = new Serializer(
+            [
+                new ArrayDenormalizer(),
+                new SettingModelNormalizer(),
+                new DomainModelNormalizer(),
+                new TagModelNormalizer(),
+            ],
+            [
+                new JsonEncoder(),
+            ]
+        );
     }
 
     public function testGetSettingsWithNoParameters(): void
@@ -92,7 +107,7 @@ class AwsSsmSettingsProviderTest extends TestCase
     {
         return new AwsSsmSettingsProvider(
             $this->awsSsmClientMock,
-            $this->serializerMock,
+            $this->serializer,
             $parameterNames
         );
     }
