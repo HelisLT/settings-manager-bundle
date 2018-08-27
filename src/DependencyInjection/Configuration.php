@@ -60,6 +60,7 @@ class Configuration implements ConfigurationInterface
                     ->scalarPrototype()->end()
                 ->end()
                 ->append($this->getSettingsNode())
+                ->append($this->getListenersNode())
             ->end();
 
         return $treeBuilder;
@@ -135,6 +136,23 @@ class Configuration implements ConfigurationInterface
                 ->end()
             ->end()
         ->end();
+
+        return $node;
+    }
+
+    /**
+     * @return NodeDefinition
+     */
+    private function getListenersNode(): NodeDefinition
+    {
+        $treeBuilder = new TreeBuilder();
+        $node = $treeBuilder->root('listeners');
+        $node
+            ->addDefaultsIfNotSet()
+            ->children()
+                ->arrayNode('controller')->canBeEnabled()->end()
+                ->arrayNode('command')->canBeEnabled()->end()
+            ->end();
 
         return $node;
     }
