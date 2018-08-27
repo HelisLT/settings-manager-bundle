@@ -59,7 +59,7 @@ class DecoratingPredisSettingsProvider implements SettingsProviderInterface
 
         $result = $this->redis->pipeline(function (Pipeline $pipe) use ($domainNames) {
             foreach ($domainNames as $domainName) {
-                $pipe->hgetall($domainName);
+                $pipe->hgetall($this->getNamespacedKey($domainName));
             }
         });
 
@@ -83,7 +83,7 @@ class DecoratingPredisSettingsProvider implements SettingsProviderInterface
         $result = $this->redis->pipeline(
             function (Pipeline $pipe) use ($domainNames, $settingNames) {
                 foreach ($domainNames as $domainName) {
-                    $pipe->hmget($domainName, $settingNames);
+                    $pipe->hmget($this->getNamespacedKey($domainName), $settingNames);
                 }
             }
         );
@@ -119,10 +119,18 @@ class DecoratingPredisSettingsProvider implements SettingsProviderInterface
         if ($newDomain) {
             $pipe = $this->redis->pipeline();
             $pipe->del([$this->getDomainKey(false), $this->getDomainKey(true)]);
-            $pipe->hset($settingModel->getDomain()->getName(), $settingModel->getName(), $serializedSetting);
+            $pipe->hset(
+                $this->getNamespacedKey($settingModel->getDomain()->getName()),
+                $settingModel->getName(),
+                $serializedSetting
+            );
             $pipe->execute();
         } else {
-            $this->redis->hset($settingModel->getDomain()->getName(), $settingModel->getName(), $serializedSetting);
+            $this->redis->hset(
+                $this->getNamespacedKey($settingModel->getDomain()->getName()),
+                $settingModel->getName(),
+                $serializedSetting
+            );
         }
 
         return $output;
@@ -134,7 +142,7 @@ class DecoratingPredisSettingsProvider implements SettingsProviderInterface
 
         if ($output) {
             $pipe = $this->redis->pipeline();
-            $pipe->hdel($settingModel->getDomain()->getName(), [$settingModel->getName()]);
+            $pipe->hdel($this->getNamespacedKey($settingModel->getDomain()->getName()), [$settingModel->getName()]);
             $pipe->del([$this->getDomainKey(false), $this->getDomainKey(true)]);
             $pipe->execute();
         } else {
@@ -182,7 +190,7 @@ class DecoratingPredisSettingsProvider implements SettingsProviderInterface
         $output = $this->decoratingProvider->deleteDomain($domainName);
 
         $this->redis->del([
-            $domainName,
+            $this->getNamespacedKey($domainName),
             $this->getDomainKey(false),
             $this->getDomainKey(true),
         ]);
@@ -225,7 +233,7 @@ class DecoratingPredisSettingsProvider implements SettingsProviderInterface
             $this->redis->pipeline(function (Pipeline $pipe) use ($settings, $key, $isBuilt) {
                 foreach ($settings as $setting) {
                     $pipe->hset(
-                        $setting->getDomain()->getName(),
+                        $this->getNamespacedKey($setting->getDomain()->getName()),
                         $setting->getName(),
                         $this->serializer->serialize($setting, 'json')
                     );
