@@ -8,8 +8,8 @@ use Liip\FunctionalTestBundle\Test\WebTestCase;
 use Helis\SettingsManagerBundle\Model\DomainModel;
 use Helis\SettingsManagerBundle\Provider\SettingsProviderInterface;
 use Helis\SettingsManagerBundle\Settings\SettingsManager;
-use Helis\SettingsManagerBundle\Tests\Functional\DataFixtures\ORM\LoadSettingsData;
-use Helis\SettingsManagerBundle\Tests\Functional\Entity\Setting;
+use App\DataFixtures\ORM\LoadSettingsData;
+use App\Entity\Setting;
 
 class SettingsManagerTest extends WebTestCase
 {

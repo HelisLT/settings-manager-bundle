@@ -31,6 +31,7 @@ class SwitchableCommandSubscriber implements EventSubscriberInterface
         if ($command instanceof SwitchableCommandInterface
             && !$command::isCommandEnabled($this->settingsRouter)
         ) {
+            $event->getOutput()->writeln('Command is disabled');
             $event->disableCommand();
         }
     }

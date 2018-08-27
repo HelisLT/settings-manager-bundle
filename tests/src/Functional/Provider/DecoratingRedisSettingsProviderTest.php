@@ -5,8 +5,8 @@ namespace Helis\SettingsManagerBundle\Tests\Functional\Provider;
 
 use Helis\SettingsManagerBundle\Provider\DecoratingRedisSettingsProvider;
 use Helis\SettingsManagerBundle\Provider\DoctrineOrmSettingsProvider;
-use Helis\SettingsManagerBundle\Tests\Functional\Entity\Setting;
-use Helis\SettingsManagerBundle\Tests\Functional\Entity\Tag;
+use App\Entity\Setting;
+use App\Entity\Tag;
 
 class RedisDoctrineOrmSettingsProviderTest extends DecoratingPredisSettingsProviderTest
 {

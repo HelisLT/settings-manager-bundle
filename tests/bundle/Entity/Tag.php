@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Helis\SettingsManagerBundle\Tests\Functional\Entity;
+namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Helis\SettingsManagerBundle\Model\TagModel;

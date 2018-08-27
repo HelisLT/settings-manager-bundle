@@ -1,14 +1,14 @@
 <?php
 declare(strict_types=1);
 
-namespace Helis\SettingsManagerBundle\Tests\Functional\DataFixtures\ORM;
+namespace App\DataFixtures\ORM;
 
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\Persistence\ObjectManager;
 use Helis\SettingsManagerBundle\Model\DomainModel;
 use Helis\SettingsManagerBundle\Model\Type;
-use Helis\SettingsManagerBundle\Tests\Functional\Entity\Setting;
-use Helis\SettingsManagerBundle\Tests\Functional\Entity\Tag;
+use App\Entity\Setting;
+use App\Entity\Tag;
 
 class LoadSettingsData extends Fixture
 {
