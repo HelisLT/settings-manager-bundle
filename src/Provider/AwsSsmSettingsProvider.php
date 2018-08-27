@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Helis\SettingsManagerBundle\Provider;
 
 use Aws\Ssm\SsmClient;
+use Helis\SettingsManagerBundle\Exception\ReadOnlyProviderException;
 use Helis\SettingsManagerBundle\Model\DomainModel;
 use Helis\SettingsManagerBundle\Model\SettingModel;
 use Helis\SettingsManagerBundle\Model\Type;
@@ -51,6 +52,10 @@ class AwsSsmSettingsProvider extends SimpleSettingsProvider
 
     public function save(SettingModel $settingModel): bool
     {
+        if (!in_array($settingModel->getName(), $this->parameterNames)) {
+            throw new ReadOnlyProviderException(get_class($this));
+        }
+
         $this->ssmClient->putParameter([
             'Name' => $settingModel->getName(),
             'Overwrite' => true,

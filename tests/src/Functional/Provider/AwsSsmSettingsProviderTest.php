@@ -6,6 +6,7 @@ namespace Helis\SettingsManagerBundle\Tests\Functional\Provider;
 
 use Aws\Result;
 use Aws\Ssm\SsmClient;
+use Helis\SettingsManagerBundle\Exception\ReadOnlyProviderException;
 use Helis\SettingsManagerBundle\Model\DomainModel;
 use Helis\SettingsManagerBundle\Model\SettingModel;
 use Helis\SettingsManagerBundle\Model\Type;
@@ -169,7 +170,7 @@ class AwsSsmSettingsProviderTest extends TestCase
 
     public function testSave(): void
     {
-        $settingsProvider = $this->createSettingsProvider([]);
+        $settingsProvider = $this->createSettingsProvider(['Parameter A Name']);
 
         $setting = (new SettingModel())
             ->setName('Parameter A Name')
@@ -186,6 +187,24 @@ class AwsSsmSettingsProviderTest extends TestCase
                     'Value'     => 'a_value',
                 ]
             );
+
+        $settingsProvider->save($setting);
+    }
+
+    public function testInvalidSave(): void
+    {
+        $this->expectException(ReadOnlyProviderException::class);
+        $this->expectExceptionMessage('Helis\SettingsManagerBundle\Provider\AwsSsmSettingsProvider setting provider is read only');
+
+        $settingsProvider = $this->createSettingsProvider(['Parameter A Name']);
+
+        $setting = (new SettingModel())
+            ->setName('Invalid parameter A Name')
+            ->setData('a_value');
+
+        $this->awsSsmClientMock
+            ->expects($this->never())
+            ->method('putParameter');
 
         $settingsProvider->save($setting);
     }
