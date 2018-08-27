@@ -108,6 +108,10 @@ services:
         resource: '%kernel.root_dir%/../bundle/Command/*'
         tags: [console.command]
 
+    App\Controller\:
+        resource: '%kernel.root_dir%/../bundle/Controller/*'
+        tags: [controller.service_arguments]
+
     Helis\SettingsManagerBundle\Provider\DoctrineOrmSettingsProvider:
         arguments:
             $entityManager: '@doctrine.orm.default_entity_manager'
