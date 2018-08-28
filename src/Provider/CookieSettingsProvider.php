@@ -33,6 +33,8 @@ class CookieSettingsProvider extends SimpleSettingsProvider implements EventSubs
     private $serializer;
     private $symmetricKeyMaterial;
     private $cookieName;
+    private $cookiePath;
+    private $cookieDomain;
     private $symmetricKey;
     private $ttl;
     private $issuer;
@@ -44,7 +46,9 @@ class CookieSettingsProvider extends SimpleSettingsProvider implements EventSubs
     public function __construct(
         SerializerInterface $serializer,
         string $symmetricKeyMaterial = 'GuxH2igWOvGBSk3cpeL300Fzv9JiAtvC',
-        string $cookieName = 'stn'
+        string $cookieName = 'stn',
+        string $cookiePath = '/',
+        ?string $cookieDomain = null
     ) {
         $this->serializer = $serializer;
         $this->symmetricKeyMaterial = $symmetricKeyMaterial;
@@ -52,6 +56,8 @@ class CookieSettingsProvider extends SimpleSettingsProvider implements EventSubs
         $this->ttl = 86400;
         $this->issuer = 'settings_manager';
         $this->subject = 'cookie_provider';
+        $this->cookieDomain = $cookieDomain;
+        $this->cookiePath = $cookiePath;
 
         $this->changed = false;
         parent::__construct([]);
@@ -166,7 +172,7 @@ class CookieSettingsProvider extends SimpleSettingsProvider implements EventSubs
         $event
             ->getResponse()
             ->headers
-            ->setCookie(new Cookie($this->cookieName, (string) $token, time() + $this->ttl));
+            ->setCookie(new Cookie($this->cookieName, (string) $token, time() + $this->ttl, $this->cookiePath, $this->cookieDomain));
     }
 
     public function setTtl(int $ttl): void
