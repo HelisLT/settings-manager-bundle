@@ -7,7 +7,7 @@ namespace Helis\SettingsManagerBundle\Tests\Functional\Settings;
 use Helis\SettingsManagerBundle\Provider\SettingsProviderInterface;
 use Helis\SettingsManagerBundle\Settings\ProvidersManager;
 use Helis\SettingsManagerBundle\Settings\SettingsManager;
-use Helis\SettingsManagerBundle\Tests\Functional\Entity\Setting;
+use App\Entity\Setting;
 use Liip\FunctionalTestBundle\Test\WebTestCase;
 
 class ProvidersManagerTest extends WebTestCase

@@ -12,6 +12,8 @@ use Helis\SettingsManagerBundle\Settings\SettingsAccessControl;
 use Helis\SettingsManagerBundle\Settings\SettingsManager;
 use Helis\SettingsManagerBundle\Settings\SettingsRouter;
 use Helis\SettingsManagerBundle\Settings\SettingsStore;
+use Helis\SettingsManagerBundle\Subscriber\SwitchableCommandSubscriber;
+use Helis\SettingsManagerBundle\Subscriber\SwitchableControllerSubscriber;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -55,6 +57,7 @@ class HelisSettingsManagerExtension extends Extension
         $this->loadSettingsManager($config, $container);
         $this->loadSettingsRouter($config, $container);
         $this->loadSimpleProvider($config, $container);
+        $this->loadListeners($config['listeners'], $container);
     }
 
     public function loadSettingsRouter(array $config, ContainerBuilder $container): void
@@ -167,5 +170,24 @@ class HelisSettingsManagerExtension extends Extension
                 'id' => 'settings_manager.settings_collector',
                 'template' => '@HelisSettingsManager/profiler/profiler.html.twig',
             ]);
+    }
+
+    private function loadListeners(array $config, ContainerBuilder $container): void
+    {
+        if ($config['controller']['enabled']) {
+            $container
+                ->register(SwitchableControllerSubscriber::class, SwitchableControllerSubscriber::class)
+                ->setArgument('$settingsRouter', new Reference(SettingsRouter::class))
+                ->setPublic(false)
+                ->addTag('kernel.event_subscriber');
+        }
+
+        if ($config['command']['enabled']) {
+            $container
+                ->register(SwitchableCommandSubscriber::class, SwitchableCommandSubscriber::class)
+                ->setArgument('$settingsRouter', new Reference(SettingsRouter::class))
+                ->setPublic(false)
+                ->addTag('kernel.event_subscriber');
+        }
     }
 }

@@ -11,9 +11,9 @@ use Helis\SettingsManagerBundle\Model\DomainModel;
 use Helis\SettingsManagerBundle\Model\SettingModel;
 use Helis\SettingsManagerBundle\Model\Type;
 use Helis\SettingsManagerBundle\Provider\DecoratingPredisSettingsProvider;
-use Helis\SettingsManagerBundle\Tests\Functional\DataFixtures\ORM\LoadSettingsData;
-use Helis\SettingsManagerBundle\Tests\Functional\Entity\Setting;
-use Helis\SettingsManagerBundle\Tests\Functional\Entity\Tag;
+use App\DataFixtures\ORM\LoadSettingsData;
+use App\Entity\Setting;
+use App\Entity\Tag;
 use Symfony\Component\Stopwatch\Stopwatch;
 
 class DecoratingPredisSettingsProviderTest extends WebTestCase

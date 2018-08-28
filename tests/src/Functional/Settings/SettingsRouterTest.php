@@ -7,7 +7,7 @@ use Liip\FunctionalTestBundle\Test\WebTestCase;
 use Helis\SettingsManagerBundle\Model\Type;
 use Helis\SettingsManagerBundle\Settings\SettingsManager;
 use Helis\SettingsManagerBundle\Settings\SettingsRouter;
-use Helis\SettingsManagerBundle\Tests\Functional\DataFixtures\ORM\LoadSettingsData;
+use App\DataFixtures\ORM\LoadSettingsData;
 
 class SettingsRouterTest extends WebTestCase
 {

@@ -37,12 +37,9 @@ doctrine:
         naming_strategy: doctrine.orm.naming_strategy.underscore
         auto_mapping: true
         mappings:
-            settings_manager_test:
+            AppBundle:
                 type: annotation
-                is_bundle: false
-                dir: "%kernel.root_dir%/../src/Functional/Entity"
-                alias: HelisSettingsManagerTestBundle
-                prefix: Helis\SettingsManagerBundle\Tests\Functional
+                is_bundle: true
             HelisSettingsManagerBundle:
                 type: yml
                 is_bundle: true
@@ -59,6 +56,9 @@ helis_settings_manager:
     logger:
         enabled: true
         service_id: monolog.logger.settings
+    listeners:
+        command: true
+        controller: true
     settings_files:
         - '%kernel.root_dir%/config/extra_settings.yml'
     settings:
@@ -100,15 +100,23 @@ services:
     _defaults:
         public: true
 
-    Helis\SettingsManagerBundle\Tests\Functional\DataFixtures\:
-        resource: '%kernel.root_dir%/../src/Functional/DataFixtures/*'
+    App\DataFixtures\:
+        resource: '%kernel.root_dir%/../bundle/DataFixtures/*'
         tags: [doctrine.fixture.orm]
+
+    App\Command\:
+        resource: '%kernel.root_dir%/../bundle/Command/*'
+        tags: [console.command]
+
+    App\Controller\:
+        resource: '%kernel.root_dir%/../bundle/Controller/*'
+        tags: [controller.service_arguments]
 
     Helis\SettingsManagerBundle\Provider\DoctrineOrmSettingsProvider:
         arguments:
             $entityManager: '@doctrine.orm.default_entity_manager'
-            $settingsEntityClass: 'Helis\SettingsManagerBundle\Tests\Functional\Entity\Setting'
-            $tagEntityClass: 'Helis\SettingsManagerBundle\Tests\Functional\Entity\Tag'
+            $settingsEntityClass: 'App\Entity\Setting'
+            $tagEntityClass: 'App\Entity\Tag'
         tags:
             - { name: settings_manager.provider, provider: orm, priority: 20 }
 

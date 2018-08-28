@@ -16,7 +16,8 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Helis\\SettingsManagerBundle\\Tests\\": "tests/src/"
+            "Helis\\SettingsManagerBundle\\Tests\\": "tests/src/",
+            "App\\": "tests/bundle/"
         },
         "classmap": ["tests/app/AppKernel.php"]
     },

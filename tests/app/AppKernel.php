@@ -1,6 +1,8 @@
 <?php
 
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\Loader\LoaderInterface;
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\HttpKernel\Kernel;
 
 class AppKernel extends Kernel
@@ -23,6 +25,7 @@ class AppKernel extends Kernel
             // for testing
             new \Doctrine\Bundle\FixturesBundle\DoctrineFixturesBundle(),
             new \Liip\FunctionalTestBundle\LiipFunctionalTestBundle(),
+            new \App\AppBundle(),
         ];
     }
 
@@ -44,5 +47,33 @@ class AppKernel extends Kernel
     public function registerContainerConfiguration(LoaderInterface $loader)
     {
         $loader->load($this->getRootDir().'/config/config_'.$this->getEnvironment().'.yml');
+    }
+
+    protected function build(ContainerBuilder $container)
+    {
+        parent::build($container);
+
+        $container->addCompilerPass(new class implements CompilerPassInterface {
+            public function process(ContainerBuilder $container)
+            {
+                foreach ($container->getDefinitions() as $id => $definition) {
+                    if ($this->supports($id)) {
+                        $definition->setPublic(true);
+                    }
+                }
+
+                foreach ($container->getAliases() as $id => $alias) {
+                    if ($this->supports($id)) {
+                        $alias->setPublic(true);
+                    }
+                }
+            }
+
+            private function supports(string $id): bool
+            {
+                return strpos($id, 'settings_manager.') === 0
+                    || strpos($id, 'Helis\SettingsManagerBundle') === 0;
+            }
+        });
     }
 }

@@ -32,6 +32,7 @@ class ConfigurationTest extends TestCase
                     'settings' => [],
                     'profiler' => ['enabled' => false],
                     'logger' => ['enabled' => false, 'service_id' => null],
+                    'listeners' => ['controller' => ['enabled' => false], 'command' => ['enabled' => false]],
                 ],
             ],
             // case 1: settings files
@@ -56,6 +57,7 @@ class ConfigurationTest extends TestCase
                     'settings' => [],
                     'profiler' => ['enabled' => false],
                     'logger' => ['enabled' => false, 'service_id' => null],
+                    'listeners' => ['controller' => ['enabled' => false], 'command' => ['enabled' => false]],
                 ],
             ],
             // case 3: settings files, settings
@@ -151,6 +153,7 @@ class ConfigurationTest extends TestCase
                     ],
                     'profiler' => ['enabled' => false],
                     'logger' => ['enabled' => false, 'service_id' => null],
+                    'listeners' => ['controller' => ['enabled' => false], 'command' => ['enabled' => false]],
                 ],
             ],
         ];
