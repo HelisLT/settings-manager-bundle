@@ -46,9 +46,7 @@ class CookieSettingsProvider extends SimpleSettingsProvider implements EventSubs
     public function __construct(
         SerializerInterface $serializer,
         string $symmetricKeyMaterial = 'GuxH2igWOvGBSk3cpeL300Fzv9JiAtvC',
-        string $cookieName = 'stn',
-        string $cookiePath = '/',
-        ?string $cookieDomain = null
+        string $cookieName = 'stn'
     ) {
         $this->serializer = $serializer;
         $this->symmetricKeyMaterial = $symmetricKeyMaterial;
@@ -56,8 +54,7 @@ class CookieSettingsProvider extends SimpleSettingsProvider implements EventSubs
         $this->ttl = 86400;
         $this->issuer = 'settings_manager';
         $this->subject = 'cookie_provider';
-        $this->cookieDomain = $cookieDomain;
-        $this->cookiePath = $cookiePath;
+        $this->cookiePath = '/';
 
         $this->changed = false;
         parent::__construct([]);
@@ -202,5 +199,15 @@ class CookieSettingsProvider extends SimpleSettingsProvider implements EventSubs
         }
 
         return $this->symmetricKey;
+    }
+
+    public function setCookiePath(string $cookiePath): void
+    {
+        $this->cookiePath = $cookiePath;
+    }
+
+    public function setCookieDomain(?string $cookieDomain): void
+    {
+        $this->cookieDomain = $cookieDomain;
     }
 }
