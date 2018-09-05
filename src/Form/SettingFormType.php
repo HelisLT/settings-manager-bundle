@@ -91,6 +91,7 @@ class SettingFormType extends AbstractType
                     ->add('data', TextType::class, [
                         'translation_domain' => 'HelisSettingsManager',
                         'label' => 'edit.form.value',
+                        'required' => false,
                     ]);
             }
         });
