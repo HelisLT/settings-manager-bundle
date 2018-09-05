@@ -1,6 +1,9 @@
 Helis\SettingsManagerBundle\Model\SettingModel:
     constraints:
         - Helis\SettingsManagerBundle\Validator\Constraints\UniqueSettingDomain: { groups: [duplication] }
+    getters:
+        data:
+            - NotNull: { message: 'Setting value cannot be null', groups: [Default] }
     properties:
         name:
             - NotBlank: { message: 'Setting name should not be blank', groups: [Default] }
