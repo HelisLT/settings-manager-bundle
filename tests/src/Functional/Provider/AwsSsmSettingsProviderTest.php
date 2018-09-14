@@ -106,12 +106,14 @@ class AwsSsmSettingsProviderTest extends TestCase
 
     public function testGetSettingsWithMultipleParameters(): void
     {
-        $settingsProvider = $this->createSettingsProvider(['parameter_a', 'parameter_b']);
+        $settingsProvider = $this->createSettingsProvider(['parameter_a', 'parameter_b', 'parameter_c']);
 
+        $valueD = ['parameter_d_1', 'parameter_d_2', 'parameter_d_3'];
         $awsResult = $this->createConfiguredMock(
             Result::class,
             [
                 'get' => [
+                    // Not json encoded, bc compatiblity
                     [
                         'Name'  => 'Parameter A Name',
                         'Value' => 'a_value',
@@ -120,6 +122,15 @@ class AwsSsmSettingsProviderTest extends TestCase
                         'Name'  => 'Parameter B Name',
                         'Value' => 'b_value',
                     ],
+                    // Serialized values
+                    [
+                        'Name'  => 'Parameter C Name',
+                        'Value' => '"c_value"',
+                    ],
+                    [
+                        'Name'  => 'Parameter D Name',
+                        'Value' => json_encode($valueD),
+                    ],
                 ],
             ]
         );
@@ -127,13 +138,13 @@ class AwsSsmSettingsProviderTest extends TestCase
         $this->awsSsmClientMock
             ->method('getParameters')
             ->willReturnMap([
-                [['Names' => ['parameter_a', 'parameter_b']], $awsResult],
+                [['Names' => ['parameter_a', 'parameter_b', 'parameter_c']], $awsResult],
             ]);
 
         /** @var SettingModel[] $settings */
         $settings = $settingsProvider->getSettings([DomainModel::DEFAULT_NAME]);
 
-        $this->assertCount(2, $settings);
+        $this->assertCount(4, $settings);
 
         $this->assertSame('Parameter A Name', $settings[0]->getName());
         $this->assertSame(DomainModel::DEFAULT_NAME, $settings[0]->getDomain()->getName());
@@ -144,6 +155,16 @@ class AwsSsmSettingsProviderTest extends TestCase
         $this->assertSame(DomainModel::DEFAULT_NAME, $settings[1]->getDomain()->getName());
         $this->assertSame(Type::STRING, $settings[1]->getType()->getValue());
         $this->assertSame('b_value', $settings[1]->getData());
+
+        $this->assertSame('Parameter C Name', $settings[2]->getName());
+        $this->assertSame(DomainModel::DEFAULT_NAME, $settings[2]->getDomain()->getName());
+        $this->assertSame(Type::STRING, $settings[2]->getType()->getValue());
+        $this->assertSame('c_value', $settings[2]->getData());
+
+        $this->assertSame('Parameter D Name', $settings[3]->getName());
+        $this->assertSame(DomainModel::DEFAULT_NAME, $settings[3]->getDomain()->getName());
+        $this->assertSame(Type::YAML, $settings[3]->getType()->getValue());
+        $this->assertSame($valueD, $settings[3]->getData());
     }
 
     public function testGetSettingsMultipleTimesFetchesOnlyOnce(): void
@@ -184,7 +205,7 @@ class AwsSsmSettingsProviderTest extends TestCase
                     'Name'      => 'Parameter A Name',
                     'Overwrite' => true,
                     'Type'      => 'String',
-                    'Value'     => 'a_value',
+                    'Value'     => '"a_value"',
                 ]
             );
 

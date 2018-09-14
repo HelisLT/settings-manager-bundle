@@ -6,6 +6,7 @@ namespace Helis\SettingsManagerBundle\Provider;
 
 use Aws\Ssm\SsmClient;
 use Helis\SettingsManagerBundle\Exception\ReadOnlyProviderException;
+use Helis\SettingsManagerBundle\Exception\UnknownTypeException;
 use Helis\SettingsManagerBundle\Model\DomainModel;
 use Helis\SettingsManagerBundle\Model\SettingModel;
 use Helis\SettingsManagerBundle\Model\Type;
@@ -14,6 +15,14 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 class AwsSsmSettingsProvider extends SimpleSettingsProvider
 {
+    private const TYPE_MAP = [
+        'double' => Type::FLOAT,
+        'boolean' => Type::BOOL,
+        'array' => Type::YAML,
+        'integer' => Type::INT,
+        'string' => Type::STRING,
+    ];
+
     use ReadOnlyProviderTrait;
 
     private $ssmClient;
@@ -60,7 +69,7 @@ class AwsSsmSettingsProvider extends SimpleSettingsProvider
             'Name' => $settingModel->getName(),
             'Overwrite' => true,
             'Type' => 'String',
-            'Value' => $settingModel->getData(),
+            'Value' => json_encode($settingModel->getData()),
         ]);
 
         return parent::save($settingModel);
@@ -70,6 +79,11 @@ class AwsSsmSettingsProvider extends SimpleSettingsProvider
     {
         $result = $this->ssmClient->getParameters(['Names' => $this->parameterNames]);
         foreach ($result->get('Parameters') as $parameter) {
+            $value = @json_decode($parameter['Value'], true);
+            if ($value === null) {
+                $value = $parameter['Value'];
+            }
+
             $setting = $this->denormalizer->denormalize(
                 [
                     'name' => $parameter['Name'],
@@ -77,14 +91,25 @@ class AwsSsmSettingsProvider extends SimpleSettingsProvider
                         'name' => DomainModel::DEFAULT_NAME,
                         'enabled' => true,
                     ],
-                    'type' => Type::STRING,
+                    'type' => $this->resolveType($value),
                     'data' => [
-                        'value' => $parameter['Value'],
+                        'value' => $value,
                     ],
                 ],
                 SettingModel::class
             );
             $this->settings[] = $setting;
         }
+    }
+
+    private function resolveType($value): string
+    {
+        $type = gettype($value);
+
+        if (isset(self::TYPE_MAP[$type])) {
+            return self::TYPE_MAP[$type];
+        }
+
+        throw new UnknownTypeException($type);
     }
 }
