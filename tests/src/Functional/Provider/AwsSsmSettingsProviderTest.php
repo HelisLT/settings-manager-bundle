@@ -106,9 +106,8 @@ class AwsSsmSettingsProviderTest extends TestCase
 
     public function testGetSettingsWithMultipleParameters(): void
     {
-        $settingsProvider = $this->createSettingsProvider(['parameter_a', 'parameter_b', 'parameter_c']);
+        $settingsProvider = $this->createSettingsProvider(['parameter_a', 'parameter_b', 'parameter_c', 'parameter_d']);
 
-        $valueD = ['parameter_d_1', 'parameter_d_2', 'parameter_d_3'];
         $awsResult = $this->createConfiguredMock(
             Result::class,
             [
@@ -129,7 +128,7 @@ class AwsSsmSettingsProviderTest extends TestCase
                     ],
                     [
                         'Name'  => 'Parameter D Name',
-                        'Value' => json_encode($valueD),
+                        'Value' => '["parameter_d_1","parameter_d_2","parameter_d_3"]',
                     ],
                 ],
             ]
@@ -138,7 +137,7 @@ class AwsSsmSettingsProviderTest extends TestCase
         $this->awsSsmClientMock
             ->method('getParameters')
             ->willReturnMap([
-                [['Names' => ['parameter_a', 'parameter_b', 'parameter_c']], $awsResult],
+                [['Names' => ['parameter_a', 'parameter_b', 'parameter_c', 'parameter_d']], $awsResult],
             ]);
 
         /** @var SettingModel[] $settings */
@@ -164,7 +163,7 @@ class AwsSsmSettingsProviderTest extends TestCase
         $this->assertSame('Parameter D Name', $settings[3]->getName());
         $this->assertSame(DomainModel::DEFAULT_NAME, $settings[3]->getDomain()->getName());
         $this->assertSame(Type::YAML, $settings[3]->getType()->getValue());
-        $this->assertSame($valueD, $settings[3]->getData());
+        $this->assertSame(['parameter_d_1', 'parameter_d_2', 'parameter_d_3'], $settings[3]->getData());
     }
 
     public function testGetSettingsMultipleTimesFetchesOnlyOnce(): void
