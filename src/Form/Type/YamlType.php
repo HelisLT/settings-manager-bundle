@@ -14,11 +14,20 @@ class YamlType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addModelTransformer(new CallbackTransformer(
-            function (array $array) {
-                return json_encode($array);
+            function ($array) {
+                return $array !== null ? json_encode($array) : $array;
             },
-            function (string $json) {
-                return json_decode($json, true);
+            function ($json) {
+                if ($json === null) {
+                    return [];
+                }
+
+                $array = json_decode($json, true);
+                if (json_last_error() !== JSON_ERROR_NONE || !is_array($array)) {
+                    $array = [$array ?? $json];
+                }
+
+                return $array;
             }
         ));
     }
