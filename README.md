@@ -195,7 +195,7 @@ setting_provider_factory.foo:
 
 ### DoctrineORM settings provider
 
-`Helis\SettingsManagerBundle\Provider\AwsSsmSettingsProvider`
+`Helis\SettingsManagerBundle\Provider\DoctrineOrmSettingsProvider`
 
 This is a provider which reads and saves settings using `EntityManagerInterface`.
 
