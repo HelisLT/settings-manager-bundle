@@ -108,7 +108,7 @@ If you dont want to inject `SettingsRouter` or wish for a cleaner service, servi
 ```yaml
 AppBundle\Service\AmazingService:
     tags:
-        - { name: settings.setting_aware, setting: foo, method: setEnabled }
+        - { name: settings_manager.setting_aware, setting: foo, method: setEnabled }
 ```
 
 ## Models
