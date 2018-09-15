@@ -1,5 +1,6 @@
 Helis\SettingsManagerBundle\Model\SettingModel:
     constraints:
+        - Helis\SettingsManagerBundle\Validator\Constraints\SettingType: { groups: [Default] }
         - Helis\SettingsManagerBundle\Validator\Constraints\UniqueSettingDomain: { groups: [duplication] }
     getters:
         data:
