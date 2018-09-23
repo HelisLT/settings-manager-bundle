@@ -7,10 +7,11 @@ use Helis\SettingsManagerBundle\Provider\DecoratingRedisSettingsProvider;
 use Helis\SettingsManagerBundle\Provider\DoctrineOrmSettingsProvider;
 use App\Entity\Setting;
 use App\Entity\Tag;
+use Helis\SettingsManagerBundle\Provider\SettingsProviderInterface;
 
 class RedisDoctrineOrmSettingsProviderTest extends DecoratingPredisSettingsProviderTest
 {
-    protected function setUp()
+    protected function createProvider(): SettingsProviderInterface
     {
         if (!extension_loaded('redis')) {
             $this->markTestSkipped('phpredis extension required');
@@ -24,7 +25,7 @@ class RedisDoctrineOrmSettingsProviderTest extends DecoratingPredisSettingsProvi
 
         $container = $this->getContainer();
 
-        $this->provider = new DecoratingRedisSettingsProvider(
+        return new DecoratingRedisSettingsProvider(
             new DoctrineOrmSettingsProvider(
                 $container->get('doctrine.orm.default_entity_manager'),
                 Setting::class,
