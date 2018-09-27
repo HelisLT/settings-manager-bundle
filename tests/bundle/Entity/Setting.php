@@ -27,7 +27,7 @@ class Setting extends SettingModel
     /**
      * @var ArrayCollection|Tag[]
      *
-     * @ORM\ManyToMany(targetEntity="Tag")
+     * @ORM\ManyToMany(targetEntity="Tag", cascade={"persist"}, fetch="EAGER")
      * @ORM\JoinTable(name="settings_test_setting__tag",
      *      joinColumns={@ORM\JoinColumn(name="setting_id", referencedColumnName="id")},
      *      inverseJoinColumns={@ORM\JoinColumn(name="tag_id", referencedColumnName="id")}

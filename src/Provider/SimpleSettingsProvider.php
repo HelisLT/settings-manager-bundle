@@ -17,7 +17,7 @@ class SimpleSettingsProvider implements SettingsProviderInterface
     /**
      * @param SettingModel[] $settings
      */
-    public function __construct(array $settings)
+    public function __construct(array $settings = [])
     {
         $this->settings = $settings;
     }

@@ -126,8 +126,7 @@ class DoctrineOrmSettingsProvider implements SettingsProviderInterface
         if ($entity !== null) {
             $entity->setData($settingModel->getData());
         } else {
-            $entity = $settingModel instanceof $this->settingsEntityClass
-                ? $settingModel : $this->transformModelToEntity($settingModel);
+            $entity = $this->transformModelToEntity($settingModel);
         }
 
         $this->entityManager->persist($entity);
@@ -200,47 +199,61 @@ class DoctrineOrmSettingsProvider implements SettingsProviderInterface
     {
         // transform setting
 
-        /** @var SettingModel $entity */
-        $entity = new $this->settingsEntityClass();
-        $entity
-            ->setName($model->getName())
-            ->setType($model->getType())
-            ->setDescription($model->getDescription())
-            ->setDataValue($model->getDataValue())
-            ->setDomain($model->getDomain());
+        if (!$model instanceof $this->settingsEntityClass) {
+            /** @var SettingModel $entity */
+            $entity = new $this->settingsEntityClass();
+            $entity
+                ->setName($model->getName())
+                ->setType($model->getType())
+                ->setDescription($model->getDescription())
+                ->setDataValue($model->getDataValue())
+                ->setDomain($model->getDomain());
+
+            $entity->setTags($model->getTags());
+            $model = $entity;
+        }
 
         // transform tags
 
         if ($this->tagEntityClass && $model->getTags()->count() > 0) {
-            $tagNamesToFetch = $model->getTags()->map(function (TagModel $model) {
-                return $model->getName();
-            })->toArray();
+            $knownTags = [];
+            $tagNamesToFetch = [];
 
-            /** @var TagModel[] $fetchedTags */
-            $fetchedTags = $this
-                ->entityManager
-                ->getRepository($this->tagEntityClass)
-                ->findBy(['name' => $tagNamesToFetch]);
-            if (count($fetchedTags) < count($tagNamesToFetch)) {
-                $fetchedTagNames = [];
-                foreach ($fetchedTags as $fetchedTag) {
-                    $fetchedTagNames[] = $fetchedTag->getName();
-                }
-
-                foreach (array_diff($tagNamesToFetch, $fetchedTagNames) as $newTagName) {
-                    /** @var TagModel $newTag */
-                    $newTag = new $this->tagEntityClass();
-                    $newTag->setName($newTagName);
-                    $fetchedTags[] = $newTag;
+            foreach ($model->getTags() as $tag) {
+                if ($this->entityManager->contains($tag)) {
+                    $knownTags[] = $tag;
+                } else {
+                    $tagNamesToFetch[] = $tag->getName();
                 }
             }
 
-            foreach ($fetchedTags as $fetchedTag) {
-                $this->entityManager->persist($fetchedTag);
+            if (count($tagNamesToFetch) > 0) {
+                /** @var TagModel[] $fetchedTags */
+                $fetchedTags = $this
+                    ->entityManager
+                    ->getRepository($this->tagEntityClass)
+                    ->findBy(['name' => $tagNamesToFetch]);
+
+                if (count($fetchedTags) !== count($tagNamesToFetch)) {
+                    $fetchedTagNames = [];
+                    foreach ($fetchedTags as $fetchedTag) {
+                        $fetchedTagNames[] = $fetchedTag->getName();
+                    }
+
+                    foreach (array_diff($tagNamesToFetch, $fetchedTagNames) as $newTagName) {
+                        /** @var TagModel $newTag */
+                        $newTag = new $this->tagEntityClass();
+                        $newTag->setName($newTagName);
+                        $fetchedTags[] = $newTag;
+                    }
+                }
+
+                $knownTags = array_merge($knownTags, $fetchedTags);
             }
-            $entity->setTags(new ArrayCollection($fetchedTags));
+
+            $model->setTags(new ArrayCollection($knownTags));
         }
 
-        return $entity;
+        return $model;
     }
 }
