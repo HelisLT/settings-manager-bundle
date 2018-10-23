@@ -152,13 +152,15 @@ class DecoratingPredisSettingsProvider implements SettingsProviderInterface
         return $output;
     }
 
-    public function getDomains(bool $onlyEnabled = false): array
+    public function getDomains(bool $onlyEnabled = false, bool $invalidate = false): array
     {
         $key = $this->getDomainKey($onlyEnabled);
-        $domains = $this->redis->get($key);
+        if (!$invalidate) {
+            $cachedDomains = $this->redis->get($key);
 
-        if ($domains) {
-            return $this->serializer->deserialize($domains, DomainModel::class . '[]', 'json');
+            if ($cachedDomains) {
+                return $this->serializer->deserialize($cachedDomains, DomainModel::class . '[]', 'json');
+            }
         }
 
         $domains = $this->decoratingProvider->getDomains($onlyEnabled);

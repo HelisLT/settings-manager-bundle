@@ -75,7 +75,7 @@ class DoctrineOrmSettingsProvider implements SettingsProviderInterface
         return $qb->getQuery()->getResult();
     }
 
-    public function getDomains(bool $onlyEnabled = false): array
+    public function getDomains(bool $onlyEnabled = false, bool $invalidate = false): array
     {
         $qb = $this->entityManager->createQueryBuilder();
         $qb
@@ -148,7 +148,7 @@ class DoctrineOrmSettingsProvider implements SettingsProviderInterface
                 'dname' => $settingModel->getDomain()->getName(),
             ]);
 
-        $success = ((int) $qb->getQuery()->getSingleScalarResult()) > 0;
+        $success = ((int)$qb->getQuery()->getSingleScalarResult()) > 0;
 
         if ($success) {
             $this->entityManager->clear($this->settingsEntityClass);
@@ -169,7 +169,7 @@ class DoctrineOrmSettingsProvider implements SettingsProviderInterface
             ->setParameter('priority', $domainModel->getPriority())
             ->setParameter('dname', $domainModel->getName());
 
-        $success = ((int) $qb->getQuery()->getSingleScalarResult()) > 0;
+        $success = ((int)$qb->getQuery()->getSingleScalarResult()) > 0;
 
         if ($success) {
             $this->entityManager->clear($this->settingsEntityClass);
@@ -186,7 +186,7 @@ class DoctrineOrmSettingsProvider implements SettingsProviderInterface
             ->where($qb->expr()->eq('s.domain.name', ':dname'))
             ->setParameter('dname', $domainName);
 
-        $success = ((int) $qb->getQuery()->getSingleScalarResult()) > 0;
+        $success = ((int)$qb->getQuery()->getSingleScalarResult()) > 0;
 
         if ($success) {
             $this->entityManager->clear($this->settingsEntityClass);

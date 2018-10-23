@@ -50,7 +50,7 @@ class SimpleSettingsProvider implements SettingsProviderInterface
         return $out;
     }
 
-    public function getDomains(bool $onlyEnabled = false): array
+    public function getDomains(bool $onlyEnabled = false, bool $invalidate = false): array
     {
         $out = [];
 

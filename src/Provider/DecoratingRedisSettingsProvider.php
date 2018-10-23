@@ -150,16 +150,19 @@ class DecoratingRedisSettingsProvider implements SettingsProviderInterface
         return $output;
     }
 
-    public function getDomains(bool $onlyEnabled = false): array
+    public function getDomains(bool $onlyEnabled = false, bool $invalidate = false): array
     {
         $key = $this->getDomainKey($onlyEnabled);
-        $domains = $this->redis->get($key);
 
-        if ($domains) {
-            return $this->serializer->deserialize($domains, DomainModel::class . '[]', 'json');
+        if (!$invalidate) {
+            $cachedDomains = $this->redis->get($key);
+
+            if ($cachedDomains) {
+                return $this->serializer->deserialize($cachedDomains, DomainModel::class . '[]', 'json');
+            }
         }
 
-        $domains = $this->decoratingProvider->getDomains($onlyEnabled);
+        $domains = $this->getPersistedDomains();
 
         $this->redis->setex(
             $key,
@@ -243,5 +246,37 @@ class DecoratingRedisSettingsProvider implements SettingsProviderInterface
                 $this->redis->setex($key, $this->ttl, 1);
             }
         }
+    }
+
+    /**
+     * @return DomainModel[]
+     */
+    private function getPersistedDomains(): array
+    {
+        $redisKeys = array_flip($this->redis->keys(sprintf('%s\[*\]', $this->namespace)));
+        unset(
+            $redisKeys[$this->getNamespacedKey(self::DOMAIN_KEY)],
+            $redisKeys[$this->getNamespacedKey(self::HASHMAP_KEY)]
+        );
+
+        $pipe = $this->redis->multi(Redis::PIPELINE);
+        foreach ($redisKeys as $redisKey => $i) {
+            $pipe->hGetAll($redisKey);
+        }
+        $result = $pipe->exec();
+
+        $domains = [];
+        foreach ($result as $domainGroup) {
+            foreach ($domainGroup as $item) {
+                if ($item !== null && $item !== false) {
+                    /** @var SettingModel $setting */
+                    $setting = $this->serializer->deserialize($item, SettingModel::class, 'json');
+                    $domains[] = $setting->getDomain();
+                    break;
+                }
+            }
+        }
+
+        return $domains;
     }
 }

@@ -59,7 +59,7 @@ class ProvidersManager
      */
     private function warmUpProvider(SettingsProviderInterface $provider, array $sourceSettings): void
     {
-        $domainNames = $this->extractDomainNames($provider->getDomains());
+        $domainNames = $this->extractDomainNames($provider->getDomains(false, true));
         $settings = $provider->getSettings($domainNames);
 
         $missingSettings = $this->getDiff($sourceSettings, $settings);
@@ -84,7 +84,7 @@ class ProvidersManager
         foreach ($sourceSettings as $a) {
             $found = false;
             foreach ($settings as $b) {
-                if ($a->getDomain() === $b->getDomain() && $a->getName() === $b->getName()) {
+                if ($a->getName() === $b->getName() && $a->getDomain()->getName() === $b->getDomain()->getName()) {
                     $found = true;
                     break;
                 }

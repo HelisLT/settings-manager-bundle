@@ -91,7 +91,7 @@ class LazyReadableSimpleSettingsProvider extends ReadableSimpleSettingsProvider
         return $out;
     }
 
-    public function getDomains(bool $onlyEnabled = false): array
+    public function getDomains(bool $onlyEnabled = false, bool $invalidate = false): array
     {
         if (count($this->normalizedDomains) > 0 && count($this->domainModels) === 0) {
             $this->domainModels = $this

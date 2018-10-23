@@ -52,7 +52,7 @@ class AwsSsmSettingsProvider extends SimpleSettingsProvider
         return parent::getSettingsByName($domainNames, $settingNames);
     }
 
-    public function getDomains(bool $onlyEnabled = false): array
+    public function getDomains(bool $onlyEnabled = false, bool $invalidate = false): array
     {
         $this->fetch();
 
