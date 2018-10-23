@@ -58,7 +58,7 @@ class DecoratingRedisSettingsProvider implements SettingsProviderInterface
 
         $pipe = $this->redis->multi(Redis::PIPELINE);
         foreach ($domainNames as $domainName) {
-            $pipe->hgetall($this->getNamespacedKey($domainName));
+            $pipe->hGetAll($this->getNamespacedKey($domainName));
         }
         $result = $pipe->exec();
 
@@ -80,7 +80,7 @@ class DecoratingRedisSettingsProvider implements SettingsProviderInterface
 
         $pipe = $this->redis->multi(Redis::PIPELINE);
         foreach ($domainNames as $domainName) {
-            $pipe->hmget($this->getNamespacedKey($domainName), $settingNames);
+            $pipe->hMGet($this->getNamespacedKey($domainName), $settingNames);
         }
         $result = $pipe->exec();
         $out = [];
@@ -113,7 +113,14 @@ class DecoratingRedisSettingsProvider implements SettingsProviderInterface
 
         if ($newDomain) {
             $pipe = $this->redis->multi(Redis::PIPELINE);
-            $pipe->del([$this->getDomainKey(false), $this->getDomainKey(true)]);
+            $domainName = $settingModel->getDomain()->getName();
+            $serializedDomain = $this->serializer->serialize($settingModel->getDomain(), 'json');
+
+            $pipe->hSet($this->getDomainKey(false), $domainName, $serializedDomain);
+            if ($settingModel->getDomain()->isEnabled()) {
+                $pipe->hSet($this->getDomainKey(true), $domainName, $serializedDomain);
+            }
+
             $pipe->hset(
                 $this->getNamespacedKey($settingModel->getDomain()->getName()),
                 $settingModel->getName(),
@@ -135,17 +142,16 @@ class DecoratingRedisSettingsProvider implements SettingsProviderInterface
     {
         $output = $this->decoratingProvider->delete($settingModel);
 
-        if ($output) {
-            $pipe = $this->redis->multi(Redis::PIPELINE);
-            $pipe->hdel(
-                $this->getNamespacedKey($settingModel->getDomain()->getName()),
-                $settingModel->getName()
-            );
-            $pipe->del([$this->getDomainKey(false), $this->getDomainKey(true)]);
-            $pipe->exec();
-        } else {
-            $this->redis->del([$this->getDomainKey(false), $this->getDomainKey(true)]);
+        $pipe = $this->redis->multi(Redis::PIPELINE);
+        $pipe->hDel($this->getNamespacedKey($settingModel->getDomain()->getName()), $settingModel->getName());
+
+        $domainName = $settingModel->getDomain()->getName();
+        $domainNames = $this->extractDomainNames($this->decoratingProvider->getDomains());
+        if (!in_array($domainName, $domainNames)) {
+            $pipe->hDel($this->getDomainKey(true), $domainName);
+            $pipe->hDel($this->getDomainKey(false), $domainName);
         }
+        $pipe->exec();
 
         return $output;
     }
@@ -153,19 +159,24 @@ class DecoratingRedisSettingsProvider implements SettingsProviderInterface
     public function getDomains(bool $onlyEnabled = false): array
     {
         $key = $this->getDomainKey($onlyEnabled);
-        $domains = $this->redis->get($key);
+        $domains = $this->redis->hGetAll($key);
 
         if ($domains) {
-            return $this->serializer->deserialize($domains, DomainModel::class . '[]', 'json');
+            foreach ($domains as &$domain) {
+                $domain = $this->serializer->deserialize($domain, DomainModel::class, 'json');
+            }
+            return array_values($domains);
         }
 
         $domains = $this->decoratingProvider->getDomains($onlyEnabled);
 
-        $this->redis->setex(
-            $key,
-            $this->ttl,
-            $this->serializer->serialize($domains, 'json')
-        );
+        if (count($domains) > 0) {
+            $dictionary = [];
+            foreach ($domains as $domain) {
+                $dictionary[$domain->getName()] = $this->serializer->serialize($domain, 'json');
+            }
+            $this->redis->hMSet($key, $dictionary);
+        }
 
         return $domains;
     }
@@ -174,7 +185,15 @@ class DecoratingRedisSettingsProvider implements SettingsProviderInterface
     {
         $output = $this->decoratingProvider->updateDomain($domainModel);
 
-        $this->redis->del([$this->getDomainKey(false), $this->getDomainKey(true)]);
+        $pipe = $this->redis->multi(Redis::PIPELINE);
+        $serializedDomain = $this->serializer->serialize($domainModel, 'json');
+        $pipe->hSet($this->getDomainKey(false), $domainModel->getName(), $serializedDomain);
+        if ($domainModel->isEnabled()) {
+            $pipe->hSet($this->getDomainKey(true), $domainModel->getName(), $serializedDomain);
+        } else {
+            $pipe->hDel($this->getDomainKey(true), $domainModel->getName());
+        }
+        $pipe->exec();
         $this->buildHashmap(true, $domainModel->getName());
 
         return $output;
@@ -184,11 +203,11 @@ class DecoratingRedisSettingsProvider implements SettingsProviderInterface
     {
         $output = $this->decoratingProvider->deleteDomain($domainName);
 
-        $this->redis->del([
-            $this->getNamespacedKey($domainName),
-            $this->getDomainKey(false),
-            $this->getDomainKey(true),
-        ]);
+        $pipe = $this->redis->multi(Redis::PIPELINE);
+        $pipe->del([$this->getNamespacedKey($domainName)]);
+        $pipe->hDel($this->getDomainKey(true), $domainName);
+        $pipe->hDel($this->getDomainKey(false), $domainName);
+        $pipe->exec();
 
         return $output;
     }
@@ -208,7 +227,7 @@ class DecoratingRedisSettingsProvider implements SettingsProviderInterface
         return sprintf('%s[%s]', $this->namespace, $key);
     }
 
-    private function buildHashmap(bool $force = false, ?string $domainName = null)
+    protected function buildHashmap(bool $force = false, ?string $domainName = null): void
     {
         $key = $this->getHashMapKey();
         $isBuilt = $this->redis->get($key);
