@@ -131,6 +131,45 @@ abstract class AbstractSettingsProviderTest extends WebTestCase
         $this->assertEquals('sea', $setting->getDomain()->getName());
     }
 
+    public function testSaveWithNewDomain()
+    {
+        $this->loadSettings();
+
+        $settings = $this->provider->getSettings(['water']);
+        $this->assertCount(0, $settings);
+
+        $newDomain = new DomainModel();
+        $newDomain->setName('water');
+        $newDomain->setEnabled(true);
+
+        $newSetting = new SettingModel();
+        $newSetting
+            ->setName('whale')
+            ->setType(Type::BOOL())
+            ->setData(false)
+            ->setDomain($newDomain);
+
+        $this->assertTrue($this->provider->save($newSetting));
+
+        $settings = $this->provider->getSettings(['water']);
+        $this->assertCount(1, $settings);
+        $map = $this->buildSettingHashmap(...$settings)['water'];
+
+        $expected = ['whale'];
+        sort($expected);
+        $actual = array_keys($map);
+        sort($actual);
+        $this->assertEquals($expected, $actual);
+
+        /** @var SettingModel $setting */
+        $setting = $map['whale'];
+        $this->assertEquals('whale', $setting->getName());
+        $this->assertTrue($setting->getType()->equals(Type::BOOL()));
+        $this->assertFalse($setting->getData());
+        $this->assertEquals('water', $setting->getDomain()->getName());
+        $this->assertTrue($setting->getDomain()->isEnabled());
+    }
+
     public function testDelete()
     {
         $this->loadSettings();
