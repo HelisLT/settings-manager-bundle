@@ -43,6 +43,8 @@ class SettingsAwarePass implements CompilerPassInterface
                 ->register($serviceId, $definition->getClass())
                 ->setArguments([$callMap, new Reference("{$serviceId}_base")])
                 ->setFactory([new Reference(SettingsAwareServiceFactory::class), 'get'])
+                ->setPublic($definition->isPublic())
+                ->setLazy($definition->isLazy())
                 ->setTags($initialTags);
         }
     }
