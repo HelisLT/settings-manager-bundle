@@ -146,7 +146,7 @@ class CookieSettingsProvider extends SimpleSettingsProvider implements EventSubs
         if (empty($this->settings)) {
             // also check for a cookie if needs to be cleared
             if ($event->getRequest()->cookies->has($this->cookieName)) {
-                $event->getResponse()->headers->clearCookie($this->cookieName);
+                $event->getResponse()->headers->clearCookie($this->cookieName, $this->cookiePath, $this->cookieDomain);
             }
 
             return;
