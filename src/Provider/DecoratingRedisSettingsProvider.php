@@ -100,40 +100,26 @@ class DecoratingRedisSettingsProvider implements SettingsProviderInterface
     {
         $output = $this->decoratingProvider->save($settingModel);
 
-        $newDomain = true;
-        /** @var DomainModel $domain */
-        foreach ($this->getDomains() as $domain) {
-            if ($domain->getName() === $settingModel->getDomain()->getName()) {
-                $newDomain = false;
-                break;
-            }
-        }
+        // trigger domain warmup, in case of empty hashes
+        $this->getDomains();
+        $this->getDomains(true);
 
+        $pipe = $this->redis->multi(Redis::PIPELINE);
+        $domainName = $settingModel->getDomain()->getName();
         $serializedSetting = $this->serializer->serialize($settingModel, 'json');
+        $serializedDomain = $this->serializer->serialize($settingModel->getDomain(), 'json');
 
-        if ($newDomain) {
-            $pipe = $this->redis->multi(Redis::PIPELINE);
-            $domainName = $settingModel->getDomain()->getName();
-            $serializedDomain = $this->serializer->serialize($settingModel->getDomain(), 'json');
-
-            $pipe->hSet($this->getDomainKey(false), $domainName, $serializedDomain);
-            if ($settingModel->getDomain()->isEnabled()) {
-                $pipe->hSet($this->getDomainKey(true), $domainName, $serializedDomain);
-            }
-
-            $pipe->hset(
-                $this->getNamespacedKey($settingModel->getDomain()->getName()),
-                $settingModel->getName(),
-                $serializedSetting
-            );
-            $pipe->exec();
-        } else {
-            $this->redis->hset(
-                $this->getNamespacedKey($settingModel->getDomain()->getName()),
-                $settingModel->getName(),
-                $serializedSetting
-            );
+        $pipe->hSetNx($this->getDomainKey(false), $domainName, $serializedDomain);
+        if ($settingModel->getDomain()->isEnabled()) {
+            $pipe->hSetNx($this->getDomainKey(true), $domainName, $serializedDomain);
         }
+
+        $pipe->hSet(
+            $this->getNamespacedKey($settingModel->getDomain()->getName()),
+            $settingModel->getName(),
+            $serializedSetting
+        );
+        $pipe->exec();
 
         return $output;
     }
