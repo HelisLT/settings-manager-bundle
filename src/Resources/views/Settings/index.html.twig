@@ -33,7 +33,7 @@
                             </td>
                             <td>{{ ('type.'~setting.getType().getValue()) | lower | trans() }}</td>
                             <td>{{ setting.getDomain().getName() }}</td>
-                            <td width="30%">
+                            <td width="30%" style="word-break: break-word;">
                                 {% if setting.getType.getValue is constant('Helis\\SettingsManagerBundle\\Model\\Type::BOOL') %}
                                     <input
                                             type="checkbox"
