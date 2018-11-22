@@ -52,7 +52,7 @@
         "friendsofphp/php-cs-fixer": "^2.11",
         "friendsofsymfony/jsrouting-bundle": "^2.1",
         "knplabs/knp-menu-bundle": "^2.2",
-        "liip/functional-test-bundle": "~2.0@alpha",
+        "liip/functional-test-bundle": ">=2.0.0-alpha1 <=2.0.0-alpha8",
         "paragonie/paseto": "^1.0",
         "phpunit/phpunit": "^6.5",
         "predis/predis": "^1.1",
