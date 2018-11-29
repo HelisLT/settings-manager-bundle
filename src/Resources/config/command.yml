@@ -5,3 +5,4 @@ services:
         autoconfigure: true
 
     Helis\SettingsManagerBundle\Command\WarmUpProvidersCommand: ~
+    Helis\SettingsManagerBundle\Command\GenerateKeysCommand: ~

@@ -291,6 +291,32 @@ Helis\SettingsManagerBundle\Provider\CookieSettingsProvider:
         - { name: kernel.event_subscriber }
 ```
 
+### Asymmetric Cookie settings provider
+
+`Helis\SettingsManagerBundle\Provider\AsymmetricCookieSettingsProvider`
+
+This is a provider, which only enables existing settings by using a cookie. Cookies are encoded with asymmetric private
+and public keys, so that they could not be randomly enabled by users.
+
+Required libraries:
+
+ - [paragonie/paseto](https://github.com/paragonie/paseto)
+
+ > `composer require paragonie/paseto`
+
+ `Paseto` is used to encrypt cookies.
+
+ Configuration example:
+
+```yaml
+Helis\SettingsManagerBundle\Provider\AsymmetricCookieSettingsProvider:
+    arguments:
+        $serializer: '@settings_manager.serializer'
+    tags:
+        - { name: settings_manager.provider, provider: asymmetric_cookie, priority: 40 }
+        - { name: kernel.event_subscriber }
+```
+
 ### AWS SSM settings provider
 
 `Helis\SettingsManagerBundle\Provider\AwsSsmSettingsProvider`
