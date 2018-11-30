@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Helis\SettingsManagerBundle\DependencyInjection;
 
 use Helis\SettingsManagerBundle\DataCollector\SettingsCollector;
+use Helis\SettingsManagerBundle\Enqueue\Consumption\WarmupSettingsManagerExtension;
 use Helis\SettingsManagerBundle\Provider\Factory\SimpleSettingsProviderFactory;
 use Helis\SettingsManagerBundle\Provider\LazyReadableSimpleSettingsProvider;
 use Helis\SettingsManagerBundle\Provider\SettingsProviderInterface;
@@ -58,6 +59,7 @@ class HelisSettingsManagerExtension extends Extension
         $this->loadSettingsRouter($config, $container);
         $this->loadSimpleProvider($config, $container);
         $this->loadListeners($config['listeners'], $container);
+        $this->loadEnqueueExtension($config['enqueue_extension'], $container);
     }
 
     public function loadSettingsRouter(array $config, ContainerBuilder $container): void
@@ -68,6 +70,19 @@ class HelisSettingsManagerExtension extends Extension
             ->setArgument(0, new Reference(SettingsManager::class))
             ->setArgument(1, new Reference(SettingsStore::class))
             ->setArgument(2, new Reference('event_dispatcher'));
+    }
+
+    private function loadEnqueueExtension(array $config, ContainerBuilder $container): void
+    {
+        if (!$config['enabled']) {
+            return;
+        }
+
+        $container
+            ->register(WarmupSettingsManagerExtension::class, WarmupSettingsManagerExtension::class)
+            ->addMethodCall('setSettingsRouter', [new Reference(SettingsRouter::class)])
+            ->addMethodCall('setDivider', [$config['divider']])
+            ->addTag('enqueue.consumption.extension', ['priority' => $config['priority']]);
     }
 
     private function loadSettingsAccessControl(array $config, ContainerBuilder $container): void

@@ -52,6 +52,7 @@ monolog:
         - settings
 
 helis_settings_manager:
+    enqueue_extension: true
     profiler: true
     logger:
         enabled: true
