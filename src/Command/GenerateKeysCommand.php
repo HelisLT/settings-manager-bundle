@@ -14,11 +14,12 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class GenerateKeysCommand extends Command
 {
+    protected static $defaultName = 'helis:settings:generate-keys';
 
     protected function configure(): void
     {
         $this
-            ->setName('debug:settings:generate-keys')
+            ->setName('helis:debug:settings:generate-keys')
             ->addArgument(
                 'private_key_path',
                 InputArgument::REQUIRED,
@@ -46,5 +47,4 @@ class GenerateKeysCommand extends Command
 
         $io->success('Saved generated keys');
     }
-
 }
