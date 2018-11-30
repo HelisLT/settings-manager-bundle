@@ -18,6 +18,14 @@ class Configuration implements ConfigurationInterface
         $rootNode = $treeBuilder->root('helis_settings_manager');
         $rootNode
             ->children()
+                ->arrayNode('enqueue_extension')
+                    ->canBeEnabled()
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->integerNode('divider')->defaultValue(1)->end()
+                        ->integerNode('priority')->defaultValue(100)->end()
+                    ->end()
+                ->end()
                 ->arrayNode('profiler')
                     ->canBeEnabled()
                     ->addDefaultsIfNotSet()

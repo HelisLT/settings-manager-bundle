@@ -27,7 +27,7 @@ class WarmupSettingsManagerExtension implements ExtensionInterface
         $this->divider = $divider;
     }
 
-    public function onPostReceived(Context $context)
+    public function onPreReceived(Context $context)
     {
         if (!$this->settingsRouter) {
             return;

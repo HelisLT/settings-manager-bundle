@@ -33,6 +33,7 @@ class ConfigurationTest extends TestCase
                     'profiler' => ['enabled' => false],
                     'logger' => ['enabled' => false, 'service_id' => null],
                     'listeners' => ['controller' => ['enabled' => false], 'command' => ['enabled' => false]],
+                    'enqueue_extension' => ['enabled' => false, 'divider' => 1, 'priority' => 100],
                 ],
             ],
             // case 1: settings files
@@ -58,12 +59,14 @@ class ConfigurationTest extends TestCase
                     'profiler' => ['enabled' => false],
                     'logger' => ['enabled' => false, 'service_id' => null],
                     'listeners' => ['controller' => ['enabled' => false], 'command' => ['enabled' => false]],
+                    'enqueue_extension' => ['enabled' => false, 'divider' => 1, 'priority' => 100],
                 ],
             ],
             // case 3: settings files, settings
             [
                 [
                     'helis_settings_manager' => [
+                        'enqueue_extension' => true,
                         'settings_files' => [
                             'some/file1.yml',
                             'some/file2.yml',
@@ -154,6 +157,7 @@ class ConfigurationTest extends TestCase
                     'profiler' => ['enabled' => false],
                     'logger' => ['enabled' => false, 'service_id' => null],
                     'listeners' => ['controller' => ['enabled' => false], 'command' => ['enabled' => false]],
+                    'enqueue_extension' => ['enabled' => true, 'divider' => 1, 'priority' => 100],
                 ],
             ],
         ];
