@@ -19,7 +19,6 @@ class GenerateKeysCommand extends Command
     protected function configure(): void
     {
         $this
-            ->setName('helis:debug:settings:generate-keys')
             ->addArgument(
                 'private_key_path',
                 InputArgument::REQUIRED,
