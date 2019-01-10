@@ -38,7 +38,6 @@
         "symfony/proxy-manager-bridge": "^3.4|^4.0",
         "symfony/security-bundle": "^3.4|^4.0",
         "symfony/serializer": "^3.4|^4.0",
-        "symfony/twig-bundle": "^3.4|^4.0",
         "symfony/validator": "^3.4|^4.0",
         "symfony/yaml": "^3.4|^4.0"
     },
@@ -59,6 +58,7 @@
         "symfony/framework-bundle": "^3.4|^4.0",
         "symfony/monolog-bundle": "^3.1",
         "symfony/stopwatch": "^3.4|^4.0",
+        "symfony/twig-bundle": "^3.4|^4.0",
         "symfony/web-profiler-bundle": "^3.4|^4.0"
     },
     "suggest": {
