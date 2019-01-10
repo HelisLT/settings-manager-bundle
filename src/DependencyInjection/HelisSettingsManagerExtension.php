@@ -37,10 +37,13 @@ class HelisSettingsManagerExtension extends Extension
         $loader->load('services.yml');
         $loader->load('serializer.yml');
         $loader->load('validators.yml');
-        $loader->load('twig.yml');
         $loader->load('command.yml');
 
         $bundles = $container->getParameter('kernel.bundles');
+
+        if (isset($bundles['TwigBundle'])) {
+            $loader->load('twig.yml');
+        }
 
         if (isset($bundles['KnpMenuBundle'])) {
             $loader->load('menu.yml');
