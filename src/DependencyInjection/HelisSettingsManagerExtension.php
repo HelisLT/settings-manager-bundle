@@ -9,7 +9,6 @@ use Helis\SettingsManagerBundle\Enqueue\Consumption\WarmupSettingsManagerExtensi
 use Helis\SettingsManagerBundle\Provider\Factory\SimpleSettingsProviderFactory;
 use Helis\SettingsManagerBundle\Provider\LazyReadableSimpleSettingsProvider;
 use Helis\SettingsManagerBundle\Provider\SettingsProviderInterface;
-use Helis\SettingsManagerBundle\Settings\SettingsAccessControl;
 use Helis\SettingsManagerBundle\Settings\SettingsManager;
 use Helis\SettingsManagerBundle\Settings\SettingsRouter;
 use Helis\SettingsManagerBundle\Settings\SettingsStore;
@@ -23,7 +22,6 @@ use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Yaml\Yaml;
 
 class HelisSettingsManagerExtension extends Extension
@@ -57,7 +55,6 @@ class HelisSettingsManagerExtension extends Extension
             $container->setAlias('settings_manager.logger', $config['logger']['service_id']);
         }
 
-        $this->loadSettingsAccessControl($config, $container);
         $this->loadSettingsManager($config, $container);
         $this->loadSettingsRouter($config, $container);
         $this->loadSimpleProvider($config, $container);
@@ -86,15 +83,6 @@ class HelisSettingsManagerExtension extends Extension
             ->addMethodCall('setSettingsRouter', [new Reference(SettingsRouter::class)])
             ->addMethodCall('setDivider', [$config['divider']])
             ->addTag('enqueue.consumption.extension', ['priority' => $config['priority']]);
-    }
-
-    private function loadSettingsAccessControl(array $config, ContainerBuilder $container): void
-    {
-        $container
-            ->register(SettingsAccessControl::class, SettingsAccessControl::class)
-            ->setArgument('$authorizationChecker', new Reference(AuthorizationCheckerInterface::class))
-            ->addMethodCall('setEnabled', [$config['access_control']['enabled']])
-            ->setPublic(false);
     }
 
     private function loadSettingsManager(array $config, ContainerBuilder $container): void

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Helis\SettingsManagerBundle\Settings;
 
 use Helis\SettingsManagerBundle\Event\GetSettingEvent;
+use Helis\SettingsManagerBundle\Model\DomainModel;
 use Helis\SettingsManagerBundle\Model\SettingModel;
 use Helis\SettingsManagerBundle\SettingsManagerEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -117,19 +118,17 @@ class SettingsRouter
         if ($this->settingsStore->containsKey($settingName)) {
             $setting = $this->settingsStore->get($settingName);
         } else {
-            if (count($this->settingsStore->getDomains()) === 0) {
-                $domains = $this->settingsManager->getEnabledDomains();
-                if (count($domains) === 0) {
-                    return null;
-                }
-                $this->settingsStore->setDomains($domains);
+            $this->warmupDomains();
+            if (empty($this->settingsStore->getDomainNames())) {
+                return null;
             }
 
-            $settings = $this
-                ->settingsManager
-                ->getSettingsByName($this->settingsStore->getDomainNames(), [$settingName]);
-            $setting = array_shift($settings);
-            $this->settingsStore->addSetting($settingName, $setting);
+            $this->warmupSettings([$settingName]);
+            $setting = $this->settingsStore->get($settingName);
+
+            if ($setting === null) {
+                $this->settingsStore->addSetting($settingName, null);
+            }
         }
 
         if ($setting instanceof SettingModel) {
@@ -159,12 +158,40 @@ class SettingsRouter
     public function warmup(): void
     {
         if ($this->settingsStore->count() > 0) {
-            $namesToWarmup = array_keys(array_filter($this->settingsStore->toArray()));
-
+            $settingNamesToWarmup = array_keys(array_filter($this->settingsStore->toArray()));
             $this->settingsStore->clear();
-            $this->settingsStore->setDomains($this->settingsManager->getEnabledDomains());
+            $this->warmupDomains(true);
+            $this->warmupSettings($settingNamesToWarmup);
+        }
+    }
+
+    /**
+     * Warm up domains from providers
+     *
+     * @param bool $force
+     */
+    private function warmupDomains(bool $force = false): void
+    {
+        if (empty($this->settingsStore->getDomainNames()) || $force) {
+            $this->settingsStore->setDomainNames(array_map(
+                function (DomainModel $domainModel) {
+                    return $domainModel->getName();
+                },
+                $this->settingsManager->getDomains(null, true)
+            ));
+        }
+    }
+
+    /**
+     * Warmup settings from providers
+     *
+     * @param array $settingNames
+     */
+    private function warmupSettings(array $settingNames): void
+    {
+        if (!empty($this->settingsStore->getDomainNames())) {
             $this->settingsStore->setSettings(
-                $this->settingsManager->getSettingsByName($this->settingsStore->getDomainNames(), $namesToWarmup)
+                $this->settingsManager->getSettingsByName($this->settingsStore->getDomainNames(), $settingNames)
             );
         }
     }

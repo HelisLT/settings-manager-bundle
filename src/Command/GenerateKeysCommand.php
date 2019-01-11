@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Helis\SettingsManagerBundle\Command;
 
-
 use ParagonIE\Paseto\Protocol\Version2;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -52,7 +51,6 @@ class GenerateKeysCommand extends Command
             $io->error('Could not write to public key path');
             return;
         }
-
 
         $io->success('Saved generated keys');
     }

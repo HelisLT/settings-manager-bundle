@@ -26,7 +26,6 @@ class ConfigurationTest extends TestCase
             [
                 [],
                 [
-                    'access_control' => ['enabled' => false],
                     'settings_config' => ['lazy' => true, 'priority' => -10],
                     'settings_files' => [],
                     'settings' => [],
@@ -48,7 +47,6 @@ class ConfigurationTest extends TestCase
                     ],
                 ],
                 [
-                    'access_control' => ['enabled' => false],
                     'settings_config' => ['lazy' => true, 'priority' => -10],
                     'settings_files' => [
                         'some/file1.yml',
@@ -99,7 +97,6 @@ class ConfigurationTest extends TestCase
                     ],
                 ],
                 [
-                    'access_control' => ['enabled' => false],
                     'settings_config' => ['lazy' => true, 'priority' => -10],
                     'settings_files' => [
                         'some/file1.yml',

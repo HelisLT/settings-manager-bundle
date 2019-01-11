@@ -109,7 +109,7 @@ class SettingsRouterTest extends WebTestCase
 
         $settingsManager = $this->getContainer()->get(SettingsManager::class);
         $setting->setData(true);
-        $settingsManager->update($setting);
+        $settingsManager->save($setting);
 
         $this->settingsRouter->warmup();
 

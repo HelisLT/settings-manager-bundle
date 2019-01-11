@@ -54,7 +54,7 @@ class SettingsManagerTest extends WebTestCase
     public function testGetEnabledDomains()
     {
         $this->loadFixtures([LoadSettingsData::class]);
-        $domains = $this->settingsManager->getEnabledDomains();
+        $domains = $this->settingsManager->getDomains(null, true);
 
         $this->assertEquals(['default'], array_keys($domains));
 

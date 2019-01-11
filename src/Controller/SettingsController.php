@@ -7,9 +7,7 @@ namespace Helis\SettingsManagerBundle\Controller;
 use Helis\SettingsManagerBundle\Form\SettingFormType;
 use Helis\SettingsManagerBundle\Model\DomainModel;
 use Helis\SettingsManagerBundle\Model\Type;
-use Helis\SettingsManagerBundle\Settings\SettingsAccessControl;
 use Helis\SettingsManagerBundle\Settings\SettingsManager;
-use Helis\SettingsManagerBundle\SettingsManagerActions;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,16 +18,13 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class SettingsController extends AbstractController
 {
     private $settingsManager;
-    private $settingsAccessControl;
     private $validator;
 
     public function __construct(
         SettingsManager $settingsManager,
-        SettingsAccessControl $settingsAccessControl,
         ValidatorInterface $validator
     ) {
         $this->settingsManager = $settingsManager;
-        $this->settingsAccessControl = $settingsAccessControl;
         $this->validator = $validator;
     }
 
@@ -62,10 +57,6 @@ class SettingsController extends AbstractController
             throw $this->createNotFoundException('Setting not found in ' . $domainName . 'domain');
         }
 
-        if (!$this->settingsAccessControl->isGranted(SettingsManagerActions::SETTING_QUICK_EDIT, $setting)) {
-            throw $this->createAccessDeniedException();
-        }
-
         if ($setting->getType()->equals(Type::BOOL())) {
             $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
         } else {
@@ -73,7 +64,7 @@ class SettingsController extends AbstractController
         }
 
         $setting->setData($value);
-        $this->settingsManager->update($setting);
+        $this->settingsManager->save($setting);
 
         return new JsonResponse();
     }
@@ -87,15 +78,11 @@ class SettingsController extends AbstractController
             throw $this->createNotFoundException('Setting not found in ' . $domainName . 'domain');
         }
 
-        if (!$this->settingsAccessControl->isGranted(SettingsManagerActions::SETTING_EDIT, $setting)) {
-            throw $this->createAccessDeniedException();
-        }
-
         $form = $this->createForm(SettingFormType::class, $setting);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->settingsManager->update($setting);
+            $this->settingsManager->save($setting);
 
             return $this->redirectToRoute('settings_index', ['domainName' => $domainName]);
         }
@@ -116,10 +103,6 @@ class SettingsController extends AbstractController
             throw $this->createNotFoundException('Setting not found in ' . $domainName . 'domain');
         }
 
-        if (!$this->settingsAccessControl->isGranted(SettingsManagerActions::SETTING_DELETE, $setting)) {
-            throw $this->createAccessDeniedException();
-        }
-
         $this->settingsManager->delete($setting);
 
         return new JsonResponse();
@@ -132,10 +115,6 @@ class SettingsController extends AbstractController
 
         if ($setting === null) {
             throw $this->createNotFoundException('Setting not found in ' . $domainName . 'domain');
-        }
-
-        if (!$this->settingsAccessControl->isGranted(SettingsManagerActions::SETTING_DUPLICATE, $setting)) {
-            throw $this->createAccessDeniedException();
         }
 
         $setting = clone $setting;
