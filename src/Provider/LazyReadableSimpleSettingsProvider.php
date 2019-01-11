@@ -6,33 +6,32 @@ namespace Helis\SettingsManagerBundle\Provider;
 
 use Helis\SettingsManagerBundle\Model\DomainModel;
 use Helis\SettingsManagerBundle\Model\SettingModel;
-use Helis\SettingsManagerBundle\Provider\Traits\ReadOnlyProviderTrait;
-use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 class LazyReadableSimpleSettingsProvider extends ReadableSimpleSettingsProvider
 {
-    use ReadOnlyProviderTrait;
-
     private $serializer;
-    private $settingModelsByDomain;
-    private $domainModels;
-    private $enabledDomainModels;
-    private $normalizedSettingsByDomain;
-    private $normalizedDomains;
+    private $normSettingsByDomain;
+    private $normDomains;
+
+    private $modelSettingsByDomain;
+    private $modelDomains;
+    private $modelDomainsEnabled;
 
     public function __construct(
-        SerializerInterface $serializer,
-        array $normalizedSettingsByDomain,
-        array $normalizedDomains
+        DenormalizerInterface $serializer,
+        array $normSettingsByDomain,
+        array $normDomains
     ) {
         parent::__construct([]);
 
         $this->serializer = $serializer;
-        $this->settingModelsByDomain = [];
-        $this->domainModels = [];
-        $this->enabledDomainModels = [];
-        $this->normalizedSettingsByDomain = $normalizedSettingsByDomain;
-        $this->normalizedDomains = $normalizedDomains;
+        $this->normSettingsByDomain = $normSettingsByDomain;
+        $this->normDomains = $normDomains;
+
+        $this->modelSettingsByDomain = [];
+        $this->modelDomains = [];
+        $this->modelDomainsEnabled = [];
     }
 
     public function getSettings(array $domainNames): array
@@ -40,29 +39,29 @@ class LazyReadableSimpleSettingsProvider extends ReadableSimpleSettingsProvider
         $out = [];
 
         foreach ($domainNames as $domainName) {
-            if (isset($this->settingModelsByDomain[$domainName])) {
+            if (isset($this->modelSettingsByDomain[$domainName])) {
                 // has some models
-                if (count($this->settingModelsByDomain[$domainName])
-                    !== count($this->normalizedSettingsByDomain[$domainName])
+                if (count($this->modelSettingsByDomain[$domainName])
+                    !== count($this->normSettingsByDomain[$domainName])
                 ) {
                     // denormalize missing models
                     $missingSettings = array_diff_key(
-                        $this->normalizedSettingsByDomain[$domainName],
-                        $this->settingModelsByDomain[$domainName]
+                        $this->normSettingsByDomain[$domainName],
+                        $this->modelSettingsByDomain[$domainName]
                     );
-                    $this->settingModelsByDomain[$domainName] = array_replace(
-                        $this->settingModelsByDomain[$domainName],
+                    $this->modelSettingsByDomain[$domainName] = array_replace(
+                        $this->modelSettingsByDomain[$domainName],
                         $this->serializer->denormalize($missingSettings, SettingModel::class . '[]')
                     );
                 }
 
-                $out = array_merge($out, array_values($this->settingModelsByDomain[$domainName]));
-            } elseif (isset($this->normalizedSettingsByDomain[$domainName])) {
+                $out = array_merge($out, array_values($this->modelSettingsByDomain[$domainName]));
+            } elseif (isset($this->normSettingsByDomain[$domainName])) {
                 // has normalized models
-                $this->settingModelsByDomain[$domainName] = $this
+                $this->modelSettingsByDomain[$domainName] = $this
                     ->serializer
-                    ->denormalize($this->normalizedSettingsByDomain[$domainName], SettingModel::class . '[]');
-                $out = array_merge($out, array_values($this->settingModelsByDomain[$domainName]));
+                    ->denormalize($this->normSettingsByDomain[$domainName], SettingModel::class . '[]');
+                $out = array_merge($out, array_values($this->modelSettingsByDomain[$domainName]));
             }
         }
 
@@ -75,15 +74,14 @@ class LazyReadableSimpleSettingsProvider extends ReadableSimpleSettingsProvider
 
         foreach ($domainNames as $domainName) {
             foreach ($settingNames as $settingName) {
-                if (isset($this->settingModelsByDomain[$domainName][$settingName])) {
+                if (isset($this->modelSettingsByDomain[$domainName][$settingName])) {
                     // already has a model
-                    $out[] = $this->settingModelsByDomain[$domainName][$settingName];
-                } elseif (isset($this->normalizedSettingsByDomain[$domainName][$settingName])) {
+                    $out[] = $this->modelSettingsByDomain[$domainName][$settingName];
+                } elseif (isset($this->normSettingsByDomain[$domainName][$settingName])) {
                     // normalized data exists, make a model
-                    $normalizedSetting = $this->normalizedSettingsByDomain[$domainName][$settingName];
-                    $settingModel = $this->serializer->denormalize($normalizedSetting, SettingModel::class);
-                    $this->settingModelsByDomain[$domainName][$settingName] = $settingModel;
-                    $out[] = $settingModel;
+                    $out[]
+                        = $this->modelSettingsByDomain[$domainName][$settingName]
+                        = $this->serializer->denormalize($this->normSettingsByDomain[$domainName][$settingName], SettingModel::class);
                 }
             }
         }
@@ -93,18 +91,15 @@ class LazyReadableSimpleSettingsProvider extends ReadableSimpleSettingsProvider
 
     public function getDomains(bool $onlyEnabled = false): array
     {
-        if (count($this->normalizedDomains) > 0 && count($this->domainModels) === 0) {
-            $this->domainModels = $this
-                ->serializer
-                ->denormalize(array_values($this->normalizedDomains), DomainModel::class . '[]');
+        if (count($this->normDomains) > 0 && count($this->modelDomains) === 0) {
+            foreach ($this->normDomains as $normDomain) {
+                /** @var DomainModel $model */
+                $model = $this->serializer->denormalize($normDomain, DomainModel::class);
+                $this->modelDomains[] = $model;
+                $model->isEnabled() && ($this->modelDomainsEnabled[] = $model);
+            }
         }
 
-        if ($onlyEnabled && count($this->enabledDomainModels) === 0 && count($this->domainModels) > 0) {
-            $this->enabledDomainModels = array_filter($this->domainModels, function (DomainModel $domainModel) {
-                return $domainModel->isEnabled();
-            });
-        }
-
-        return $onlyEnabled ? $this->enabledDomainModels : $this->domainModels;
+        return $onlyEnabled ? $this->modelDomainsEnabled : $this->modelDomains;
     }
 }
