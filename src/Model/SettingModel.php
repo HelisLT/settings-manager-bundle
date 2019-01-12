@@ -16,10 +16,12 @@ class SettingModel
     protected $type;
     protected $data = [];
     protected $providerName;
+    protected $choices;
 
     public function __construct()
     {
         $this->tags = new ArrayCollection();
+        $this->choices = new ArrayCollection();
     }
 
     public function getName(): ?string
@@ -153,5 +155,45 @@ class SettingModel
         $this->providerName = $providerName;
 
         return $this;
+    }
+
+    /**
+     * @return ChoiceModel[]|Collection
+     */
+    public function getChoices(): Collection
+    {
+        return $this->choices ?? new ArrayCollection();
+    }
+
+    /**
+     * @param ChoiceModel[]|Collection $choices
+     *
+     * @return SettingModel
+     */
+    public function setChoices(Collection $choices): SettingModel
+    {
+        $this->choices = $choices;
+
+        return $this;
+    }
+
+    public function addChoice(ChoiceModel $choice): SettingModel
+    {
+        if (!$this->choices->contains($choice)) {
+            $this->choices->add($choice);
+        }
+
+        return $this;
+    }
+
+    public function hasChoice(string $string): bool
+    {
+        foreach ($this->choices as $choice) {
+            if ($choice->getValue() === $string) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
