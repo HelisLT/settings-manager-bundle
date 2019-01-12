@@ -46,4 +46,4 @@ edit:
         type: Type
         is_enabled: Enabled
         value: Value
-
+        choice_placeholder: Choose an option
