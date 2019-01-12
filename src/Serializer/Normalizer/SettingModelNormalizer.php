@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Helis\SettingsManagerBundle\Serializer\Normalizer;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Helis\SettingsManagerBundle\Model\ChoiceModel;
 use Helis\SettingsManagerBundle\Model\DomainModel;
 use Helis\SettingsManagerBundle\Model\SettingModel;
 use Helis\SettingsManagerBundle\Model\TagModel;
@@ -36,6 +37,9 @@ class SettingModelNormalizer implements NormalizerInterface, DenormalizerInterfa
         isset($data['tags']) && $object->setTags(new ArrayCollection(
             $this->serializer->denormalize($data['tags'], TagModel::class . '[]', $format, $context)
         ));
+        isset($data['choices']) && $object->setChoices(new ArrayCollection(
+            $this->serializer->denormalize($data['choices'], ChoiceModel::class . '[]', $format, $context)
+        ));
 
         return $object;
     }
@@ -62,6 +66,7 @@ class SettingModelNormalizer implements NormalizerInterface, DenormalizerInterfa
             'type' => $object->getType()->getValue(),
             'data' => $object->getDataValue(),
             'tags' => $this->serializer->normalize($object->getTags(), $format, $context),
+            'choices' => $this->serializer->normalize($object->getChoices(), $format, $context)
         ];
     }
 
