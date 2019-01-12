@@ -147,6 +147,7 @@ Enum which holds supported types for setting. Values:
  - INT
  - FLOAT
  - YAML
+ - CHOICE
 
 ## Setting providers
 
