@@ -14,6 +14,7 @@ use MyCLabs\Enum\Enum;
  * @method static Type INT()
  * @method static Type FLOAT()
  * @method static Type YAML()
+ * @method static Type CHOICE()
  */
 class Type extends Enum
 {
@@ -22,4 +23,5 @@ class Type extends Enum
     public const INT = 'int';
     public const FLOAT = 'float';
     public const YAML = 'yaml';
+    public const CHOICE = 'choice';
 }
