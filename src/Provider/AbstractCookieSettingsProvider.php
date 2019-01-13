@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Helis\SettingsManagerBundle\Provider;
 
-
 use Helis\SettingsManagerBundle\Model\DomainModel;
 use Helis\SettingsManagerBundle\Model\SettingModel;
 use Helis\SettingsManagerBundle\Provider\Traits\WritableProviderTrait;
@@ -64,12 +63,8 @@ abstract class AbstractCookieSettingsProvider extends SimpleSettingsProvider imp
     }
 
     protected abstract function getTokenParser(): Parser;
-    protected abstract function getTokenBuilder(): Builder;
 
-    private function getProviderShortName(): string
-    {
-        return (new \ReflectionClass($this))->getShortName();
-    }
+    protected abstract function getTokenBuilder(): Builder;
 
     public function onKernelRequest(GetResponseEvent $event): void
     {
@@ -88,7 +83,7 @@ abstract class AbstractCookieSettingsProvider extends SimpleSettingsProvider imp
         try {
             $token = $parser->parse($rawToken);
         } catch (PasetoException $e) {
-            $this->logger && $this->logger->warning(sprintf('%s: failed to parse token', $this->getProviderShortName()), [
+            $this->logger && $this->logger->warning(sprintf('%s: failed to parse token', (new \ReflectionObject($this))->getShortName()), [
                 'sRawToken' => $rawToken,
                 'sErrorMessage' => $e->getMessage(),
             ]);
@@ -101,7 +96,7 @@ abstract class AbstractCookieSettingsProvider extends SimpleSettingsProvider imp
                 ->serializer
                 ->deserialize($token->get('dt'), SettingModel::class . '[]', 'json');
         } catch (PasetoException $e) {
-            $this->logger && $this->logger->warning(sprintf('%s: '. strtolower($e), $this->getProviderShortName()) , [
+            $this->logger && $this->logger->warning(sprintf('%s: '. strtolower($e), (new \ReflectionObject($this))->getShortName()) , [
                 'sRawToken' => $rawToken,
             ]);
         }

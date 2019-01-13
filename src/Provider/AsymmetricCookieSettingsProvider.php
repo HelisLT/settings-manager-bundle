@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Helis\SettingsManagerBundle\Provider;
 
-
 use ParagonIE\Paseto\Keys\AsymmetricPublicKey;
 use ParagonIE\Paseto\Keys\AsymmetricSecretKey;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -12,17 +11,11 @@ use ParagonIE\Paseto\Builder;
 use ParagonIE\Paseto\Parser;
 use ParagonIE\Paseto\Protocol\Version2;
 use ParagonIE\Paseto\ProtocolCollection;
-use Psr\Log\LoggerAwareTrait;
-use Helis\SettingsManagerBundle\Provider\Traits\WritableProviderTrait;
 
 class AsymmetricCookieSettingsProvider extends AbstractCookieSettingsProvider
 {
-    use LoggerAwareTrait, WritableProviderTrait;
-
-    private $serializer;
-    private $publicKeyMaterial;
-    private $privateKeyMaterial;
-    private $cookieName;
+    protected $publicKeyMaterial;
+    protected $privateKeyMaterial;
 
     public function __construct(
         SerializerInterface $serializer,
@@ -33,7 +26,7 @@ class AsymmetricCookieSettingsProvider extends AbstractCookieSettingsProvider
         $this->privateKeyMaterial = $privateKeyMaterial;
         $this->publicKeyMaterial = $publicKeyMaterial;
 
-        parent::__construct($serializer, $cookieName, 86400, 'settings_manager', 'asymmetric_cookie_provider', '/');
+        parent::__construct($serializer, $cookieName, 86400, 'settings_manager', 'settings', '/');
     }
 
     protected function getTokenParser(): Parser
