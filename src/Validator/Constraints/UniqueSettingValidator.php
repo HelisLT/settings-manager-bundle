@@ -9,7 +9,7 @@ use Helis\SettingsManagerBundle\Settings\SettingsManager;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
-class UniqueSettingDomainValidator extends ConstraintValidator
+class UniqueSettingValidator extends ConstraintValidator
 {
     private $settingManager;
 
@@ -20,14 +20,13 @@ class UniqueSettingDomainValidator extends ConstraintValidator
 
     public function validate($value, Constraint $constraint)
     {
-        if (!$value instanceof SettingModel || !$constraint instanceof UniqueSettingDomain) {
+        if (!$value instanceof SettingModel || !$constraint instanceof UniqueSetting) {
             return;
         }
 
         $settings = $this->settingManager->getSettingsByName([$value->getDomain()->getName()], [$value->getName()]);
-        $setting = array_shift($settings);
 
-        if ($setting !== null) {
+        if (count($settings) > 0) {
             $this
                 ->context
                 ->buildViolation($constraint->message)

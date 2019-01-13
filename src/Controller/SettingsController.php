@@ -120,7 +120,7 @@ class SettingsController extends AbstractController
         $setting = clone $setting;
         $setting->setDomain((new DomainModel())->setName($toDomainName));
 
-        $violations = $this->validator->validate($setting, null, ['Default', 'duplication']);
+        $violations = $this->validator->validate($setting, null, ['Default', 'Duplication']);
         if ($violations->count() !== 0) {
             throw new BadRequestHttpException($violations->get(0)->getMessage());
         }
