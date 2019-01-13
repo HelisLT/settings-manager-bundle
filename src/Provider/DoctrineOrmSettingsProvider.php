@@ -88,8 +88,12 @@ class DoctrineOrmSettingsProvider implements SettingsProviderInterface
 
         if ($onlyEnabled) {
             $qb
-                ->andWhere($qb->expr()->eq('s.domain.enabled', ':enabled'))
-                ->setParameter('enabled', true);
+                ->andWhere($qb->expr()->orX(
+                    $qb->expr()->eq('s.domain.enabled', ':enabled'),
+                    $qb->expr()->eq('s.domain.name', ':default_name')
+                ))
+                ->setParameter('enabled', true)
+                ->setParameter('default_name', DomainModel::DEFAULT_NAME);
         }
 
         return array_map(

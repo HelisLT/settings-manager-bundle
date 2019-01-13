@@ -134,43 +134,46 @@ abstract class AbstractSettingsProviderTest extends AbstractReadableSettingsProv
 
         // assert before update
 
-        $this->assertArrayHasKey('sea', $domains);
-        $domainToUpdate = $domains['sea'];
-        $settings = $this->provider->getSettings(['sea']);
-        $this->assertCount(1, $settings);
-        /** @var SettingModel $setting */
-        $setting = array_shift($settings);
-        $this->assertFalse($setting->getDomain()->isEnabled());
-        $this->assertEquals(0, $setting->getDomain()->getPriority());
+        $this->assertArrayHasKey('apples', $domains);
+        $domainToUpdate = $domains['apples'];
+        $settings = $this->provider->getSettings(['apples']);
+        $this->assertCount(2, $settings);
+
         $this->assertFalse($domainToUpdate->isEnabled());
         $this->assertEquals(0, $domainToUpdate->getPriority());
+        foreach ($settings as $setting) {
+            $this->assertFalse($setting->getDomain()->isEnabled());
+            $this->assertEquals(0, $setting->getDomain()->getPriority());
+        }
 
+        // update
         $domainToUpdate->setEnabled(true);
         $domainToUpdate->setPriority(11);
         $this->provider->updateDomain($domainToUpdate);
 
-        // assert after update
-
+        // asserts after update
         $domains = $this->buildDomainMap(...$this->provider->getDomains());
+        $this->assertArrayHasKey('apples', $domains);
+        $domainToUpdate = $domains['apples'];
+        $settings = $this->provider->getSettings(['apples']);
+        $this->assertCount(2, $settings);
 
-        $this->assertArrayHasKey('sea', $domains);
-        $domainToUpdate = $domains['sea'];
-        $settings = $this->provider->getSettings(['sea']);
-        $this->assertCount(1, $settings);
-        /** @var SettingModel $setting */
-        $setting = array_shift($settings);
-        $this->assertTrue($setting->getDomain()->isEnabled());
-        $this->assertEquals(11, $setting->getDomain()->getPriority());
         $this->assertTrue($domainToUpdate->isEnabled());
         $this->assertEquals(11, $domainToUpdate->getPriority());
+        foreach ($settings as $setting) {
+            $this->assertTrue($setting->getDomain()->isEnabled());
+            $this->assertEquals(11, $setting->getDomain()->getPriority());
+        }
     }
 
     public function testDeleteDomain()
     {
-        $domains = $this->provider->getDomains();
-        $domainNames = array_map(function (DomainModel $model) {
-            return $model->getName();
-        }, $domains);
+        $domainNames = array_map(
+            function (DomainModel $model) {
+                return $model->getName();
+            },
+            $this->provider->getDomains()
+        );
 
         $settings = $this->provider->getSettings($domainNames);
         $this->assertArrayHasKey('default', $this->buildSettingHashmap(...$settings));
