@@ -119,6 +119,7 @@ class ConfigurationTest extends TestCase
                                 'value' => false,
                             ],
                             'tags' => [],
+                            'choices' => []
                         ],
                         [
                             'name' => 'cammel',
@@ -132,6 +133,7 @@ class ConfigurationTest extends TestCase
                                 'value' => false,
                             ],
                             'tags' => [],
+                            'choices' => []
                         ],
                         [
                             'name' => 'fix',
@@ -152,6 +154,7 @@ class ConfigurationTest extends TestCase
                                     'name' => 'bar',
                                 ],
                             ],
+                            'choices' => []
                         ],
                     ],
                     'profiler' => ['enabled' => false],
