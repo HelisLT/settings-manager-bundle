@@ -16,7 +16,7 @@ class SettingModel
     protected $type;
     protected $data = [];
     protected $providerName;
-    protected $choices;
+    protected $choices = [];
 
     public function __construct()
     {
@@ -158,42 +158,22 @@ class SettingModel
     }
 
     /**
-     * @return ChoiceModel[]|Collection
+     * @return array
      */
-    public function getChoices(): Collection
+    public function getChoices(): array
     {
-        return $this->choices ?? new ArrayCollection();
+        return $this->choices;
     }
 
     /**
-     * @param ChoiceModel[]|Collection $choices
+     * @param array $choices
      *
      * @return SettingModel
      */
-    public function setChoices(Collection $choices): SettingModel
+    public function setChoices(array $choices): SettingModel
     {
         $this->choices = $choices;
 
         return $this;
-    }
-
-    public function addChoice(ChoiceModel $choice): SettingModel
-    {
-        if (!$this->choices->contains($choice)) {
-            $this->choices->add($choice);
-        }
-
-        return $this;
-    }
-
-    public function hasChoice(string $string): bool
-    {
-        foreach ($this->choices as $choice) {
-            if ($choice->getValue() === $string) {
-                return true;
-            }
-        }
-
-        return false;
     }
 }
