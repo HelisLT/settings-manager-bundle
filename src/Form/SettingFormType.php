@@ -86,13 +86,21 @@ class SettingFormType extends AbstractType
                         'attr' => ['rows' => 12],
                     ]);
             } elseif ($model->getType()->equals(Type::CHOICE())) {
+                $choices = [];
+                foreach ($model->getChoices() as $choice) {
+                    if (is_array($choice['value'])) {
+                        $choices[$choice['value'][key($choice['value'])]] = key($choice['value']);
+                    } else {
+                        $choices[$choice['value']] = $choice['value'];
+                    }
+                }
                 $event
                     ->getForm()
                     ->add('data', ChoiceType::class, [
                         'translation_domain' => 'HelisSettingsManager',
                         'label' => 'edit.form.value',
                         'placeholder' => 'edit.form.choice_placeholder',
-                        'choices' => array_map(function($obj){return $obj->getValue();}, $model->getChoices()->toArray())
+                        'choices' => $choices
                     ]);
             } else {
                 $event
