@@ -12,7 +12,6 @@ services:
                 - '@Helis\SettingsManagerBundle\Serializer\Normalizer\SettingModelNormalizer'
                 - '@Helis\SettingsManagerBundle\Serializer\Normalizer\DomainModelNormalizer'
                 - '@Helis\SettingsManagerBundle\Serializer\Normalizer\TagModelNormalizer'
-                - '@Helis\SettingsManagerBundle\Serializer\Normalizer\ChoiceModelNormalizer'
             $encoders:
                 - '@settings_manager.encoder.json'
 
@@ -27,5 +26,3 @@ services:
     Helis\SettingsManagerBundle\Serializer\Normalizer\DomainModelNormalizer: ~
 
     Helis\SettingsManagerBundle\Serializer\Normalizer\TagModelNormalizer: ~
-
-    Helis\SettingsManagerBundle\Serializer\Normalizer\ChoiceModelNormalizer: ~
