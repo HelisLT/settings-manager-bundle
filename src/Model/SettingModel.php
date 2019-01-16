@@ -21,7 +21,6 @@ class SettingModel
     public function __construct()
     {
         $this->tags = new ArrayCollection();
-        $this->choices = new ArrayCollection();
     }
 
     public function getName(): ?string
