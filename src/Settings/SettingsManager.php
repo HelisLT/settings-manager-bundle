@@ -87,29 +87,34 @@ class SettingsManager implements LoggerAwareInterface
     {
         $settings = [[]];
 
+        $settingConfigModel = $this->providers['config']->getSettingsByName($domainNames, $settingNames);
+        $settingConfigModel = array_shift($settingConfigModel);
+
+        $providers = $this->providers;
+        array_shift($providers);
+
         /** @var SettingsProviderInterface $provider */
-        foreach (array_reverse($this->providers) as $pName => $provider) {
-            $providerSettings = [];
+        foreach (array_reverse($providers) as $pName => $provider) {
             foreach ($provider->getSettingsByName($domainNames, $settingNames) as $settingModel) {
                 if ($settingModel instanceof SettingModel) {
-                    $settingModel->setProviderName($pName);
-                    $providerSettings[] = $settingModel;
-                    unset($settingNames[array_search($settingModel->getName(), $settingNames, true)]);
+                    $settingConfigModel->setName($settingModel->getName())->setProviderName($pName);
+                    if (null !== $settingModel->getDescription()) {
+                        $settingConfigModel->setDescription($settingModel->getDescription());
+                    }
+                    if (null !== $settingModel->getData()) {
+                        $settingConfigModel->setData($settingModel->getData());
+                    }
                 } else {
                     $this->logger && $this->logger->warning('SettingsManager: received null setting', [
                         'sProviderName' => $pName,
-                        'sSettingName' => $settingNames,
+                        'sSettingName'  => $settingNames,
                     ]);
                 }
             }
 
-            $settings[] = $providerSettings;
-
-            // check if already has enough
-            if (count($settingNames) === 0) {
-                break;
-            }
+            $settings[] = [$settingConfigModel];
         }
+
 
         return array_merge(...$settings);
     }
