@@ -87,34 +87,29 @@ class SettingsManager implements LoggerAwareInterface
     {
         $settings = [[]];
 
-        $settingConfigModel = $this->providers['config']->getSettingsByName($domainNames, $settingNames);
-        $settingConfigModel = array_shift($settingConfigModel);
-
-        $providers = $this->providers;
-        array_shift($providers);
-
         /** @var SettingsProviderInterface $provider */
-        foreach (array_reverse($providers) as $pName => $provider) {
+        foreach (array_reverse($this->providers) as $pName => $provider) {
+            $providerSettings = [];
             foreach ($provider->getSettingsByName($domainNames, $settingNames) as $settingModel) {
                 if ($settingModel instanceof SettingModel) {
-                    $settingConfigModel->setName($settingModel->getName())->setProviderName($pName);
-                    if (null !== $settingModel->getDescription()) {
-                        $settingConfigModel->setDescription($settingModel->getDescription());
-                    }
-                    if (null !== $settingModel->getData()) {
-                        $settingConfigModel->setData($settingModel->getData());
-                    }
+                    $settingModel->setProviderName($pName);
+                    $providerSettings[] = $settingModel;
+                    unset($settingNames[array_search($settingModel->getName(), $settingNames, true)]);
                 } else {
                     $this->logger && $this->logger->warning('SettingsManager: received null setting', [
                         'sProviderName' => $pName,
-                        'sSettingName'  => $settingNames,
+                        'sSettingName' => $settingNames,
                     ]);
                 }
             }
 
-            $settings[] = [$settingConfigModel];
-        }
+            $settings[] = $providerSettings;
 
+            // check if already has enough
+            if (count($settingNames) === 0) {
+                break;
+            }
+        }
 
         return array_merge(...$settings);
     }
@@ -253,34 +248,26 @@ class SettingsManager implements LoggerAwareInterface
      */
     public function delete(SettingModel $settingModel): bool
     {
+        $changed = false;
         if ($settingModel->getProviderName()) {
-            $result = $this
+            $changed = $this
                 ->providers[$settingModel->getProviderName()]
                 ->delete($settingModel);
-
-            $this->eventDispatcher->dispatch(
-                SettingsManagerEvents::DELETE_SETTING,
-                new SettingChangeEvent($settingModel)
-            );
-
-            return $result;
-        }
-
-        $atleastOne = false;
-
-        foreach ($this->providers as $provider) {
-            if ($provider->delete($settingModel)) {
-                $atleastOne = true;
+        } else {
+            foreach ($this->providers as $provider) {
+                if ($provider->delete($settingModel)) {
+                    $changed = true;
+                }
             }
         }
-        if ($atleastOne) {
+        if ($changed) {
             $this->eventDispatcher->dispatch(
                 SettingsManagerEvents::DELETE_SETTING,
                 new SettingChangeEvent($settingModel)
             );
         }
 
-        return $atleastOne;
+        return $changed;
     }
 
     /**
