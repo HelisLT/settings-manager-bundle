@@ -21,6 +21,11 @@ Helis\SettingsManagerBundle\Model\SettingModel:
             name: data
             type: json_array
             nullable: false
+        choices:
+            name: choices
+            type: json_array
+            nullable: true
+            unique: false
     embedded:
         domain:
             class: Helis\SettingsManagerBundle\Model\DomainModel
