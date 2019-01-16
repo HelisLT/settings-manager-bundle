@@ -207,7 +207,8 @@ class DoctrineOrmSettingsProvider implements SettingsProviderInterface
                 ->setType($model->getType())
                 ->setDescription($model->getDescription())
                 ->setDataValue($model->getDataValue())
-                ->setDomain($model->getDomain());
+                ->setDomain($model->getDomain())
+                ->setChoices($model->getChoices());
 
             $entity->setTags($model->getTags());
             $model = $entity;
