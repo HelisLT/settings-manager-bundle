@@ -143,18 +143,7 @@ class Configuration implements ConfigurationInterface
                     ->end()
                 ->end()
                 ->arrayNode('choices')
-                    ->arrayPrototype()
-                        ->beforeNormalization()
-                        ->always()
-                        ->then(function ($v) {
-                            return ['value' => $v];
-                        })
-                        ->end()
-                        ->children()
-                            ->variableNode('value')
-                            ->isRequired()
-                        ->end()
-                    ->end()
+                    ->variablePrototype()->end()
                 ->end()
             ->end()
         ->end();
