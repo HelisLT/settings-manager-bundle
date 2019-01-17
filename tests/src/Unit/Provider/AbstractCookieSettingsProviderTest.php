@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Helis\SettingsManagerBundle\Tests\Unit\Provider;
 
 use Helis\SettingsManagerBundle\Provider\AbstractCookieSettingsProvider;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -11,10 +12,9 @@ use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Helis\SettingsManagerBundle\Model\DomainModel;
 use Helis\SettingsManagerBundle\Model\SettingModel;
-use Helis\SettingsManagerBundle\Tests\Functional\Provider\AbstractSettingsProviderTest;
 use Symfony\Component\Serializer\SerializerInterface;
 
-abstract class AbstractCookieSettingsProviderTest extends AbstractSettingsProviderTest
+abstract class AbstractCookieSettingsProviderTest extends TestCase
 {
     /**
      * @var AbstractCookieSettingsProvider
@@ -25,12 +25,12 @@ abstract class AbstractCookieSettingsProviderTest extends AbstractSettingsProvid
 
     protected function setUp()
     {
-        $this->loadFixtures([]);
         $this->cookieName = 'Orange';
         $this->serializer = $this->getMockBuilder(SerializerInterface::class)->getMock();
-
-        parent::setUp();
+        $this->provider = $this->createProvider();
     }
+
+    abstract protected function createProvider(): AbstractCookieSettingsProvider;
 
     public function testOnKernelResponseNothingChanged()
     {
