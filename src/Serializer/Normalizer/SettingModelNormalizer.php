@@ -36,6 +36,7 @@ class SettingModelNormalizer implements NormalizerInterface, DenormalizerInterfa
         isset($data['tags']) && $object->setTags(new ArrayCollection(
             $this->serializer->denormalize($data['tags'], TagModel::class . '[]', $format, $context)
         ));
+        isset($data['choices']) && $object->setChoices($data['choices']);
 
         return $object;
     }
@@ -62,6 +63,7 @@ class SettingModelNormalizer implements NormalizerInterface, DenormalizerInterfa
             'type' => $object->getType()->getValue(),
             'data' => $object->getDataValue(),
             'tags' => $this->serializer->normalize($object->getTags(), $format, $context),
+            'choices' => $object->getChoices(),
         ];
     }
 

@@ -97,6 +97,14 @@ helis_settings_manager:
               cool:
                   yes: [yes, no]
               damn: 5
+
+        - name: choice
+          description: 'choice example'
+          domain: default
+          type: choice
+          choices: ['choice1', 'choice2']
+          data: 'choice1'
+
 services:
     _defaults:
         public: true

@@ -85,6 +85,15 @@ class SettingFormType extends AbstractType
                         'label' => 'edit.form.value',
                         'attr' => ['rows' => 12],
                     ]);
+            } elseif ($model->getType()->equals(Type::CHOICE())) {
+                $event
+                    ->getForm()
+                    ->add('data', ChoiceType::class, [
+                        'translation_domain' => 'HelisSettingsManager',
+                        'label' => 'edit.form.value',
+                        'placeholder' => 'edit.form.choice_placeholder',
+                        'choices' => $model->getChoices()
+                    ]);
             } else {
                 $event
                     ->getForm()

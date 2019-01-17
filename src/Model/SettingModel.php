@@ -16,6 +16,7 @@ class SettingModel
     protected $type;
     protected $data = [];
     protected $providerName;
+    protected $choices = [];
 
     public function __construct()
     {
@@ -151,6 +152,26 @@ class SettingModel
     public function setProviderName(string $providerName): SettingModel
     {
         $this->providerName = $providerName;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getChoices(): array
+    {
+        return $this->choices;
+    }
+
+    /**
+     * @param array $choices
+     *
+     * @return SettingModel
+     */
+    public function setChoices(array $choices): SettingModel
+    {
+        $this->choices = $choices;
 
         return $this;
     }

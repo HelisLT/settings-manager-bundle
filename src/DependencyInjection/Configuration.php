@@ -142,6 +142,9 @@ class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
+                ->arrayNode('choices')
+                    ->variablePrototype()->end()
+                ->end()
             ->end()
         ->end();
 

@@ -21,6 +21,7 @@ class AwsSsmSettingsProvider extends SimpleSettingsProvider
         'array' => Type::YAML,
         'integer' => Type::INT,
         'string' => Type::STRING,
+        'choice' => Type::CHOICE,
     ];
 
     use ReadOnlyProviderTrait;

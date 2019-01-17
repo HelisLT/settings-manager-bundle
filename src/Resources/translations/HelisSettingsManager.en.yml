@@ -35,6 +35,7 @@ type:
     int: Integer
     float: Float
     yaml: Yaml
+    choice: Choice
 
 edit:
     back: Back to list
@@ -46,4 +47,4 @@ edit:
         type: Type
         is_enabled: Enabled
         value: Value
-
+        choice_placeholder: Choose an option
