@@ -1,7 +1,7 @@
 Helis\SettingsManagerBundle\Model\SettingModel:
     constraints:
         - Helis\SettingsManagerBundle\Validator\Constraints\SettingType: { groups: [Default] }
-        - Helis\SettingsManagerBundle\Validator\Constraints\UniqueSettingDomain: { groups: [duplication] }
+        - Helis\SettingsManagerBundle\Validator\Constraints\UniqueSetting: { groups: [Duplication] }
     getters:
         data:
             - NotNull: { message: 'Setting value cannot be null', groups: [Default] }

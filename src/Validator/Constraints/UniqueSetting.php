@@ -6,7 +6,7 @@ namespace Helis\SettingsManagerBundle\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 
-class UniqueSettingDomain extends Constraint
+class UniqueSetting extends Constraint
 {
     public $message = '{{ domainName }} domain already has setting named {{ settingName }}';
 

@@ -394,8 +394,6 @@ helis_settings_manager:
     logger:
         enabled: false
         service_id: null # Psr\Log\LoggerInterface service id
-    access_control:
-        enabled: false
     settings_files:
         # - '%kernel.root_dir%/config/extra_settings.yml'
 ```

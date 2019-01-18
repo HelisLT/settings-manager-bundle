@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Helis\SettingsManagerBundle\Settings;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Helis\SettingsManagerBundle\Model\DomainModel;
 use Helis\SettingsManagerBundle\Model\SettingModel;
 
 class SettingsStore extends ArrayCollection
@@ -16,16 +15,16 @@ class SettingsStore extends ArrayCollection
     private $settingsByProvider;
 
     /**
-     * @var DomainModel[]
+     * @var string[]
      */
-    private $domains;
+    private $domainNames;
 
     public function __construct(array $elements = [])
     {
         parent::__construct($elements);
 
         $this->settingsByProvider = [];
-        $this->domains = [];
+        $this->domainNames = [];
     }
 
     /**
@@ -66,36 +65,20 @@ class SettingsStore extends ArrayCollection
         return $this->count() > 0;
     }
 
-    /**
-     * @return string[]
-     */
     public function getDomainNames(): array
     {
-        return array_map(function (DomainModel $model) {
-            return $model->getName();
-        }, $this->domains);
+        return $this->domainNames;
     }
 
-    /**
-     * @return DomainModel[]
-     */
-    public function getDomains(): array
+    public function setDomainNames(array $domainNames): void
     {
-        return $this->domains;
-    }
-
-    /**
-     * @param DomainModel[] $domains
-     */
-    public function setDomains(array $domains): void
-    {
-        $this->domains = $domains;
+        $this->domainNames = $domainNames;
     }
 
     public function clear()
     {
         $this->settingsByProvider = [];
-        $this->domains = [];
+        $this->domainNames = [];
 
         return parent::clear();
     }

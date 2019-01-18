@@ -21,21 +21,14 @@ final class SettingsManagerEvents
     public const GET_SETTING = 'settings_manager.get_setting';
 
     /**
-     * Provides an ability to inform about setting change right after flush to storage.
+     * Provides an ability to know about saved setting.
      *
      * Event class \Helis\SettingsManagerBundle\Event\SettingChangeEvent
      */
-    public const UPDATE_SETTING = 'settings_manager.update_setting';
+    public const SAVE_SETTING = 'settings_manager.save_setting';
 
     /**
-     * Provides an ability to inform about setting duplication right after flush to storage.
-     *
-     * Event class \Helis\SettingsManagerBundle\Event\SettingChangeEvent
-     */
-    public const DUPLICATE_SETTING = 'settings_manager.duplicate_setting';
-
-    /**
-     * Provides an ability to inform about setting deletion right after flush to storage.
+     * Provides an ability to inform about setting deletion.
      *
      * Event class \Helis\SettingsManagerBundle\Event\SettingChangeEvent
      */

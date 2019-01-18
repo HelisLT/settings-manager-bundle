@@ -8,7 +8,7 @@ use Helis\SettingsManagerBundle\Model\SettingModel;
 use Helis\SettingsManagerBundle\Provider\ReadableSimpleSettingsProvider;
 use Helis\SettingsManagerBundle\Provider\SettingsProviderInterface;
 use Helis\SettingsManagerBundle\Provider\SimpleSettingsProvider;
-use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 class SimpleSettingsProviderFactory implements ProviderFactoryInterface
 {
@@ -16,7 +16,7 @@ class SimpleSettingsProviderFactory implements ProviderFactoryInterface
     private $normalizedData;
     private $readOnly;
 
-    public function __construct(SerializerInterface $serializer, array $normalizedData, bool $readOnly = true)
+    public function __construct(DenormalizerInterface $serializer, array $normalizedData, bool $readOnly = true)
     {
         $this->serializer = $serializer;
         $this->normalizedData = $normalizedData;

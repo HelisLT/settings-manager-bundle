@@ -23,10 +23,15 @@ class SettingsManager implements LoggerAwareInterface
      * @var SettingsProviderInterface[]
      */
     private $providers;
+
+    /**
+     * @var EventDispatcherInterface
+     */
     private $eventDispatcher;
 
     /**
      * @param SettingsProviderInterface[] $providers
+     * @param EventDispatcherInterface    $eventDispatcher
      */
     public function __construct(array $providers, EventDispatcherInterface $eventDispatcher)
     {
@@ -48,13 +53,10 @@ class SettingsManager implements LoggerAwareInterface
      *
      * @return DomainModel[]
      */
-    public function getDomains(?string $providerName = null, bool $onlyEnabled = false): array
+    public function getDomains(string $providerName = null, bool $onlyEnabled = false): array
     {
         $domains = [];
-        $providers = $this->providers;
-        if ($providerName !== null) {
-            $providers = [$providerName => $this->getProvider($providerName)];
-        }
+        $providers = $providerName !== null ? [$providerName => $this->getProvider($providerName)] : $this->providers;
 
         foreach ($providers as $provider) {
             foreach ($provider->getDomains($onlyEnabled) as $domainModel) {
@@ -67,14 +69,6 @@ class SettingsManager implements LoggerAwareInterface
         }
 
         return $domains;
-    }
-
-    /**
-     * @return DomainModel[]
-     */
-    public function getEnabledDomains(): array
-    {
-        return $this->getDomains(null, true);
     }
 
     /**
@@ -162,12 +156,39 @@ class SettingsManager implements LoggerAwareInterface
     }
 
     /**
+     * Tries to update an existing provider or saves to a new provider.
+     *
      * @param SettingModel $settingModel
      *
      * @return bool
      */
     public function save(SettingModel $settingModel): bool
     {
+        if ($settingModel->getProviderName()) {
+            try {
+                $result = $this->providers[$settingModel->getProviderName()]->save($settingModel);
+            } catch (ReadOnlyProviderException $e) {
+                $result = false;
+            }
+
+            if ($result === true) {
+                $this->logger && $this->logger->info('SettingsManager: setting updated', [
+                    'sSettingName' => $settingModel->getName(),
+                    'sSettingType' => $settingModel->getType()->getValue(),
+                    'sSettingValue' => json_encode($settingModel->getDataValue()),
+                    'sDomainName' => $settingModel->getDomain()->getName(),
+                    'sDomainEnabled' => $settingModel->getDomain()->isReadOnly(),
+                    'sProviderName' => $settingModel->getProviderName(),
+                ]);
+                $this->eventDispatcher->dispatch(
+                    SettingsManagerEvents::SAVE_SETTING,
+                    new SettingChangeEvent($settingModel)
+                );
+
+                return $result;
+            }
+        }
+
         $closed = $settingModel->getProviderName() !== null;
 
         foreach ($this->providers as $name => $provider) {
@@ -190,7 +211,7 @@ class SettingsManager implements LoggerAwareInterface
                         'sProviderName' => $settingModel->getProviderName(),
                     ]);
                     $this->eventDispatcher->dispatch(
-                        SettingsManagerEvents::DUPLICATE_SETTING,
+                        SettingsManagerEvents::SAVE_SETTING,
                         new SettingChangeEvent($settingModel)
                     );
 
@@ -205,7 +226,7 @@ class SettingsManager implements LoggerAwareInterface
     }
 
     /**
-     * Tries to update setting back to provider. If fails fallbacks to save method.
+     * @deprecated use save()
      *
      * @param SettingModel $settingModel
      *
@@ -213,31 +234,6 @@ class SettingsManager implements LoggerAwareInterface
      */
     public function update(SettingModel $settingModel): bool
     {
-        if ($settingModel->getProviderName()) {
-            try {
-                $result = $this->providers[$settingModel->getProviderName()]->save($settingModel);
-            } catch (ReadOnlyProviderException $e) {
-                $result = false;
-            }
-
-            if ($result === true) {
-                $this->logger && $this->logger->info('SettingsManager: setting updated', [
-                    'sSettingName' => $settingModel->getName(),
-                    'sSettingType' => $settingModel->getType()->getValue(),
-                    'sSettingValue' => json_encode($settingModel->getDataValue()),
-                    'sDomainName' => $settingModel->getDomain()->getName(),
-                    'sDomainEnabled' => $settingModel->getDomain()->isReadOnly(),
-                    'sProviderName' => $settingModel->getProviderName(),
-                ]);
-                $this->eventDispatcher->dispatch(
-                    SettingsManagerEvents::UPDATE_SETTING,
-                    new SettingChangeEvent($settingModel)
-                );
-
-                return $result;
-            }
-        }
-
         return $this->save($settingModel);
     }
 
@@ -249,6 +245,7 @@ class SettingsManager implements LoggerAwareInterface
     public function delete(SettingModel $settingModel): bool
     {
         $changed = false;
+
         if ($settingModel->getProviderName()) {
             $changed = $this
                 ->providers[$settingModel->getProviderName()]
@@ -260,6 +257,7 @@ class SettingsManager implements LoggerAwareInterface
                 }
             }
         }
+
         if ($changed) {
             $this->eventDispatcher->dispatch(
                 SettingsManagerEvents::DELETE_SETTING,
@@ -279,7 +277,6 @@ class SettingsManager implements LoggerAwareInterface
     public function copyDomainToProvider(string $domainName, string $providerName): void
     {
         $provider = $this->getProvider($providerName);
-
         $settings = $this->getSettingsByDomain([$domainName]);
 
         foreach ($settings as $setting) {
@@ -296,7 +293,7 @@ class SettingsManager implements LoggerAwareInterface
      * @param DomainModel $domainModel
      * @param null|string $providerName
      */
-    public function updateDomain(DomainModel $domainModel, ?string $providerName = null): void
+    public function updateDomain(DomainModel $domainModel, string $providerName = null): void
     {
         if ($providerName !== null) {
             $provider = $this->getProvider($providerName);
@@ -321,7 +318,7 @@ class SettingsManager implements LoggerAwareInterface
      * @param string      $domainName
      * @param null|string $providerName
      */
-    public function deleteDomain(string $domainName, ?string $providerName = null): void
+    public function deleteDomain(string $domainName, string $providerName = null): void
     {
         if ($providerName !== null) {
             $provider = $this->getProvider($providerName);
