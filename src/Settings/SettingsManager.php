@@ -13,7 +13,6 @@ use Helis\SettingsManagerBundle\Provider\SettingsProviderInterface;
 use Helis\SettingsManagerBundle\SettingsManagerEvents;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class SettingsManager implements LoggerAwareInterface
 {
@@ -25,18 +24,18 @@ class SettingsManager implements LoggerAwareInterface
     private $providers;
 
     /**
-     * @var EventDispatcherInterface
+     * @var EventManagerInterface
      */
-    private $eventDispatcher;
+    private $eventManager;
 
     /**
      * @param SettingsProviderInterface[] $providers
-     * @param EventDispatcherInterface    $eventDispatcher
+     * @param EventManagerInterface       $eventManager
      */
-    public function __construct(array $providers, EventDispatcherInterface $eventDispatcher)
+    public function __construct(array $providers, EventManagerInterface $eventManager)
     {
         $this->providers = $providers;
-        $this->eventDispatcher = $eventDispatcher;
+        $this->eventManager = $eventManager;
     }
 
     /**
@@ -180,7 +179,7 @@ class SettingsManager implements LoggerAwareInterface
                     'sDomainEnabled' => $settingModel->getDomain()->isReadOnly(),
                     'sProviderName' => $settingModel->getProviderName(),
                 ]);
-                $this->eventDispatcher->dispatch(
+                $this->eventManager->dispatch(
                     SettingsManagerEvents::SAVE_SETTING,
                     new SettingChangeEvent($settingModel)
                 );
@@ -210,7 +209,7 @@ class SettingsManager implements LoggerAwareInterface
                         'sDomainEnabled' => $settingModel->getDomain()->isReadOnly(),
                         'sProviderName' => $settingModel->getProviderName(),
                     ]);
-                    $this->eventDispatcher->dispatch(
+                    $this->eventManager->dispatch(
                         SettingsManagerEvents::SAVE_SETTING,
                         new SettingChangeEvent($settingModel)
                     );
@@ -259,7 +258,7 @@ class SettingsManager implements LoggerAwareInterface
         }
 
         if ($changed) {
-            $this->eventDispatcher->dispatch(
+            $this->eventManager->dispatch(
                 SettingsManagerEvents::DELETE_SETTING,
                 new SettingChangeEvent($settingModel)
             );

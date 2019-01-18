@@ -9,6 +9,7 @@ use Helis\SettingsManagerBundle\Enqueue\Consumption\WarmupSettingsManagerExtensi
 use Helis\SettingsManagerBundle\Provider\Factory\SimpleSettingsProviderFactory;
 use Helis\SettingsManagerBundle\Provider\LazyReadableSimpleSettingsProvider;
 use Helis\SettingsManagerBundle\Provider\SettingsProviderInterface;
+use Helis\SettingsManagerBundle\Settings\EventManagerInterface;
 use Helis\SettingsManagerBundle\Settings\SettingsManager;
 use Helis\SettingsManagerBundle\Settings\SettingsRouter;
 use Helis\SettingsManagerBundle\Settings\SettingsStore;
@@ -20,7 +21,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Yaml\Yaml;
 
@@ -69,7 +69,7 @@ class HelisSettingsManagerExtension extends Extension
             ->setPublic(true)
             ->setArgument(0, new Reference(SettingsManager::class))
             ->setArgument(1, new Reference(SettingsStore::class))
-            ->setArgument(2, new Reference('event_dispatcher'));
+            ->setArgument(2, new Reference(EventManagerInterface::class));
     }
 
     private function loadEnqueueExtension(array $config, ContainerBuilder $container): void
@@ -89,9 +89,9 @@ class HelisSettingsManagerExtension extends Extension
     {
         $container
             ->register(SettingsManager::class, SettingsManager::class)
-            ->setArgument('$eventDispatcher', new Reference(EventDispatcherInterface::class))
             ->setPublic(true)
             ->setLazy(true)
+            ->setArgument('$eventManager', new Reference(EventManagerInterface::class))
             ->addMethodCall('setLogger', [
                 new Reference(
                     'settings_manager.logger',

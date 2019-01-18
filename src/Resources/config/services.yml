@@ -1,18 +1,39 @@
 services:
     _defaults:
         public: false
-        autowire: true
-        autoconfigure: true
+        autowire: false
+        autoconfigure: false
 
-    Helis\SettingsManagerBundle\Controller\:
-        resource: '../../Controller'
+    Helis\SettingsManagerBundle\Controller\DomainController:
         public: true
+        arguments:
+            $settingsManager: '@Helis\SettingsManagerBundle\Settings\SettingsManager'
+        tags:
+            - { name: controller.service_arguments }
+
+    Helis\SettingsManagerBundle\Controller\SettingsController:
+        public: true
+        arguments:
+            $settingsManager: '@Helis\SettingsManagerBundle\Settings\SettingsManager'
+            $eventManager: '@Helis\SettingsManagerBundle\Settings\EventManagerInterface'
+            $validator: '@validator'
+        tags:
+            - { name: controller.service_arguments }
 
     Helis\SettingsManagerBundle\Settings\SettingsAwareServiceFactory:
         arguments:
-            - '@Helis\SettingsManagerBundle\Settings\SettingsRouter'
+            $settingsRouter: '@Helis\SettingsManagerBundle\Settings\SettingsRouter'
         calls:
             - [setLogger, ['@?settings_manager.logger']]
 
     Helis\SettingsManagerBundle\Settings\SettingsStore: ~
-    Helis\SettingsManagerBundle\Settings\ProvidersManager: ~
+
+    Helis\SettingsManagerBundle\Settings\ProvidersManager:
+        arguments:
+            $settingsManager: '@Helis\SettingsManagerBundle\Settings\SettingsManager'
+
+    Helis\SettingsManagerBundle\Settings\EventManager:
+        arguments:
+            $eventDispatcher: '@event_dispatcher'
+
+    Helis\SettingsManagerBundle\Settings\EventManagerInterface: '@Helis\SettingsManagerBundle\Settings\EventManager'
