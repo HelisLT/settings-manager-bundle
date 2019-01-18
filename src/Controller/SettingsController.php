@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace Helis\SettingsManagerBundle\Controller;
 
+use Helis\SettingsManagerBundle\Event\SettingChangeEvent;
 use Helis\SettingsManagerBundle\Form\SettingFormType;
 use Helis\SettingsManagerBundle\Model\DomainModel;
 use Helis\SettingsManagerBundle\Model\Type;
+use Helis\SettingsManagerBundle\Settings\EventManagerInterface;
 use Helis\SettingsManagerBundle\Settings\SettingsManager;
+use Helis\SettingsManagerBundle\SettingsManagerEvents;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,13 +21,16 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class SettingsController extends AbstractController
 {
     private $settingsManager;
+    private $eventManager;
     private $validator;
 
     public function __construct(
         SettingsManager $settingsManager,
+        EventManagerInterface $eventManager,
         ValidatorInterface $validator
     ) {
         $this->settingsManager = $settingsManager;
+        $this->eventManager = $eventManager;
         $this->validator = $validator;
     }
 
@@ -78,6 +84,7 @@ class SettingsController extends AbstractController
             throw $this->createNotFoundException('Setting not found in ' . $domainName . 'domain');
         }
 
+        $this->eventManager->dispatch(SettingsManagerEvents::PRE_EDIT_SETTING, new SettingChangeEvent($setting));
         $form = $this->createForm(SettingFormType::class, $setting);
         $form->handleRequest($request);
 

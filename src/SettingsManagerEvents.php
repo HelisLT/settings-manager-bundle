@@ -21,6 +21,14 @@ final class SettingsManagerEvents
     public const GET_SETTING = 'settings_manager.get_setting';
 
     /**
+     * Provides an ability to modify setting just before putting it into form.
+     * Could be used to modify choices
+     *
+     * Event class \Helis\SettingsManagerBundle\Event\SettingChangeEvent
+     */
+    public const PRE_EDIT_SETTING = 'settings_manager.pre_edit_setting';
+
+    /**
      * Provides an ability to know about saved setting.
      *
      * Event class \Helis\SettingsManagerBundle\Event\SettingChangeEvent
