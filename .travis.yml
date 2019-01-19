@@ -44,3 +44,10 @@ before_install:
 install: composer update $COMPOSER_FLAGS
 
 script: ./vendor/bin/phpunit -c . -v
+
+jobs:
+  include:
+    - stage: Code Quality
+      php: 7.2
+      env: BENCHMARK
+      script: ./vendor/bin/phpbench run

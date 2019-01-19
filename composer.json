@@ -17,6 +17,7 @@
     "autoload-dev": {
         "psr-4": {
             "Helis\\SettingsManagerBundle\\Tests\\": "tests/src/",
+            "Helis\\SettingsManagerBundle\\Benchmarks\\": "benchmarks/",
             "App\\": "tests/bundle/"
         },
         "classmap": ["tests/app/AppKernel.php"]
@@ -51,6 +52,7 @@
         "knplabs/knp-menu-bundle": "^2.2",
         "liip/functional-test-bundle": ">=2.0.0-alpha1 <=2.0.0-alpha8",
         "paragonie/paseto": "^1.0",
+        "phpbench/phpbench": "^0.15.0",
         "phpunit/phpunit": "^6.5",
         "predis/predis": "^1.1",
         "symfony/asset": "^3.4|^4.0",
