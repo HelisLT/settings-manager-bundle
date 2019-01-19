@@ -36,54 +36,47 @@ class LazyReadableSimpleSettingsProvider extends ReadableSimpleSettingsProvider
 
     public function getSettings(array $domainNames): array
     {
-        $out = [];
+        $modelSettingsByDomain = array_intersect_key($this->modelSettingsByDomain, array_flip($domainNames));
+        $normSettingsByDomain = array_intersect_key($this->normSettingsByDomain, array_flip($domainNames));
 
-        foreach ($domainNames as $domainName) {
-            if (isset($this->modelSettingsByDomain[$domainName])) {
-                // has some models
-                if (count($this->modelSettingsByDomain[$domainName])
-                    !== count($this->normSettingsByDomain[$domainName])
-                ) {
-                    // denormalize missing models
-                    $missingSettings = array_diff_key(
-                        $this->normSettingsByDomain[$domainName],
-                        $this->modelSettingsByDomain[$domainName]
-                    );
-                    $this->modelSettingsByDomain[$domainName] = array_replace(
-                        $this->modelSettingsByDomain[$domainName],
-                        $this->serializer->denormalize($missingSettings, SettingModel::class . '[]')
-                    );
-                }
-
-                $out = array_merge($out, array_values($this->modelSettingsByDomain[$domainName]));
-            } elseif (isset($this->normSettingsByDomain[$domainName])) {
-                // has normalized models
-                $this->modelSettingsByDomain[$domainName] = $this
-                    ->serializer
-                    ->denormalize($this->normSettingsByDomain[$domainName], SettingModel::class . '[]');
-                $out = array_merge($out, array_values($this->modelSettingsByDomain[$domainName]));
-            }
+        foreach ($normSettingsByDomain as $domainName => $normSettings) {
+            $this->modelSettingsByDomain[$domainName] = array_replace(
+                $this->modelSettingsByDomain[$domainName] ?? [],
+                $this->serializer->denormalize($normSettings, SettingModel::class . '[]')
+            );
+            $modelSettingsByDomain[$domainName] = array_replace($modelSettingsByDomain[$domainName] ?? [], $this->modelSettingsByDomain[$domainName]);
+            unset($this->normSettingsByDomain[$domainName]);
         }
 
-        return $out;
+        return empty($modelSettingsByDomain)
+            ? []
+            : array_merge_recursive(...array_values($modelSettingsByDomain));
     }
 
     public function getSettingsByName(array $domainNames, array $settingNames): array
     {
-        $out = [];
+        $normSettingsByDomain = array_intersect_key($this->normSettingsByDomain, array_flip($domainNames));
+        $modelSettingsByDomain = array_intersect_key($this->modelSettingsByDomain, array_flip($domainNames));
 
-        foreach ($domainNames as $domainName) {
-            foreach ($settingNames as $settingName) {
-                if (isset($this->modelSettingsByDomain[$domainName][$settingName])) {
-                    // already has a model
-                    $out[] = $this->modelSettingsByDomain[$domainName][$settingName];
-                } elseif (isset($this->normSettingsByDomain[$domainName][$settingName])) {
-                    // normalized data exists, make a model
-                    $out[]
-                        = $this->modelSettingsByDomain[$domainName][$settingName]
-                        = $this->serializer->denormalize($this->normSettingsByDomain[$domainName][$settingName], SettingModel::class);
+
+        foreach ($normSettingsByDomain as $domainName => $normSettings) {
+            $normSettings = array_intersect_key($normSettings, array_flip($settingNames));
+
+            if (!empty($normSettings)) {
+                $pickedModelSettings = $this->serializer->denormalize($normSettings, SettingModel::class . '[]');
+                $modelSettingsByDomain[$domainName] = array_replace($modelSettingsByDomain[$domainName] ?? [], $pickedModelSettings);
+                $this->modelSettingsByDomain[$domainName] = array_replace($this->modelSettingsByDomain[$domainName] ?? [], $pickedModelSettings);
+                $this->normSettingsByDomain[$domainName] = array_diff_key($this->normSettingsByDomain[$domainName], $pickedModelSettings);
+
+                if (empty($this->normSettingsByDomain[$domainName])) {
+                    unset($this->normSettingsByDomain[$domainName]);
                 }
             }
+        }
+
+        $out = [];
+        foreach ($modelSettingsByDomain as $domainName => $modelSettings) {
+            $out = array_merge($out, array_values(array_intersect_key($modelSettings, array_flip($settingNames))));
         }
 
         return $out;
@@ -98,6 +91,7 @@ class LazyReadableSimpleSettingsProvider extends ReadableSimpleSettingsProvider
                 $this->modelDomains[] = $model;
                 $model->isEnabled() && ($this->modelDomainsEnabled[] = $model);
             }
+            $this->normDomains = [];
         }
 
         return $onlyEnabled ? $this->modelDomainsEnabled : $this->modelDomains;
