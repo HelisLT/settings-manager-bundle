@@ -35,7 +35,7 @@ addons:
     - libsodium-dev
 
 before_install:
-  - pecl install libsodium
+  - if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.1" ]]; then pecl install libsodium; fi
   - pecl info redis
   - echo "extension = redis.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - php -m
