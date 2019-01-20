@@ -58,28 +58,28 @@ class LazyReadableSimpleSettingsProvider extends ReadableSimpleSettingsProvider
         $normSettingsByDomain = array_intersect_key($this->normSettingsByDomain, array_flip($domainNames));
         $modelSettingsByDomain = array_intersect_key($this->modelSettingsByDomain, array_flip($domainNames));
 
-
-        foreach ($normSettingsByDomain as $domainName => $normSettings) {
-            $normSettings = array_intersect_key($normSettings, array_flip($settingNames));
+        if (!empty($normSettingsByDomain)) {
+            $normSettings = array_intersect_key(array_merge(...array_values($normSettingsByDomain)), array_flip($settingNames));
 
             if (!empty($normSettings)) {
-                $pickedModelSettings = $this->serializer->denormalize($normSettings, SettingModel::class . '[]');
-                $modelSettingsByDomain[$domainName] = array_replace($modelSettingsByDomain[$domainName] ?? [], $pickedModelSettings);
-                $this->modelSettingsByDomain[$domainName] = array_replace($this->modelSettingsByDomain[$domainName] ?? [], $pickedModelSettings);
-                $this->normSettingsByDomain[$domainName] = array_diff_key($this->normSettingsByDomain[$domainName], $pickedModelSettings);
+                /** @var SettingModel[] $settings */
+                $settings = $this->serializer->denormalize($normSettings, SettingModel::class . '[]');
+                foreach ($settings as $setting) {
+                    $this->modelSettingsByDomain[$setting->getDomain()->getName()][$setting->getName()]
+                        = $modelSettingsByDomain[$setting->getDomain()->getName()][$setting->getName()]
+                        = $setting;
 
-                if (empty($this->normSettingsByDomain[$domainName])) {
-                    unset($this->normSettingsByDomain[$domainName]);
+                    unset($this->normSettingsByDomain[$setting->getDomain()->getName()][$setting->getName()]);
+                    if (empty($this->normSettingsByDomain[$setting->getDomain()->getName()])) {
+                        unset($this->normSettingsByDomain[$setting->getDomain()->getName()]);
+                    }
                 }
             }
         }
 
-        $out = [];
-        foreach ($modelSettingsByDomain as $domainName => $modelSettings) {
-            $out = array_merge($out, array_values(array_intersect_key($modelSettings, array_flip($settingNames))));
-        }
-
-        return $out;
+        return empty($modelSettingsByDomain)
+            ? []
+            : array_intersect_key(array_merge(...array_values($modelSettingsByDomain)), array_flip($settingNames));
     }
 
     public function getDomains(bool $onlyEnabled = false): array
