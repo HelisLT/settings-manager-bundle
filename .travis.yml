@@ -50,4 +50,4 @@ jobs:
     - stage: Code Quality
       php: 7.2
       env: BENCHMARK
-      script: ./vendor/bin/phpbench run
+      script: ./vendor/bin/phpbench run --progress=travis
