@@ -126,7 +126,7 @@ class LazyReadableSimpleSettingsProviderBench extends Benchmark
      * @ParamProviders({"provideDomainNames", "provideSettingNames"})
      * @Revs(1000)
      * @Iterations(5)
-     * @Assert(stat="mean", value="61")
+     * @Assert(stat="mean", value="71")
      */
     public function benchGetSettingsByName(array $params): void
     {
