@@ -137,7 +137,7 @@ abstract class AbstractSettingsProviderTest extends AbstractReadableSettingsProv
         $this->assertArrayHasKey('apples', $domains);
         $domainToUpdate = $domains['apples'];
         $settings = $this->provider->getSettings(['apples']);
-        $this->assertCount(2, $settings);
+        $this->assertCount(3, $settings);
 
         $this->assertFalse($domainToUpdate->isEnabled());
         $this->assertEquals(0, $domainToUpdate->getPriority());
@@ -156,7 +156,7 @@ abstract class AbstractSettingsProviderTest extends AbstractReadableSettingsProv
         $this->assertArrayHasKey('apples', $domains);
         $domainToUpdate = $domains['apples'];
         $settings = $this->provider->getSettings(['apples']);
-        $this->assertCount(2, $settings);
+        $this->assertCount(3, $settings);
 
         $this->assertTrue($domainToUpdate->isEnabled());
         $this->assertEquals(11, $domainToUpdate->getPriority());

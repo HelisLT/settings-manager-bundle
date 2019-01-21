@@ -21,31 +21,35 @@ class LazyReadableSimpleSettingsProviderBench extends Benchmark
 
     public function setUp(): void
     {
-        $normSettingsByDomain = [];
+        $normSettings = [];
         $normDomains = [];
+
+        $settingsKeyMap = [];
+        $domainsKeyMap = [];
 
         for ($i = 0; $i < 150; $i++) {
             $domainName = 'domain_' . $i;
-            $domain = [
+            $normDomains[$domainName] = [
                 'name' => $domainName,
                 'enabled' => ($i % 3) !== 0,
                 'read_only' => false,
                 'priority' => 0,
             ];
-            $normDomains[$domainName] = $domain;
         }
 
         for ($i = 0; $i < 300; $i++) {
             $domainName = 'domain_' . $i % 150;
             $settingName = 'setting_' . $i;
-
-            $normSettingsByDomain[$domainName][$settingName] = [
+            $settingKey = $domainName.'_'.$settingName;
+            $normSettings[$settingKey] = [
                 'name' => $settingName,
                 'description' => 'It\'s not who I am underneath but what I do that defines me.',
                 'domain' => $normDomains[$domainName],
                 'type' => 'bool',
                 'data' => ['value' => $i % 2],
             ];
+
+            $settingsKeyMap[$settingName][] = $domainsKeyMap[$domainName][] = $settingKey;
         }
 
         $this->provider = new LazyReadableSimpleSettingsProvider(
@@ -60,8 +64,10 @@ class LazyReadableSimpleSettingsProviderBench extends Benchmark
                     new JsonEncoder()
                 ]
             ),
-            $normSettingsByDomain,
-            $normDomains
+            $normDomains,
+            $normSettings,
+            $settingsKeyMap,
+            $domainsKeyMap
         );
     }
 
@@ -109,7 +115,7 @@ class LazyReadableSimpleSettingsProviderBench extends Benchmark
      * @ParamProviders({"provideDomainNames"})
      * @Revs(1000)
      * @Iterations(5)
-     * @Assert(stat="mean", value="36")
+     * @Assert(stat="mean", value="61")
      */
     public function benchGetSettings(array $params): void
     {
@@ -120,7 +126,7 @@ class LazyReadableSimpleSettingsProviderBench extends Benchmark
      * @ParamProviders({"provideDomainNames", "provideSettingNames"})
      * @Revs(1000)
      * @Iterations(5)
-     * @Assert(stat="mean", value="36")
+     * @Assert(stat="mean", value="61")
      */
     public function benchGetSettingsByName(array $params): void
     {
