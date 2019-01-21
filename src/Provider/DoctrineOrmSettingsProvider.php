@@ -28,7 +28,7 @@ class DoctrineOrmSettingsProvider implements SettingsProviderInterface
 
         if (!is_subclass_of($settingsEntityClass, SettingModel::class)) {
             throw new \UnexpectedValueException(
-                $settingsEntityClass . ' is not part of the model ' . SettingModel::class
+                $settingsEntityClass.' is not part of the model '.SettingModel::class
             );
         }
 
@@ -37,7 +37,7 @@ class DoctrineOrmSettingsProvider implements SettingsProviderInterface
         if ($tagEntityClass !== null) {
             if (!is_subclass_of($tagEntityClass, TagModel::class)) {
                 throw new \UnexpectedValueException(
-                    $tagEntityClass . ' is not part of the model ' . TagModel::class
+                    $tagEntityClass.' is not part of the model '.TagModel::class
                 );
             }
 
@@ -152,7 +152,7 @@ class DoctrineOrmSettingsProvider implements SettingsProviderInterface
                 'dname' => $settingModel->getDomain()->getName(),
             ]);
 
-        $success = ((int) $qb->getQuery()->getSingleScalarResult()) > 0;
+        $success = ((int)$qb->getQuery()->getSingleScalarResult()) > 0;
 
         if ($success) {
             $this->entityManager->clear($this->settingsEntityClass);
@@ -173,7 +173,7 @@ class DoctrineOrmSettingsProvider implements SettingsProviderInterface
             ->setParameter('priority', $domainModel->getPriority())
             ->setParameter('dname', $domainModel->getName());
 
-        $success = ((int) $qb->getQuery()->getSingleScalarResult()) > 0;
+        $success = ((int)$qb->getQuery()->getSingleScalarResult()) > 0;
 
         if ($success) {
             $this->entityManager->clear($this->settingsEntityClass);
@@ -190,7 +190,7 @@ class DoctrineOrmSettingsProvider implements SettingsProviderInterface
             ->where($qb->expr()->eq('s.domain.name', ':dname'))
             ->setParameter('dname', $domainName);
 
-        $success = ((int) $qb->getQuery()->getSingleScalarResult()) > 0;
+        $success = ((int)$qb->getQuery()->getSingleScalarResult()) > 0;
 
         if ($success) {
             $this->entityManager->clear($this->settingsEntityClass);

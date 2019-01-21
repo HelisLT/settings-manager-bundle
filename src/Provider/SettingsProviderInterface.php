@@ -11,7 +11,7 @@ use Helis\SettingsManagerBundle\Model\SettingModel;
 interface SettingsProviderInterface
 {
     /**
-     *  Default provider name
+     *  Default provider name.
      */
     public const DEFAULT_PROVIDER = 'config';
 
@@ -35,7 +35,7 @@ interface SettingsProviderInterface
     /**
      * Returns setting by name.
      *
-     * @param string[] $domainNames Domains names to check
+     * @param string[] $domainNames  Domains names to check
      * @param string[] $settingNames Settings to check in those domains
      *
      * @return SettingModel[]

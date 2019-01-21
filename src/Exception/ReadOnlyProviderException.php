@@ -8,6 +8,6 @@ class ReadOnlyProviderException extends \LogicException implements SettingsExcep
 {
     public function __construct(string $providerName)
     {
-        parent::__construct($providerName . ' setting provider is read only');
+        parent::__construct($providerName.' setting provider is read only');
     }
 }

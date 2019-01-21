@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Helis\SettingsManagerBundle\Settings\Traits;
@@ -9,6 +10,7 @@ trait DomainNameExtractTrait
 {
     /**
      * @param DomainModel[] $domainModels
+     *
      * @return string[]
      */
     protected function extractDomainNames(array $domainModels): array

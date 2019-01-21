@@ -49,5 +49,10 @@ jobs:
   include:
     - stage: Code Quality
       php: 7.2
+      env: CODING_STANDARDS
+      script: composer phpcs
+
+    - stage: Code Quality
+      php: 7.2
       env: BENCHMARK
       script: ./vendor/bin/phpbench run --progress=travis

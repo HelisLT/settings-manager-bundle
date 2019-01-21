@@ -47,7 +47,7 @@ class SettingsManager implements LoggerAwareInterface
     }
 
     /**
-     * @param null|string $providerName
+     * @param string|null $providerName
      * @param bool        $onlyEnabled
      *
      * @return DomainModel[]
@@ -290,7 +290,7 @@ class SettingsManager implements LoggerAwareInterface
 
     /**
      * @param DomainModel $domainModel
-     * @param null|string $providerName
+     * @param string|null $providerName
      */
     public function updateDomain(DomainModel $domainModel, string $providerName = null): void
     {
@@ -315,7 +315,7 @@ class SettingsManager implements LoggerAwareInterface
 
     /**
      * @param string      $domainName
-     * @param null|string $providerName
+     * @param string|null $providerName
      */
     public function deleteDomain(string $domainName, string $providerName = null): void
     {

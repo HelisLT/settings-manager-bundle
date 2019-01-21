@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Helis\SettingsManagerBundle\Settings;
@@ -18,6 +19,6 @@ class EventManager implements EventManagerInterface
     public function dispatch(string $eventName, SettingEvent $event): void
     {
         $this->eventDispatcher->dispatch($eventName, $event);
-        $this->eventDispatcher->dispatch($eventName . '.' . strtolower($event->getSetting()->getName()), $event);
+        $this->eventDispatcher->dispatch($eventName.'.'.strtolower($event->getSetting()->getName()), $event);
     }
 }
