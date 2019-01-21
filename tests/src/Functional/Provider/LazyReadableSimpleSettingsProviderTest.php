@@ -11,14 +11,21 @@ class LazyReadableSimpleSettingsProviderTest extends AbstractReadableSettingsPro
     protected function createProvider(): SettingsProviderInterface
     {
         $serializer = $this->getContainer()->get('settings_manager.serializer');
-        $normalizedSettingsByDomain = [];
-        $normalizedDomains = [];
+        $normDomains = [];
+        $normSettings = [];
+        $settingsKeyMap = [];
+        $domainsKeyMap = [];
 
-        foreach ($serializer->normalize($this->getSettingFixtures()) as $normalizedSetting) {
-            $normalizedSettingsByDomain[$normalizedSetting['domain']['name']][$normalizedSetting['name']] = $normalizedSetting;
-            $normalizedDomains[$normalizedSetting['domain']['name']] = $normalizedSetting['domain'];
+        foreach ($serializer->normalize($this->getSettingFixtures()) as $setting) {
+            $domainName = $setting['domain']['name'];
+            $settingName = $setting['name'];
+            $settingKey = $domainName.'_'.$settingName;
+
+            $normDomains[$domainName] = $setting['domain'];
+            $normSettings[$settingKey] = $setting;
+            $settingsKeyMap[$settingName][] = $domainsKeyMap[$domainName][] = $settingKey;
         }
 
-        return new LazyReadableSimpleSettingsProvider($serializer, $normalizedSettingsByDomain, $normalizedDomains);
+        return new LazyReadableSimpleSettingsProvider($serializer, $normDomains, $normSettings, $settingsKeyMap, $domainsKeyMap);
     }
 }

@@ -86,12 +86,21 @@ abstract class AbstractReadableSettingsProviderTest extends WebTestCase
             ->setDomain($domain3)
             ->setData(1.2);
 
+        $setting5 = new Setting();
+        $setting5
+            ->setName('bazinga')
+            ->setDescription('fixture bool baz setting')
+            ->setType(Type::BOOL())
+            ->setDomain($domain3)
+            ->setData(true);
+
         return [
             $setting0,
             $setting1,
             $setting2,
             $setting3,
             $setting4,
+            $setting5,
         ];
     }
 
@@ -110,6 +119,7 @@ abstract class AbstractReadableSettingsProviderTest extends WebTestCase
                 [
                     ['banana', 'apples', 'int', 10],
                     ['bazinga', 'default', 'bool', false],
+                    ['bazinga', 'apples', 'bool', true],
                     ['foo', 'default', 'bool', true],
                     ['kiwi', 'apples', 'float', 1.2],
                 ],
@@ -119,6 +129,7 @@ abstract class AbstractReadableSettingsProviderTest extends WebTestCase
                 [
                     ['banana', 'apples', 'int', 10],
                     ['bazinga', 'default', 'bool', false],
+                    ['bazinga', 'apples', 'bool', true],
                     ['foo', 'default', 'bool', true],
                     ['kiwi', 'apples', 'float', 1.2],
                     ['tuna', 'sea', 'string', 'fishing'],
@@ -144,11 +155,11 @@ abstract class AbstractReadableSettingsProviderTest extends WebTestCase
         }, $settings);
 
         usort($map, function ($a, $b) {
-            return $a[0] <=> $b[0];
+            return $a[0].$a[1] <=> $b[0].$b[1];
         });
 
         usort($expectedSettingsMap, function ($a, $b) {
-            return $a[0] <=> $b[0];
+            return $a[0].$a[1] <=> $b[0].$b[1];
         });
 
         $this->assertEquals($expectedSettingsMap, $map);
@@ -169,6 +180,15 @@ abstract class AbstractReadableSettingsProviderTest extends WebTestCase
                 ['bazinga', 'foo'],
                 [
                     ['bazinga', 'default', 'bool', false],
+                    ['foo', 'default', 'bool', true],
+                ]
+            ],
+            [
+                ['default', 'apples'],
+                ['bazinga', 'foo'],
+                [
+                    ['bazinga', 'default', 'bool', false],
+                    ['bazinga', 'apples', 'bool', true],
                     ['foo', 'default', 'bool', true],
                 ]
             ],
@@ -218,11 +238,11 @@ abstract class AbstractReadableSettingsProviderTest extends WebTestCase
         }, $settings);
 
         usort($map, function ($a, $b) {
-            return $a[0] <=> $b[0];
+            return $a[0].$a[1] <=> $b[0].$b[1];
         });
 
         usort($expectedSettingsMap, function ($a, $b) {
-            return $a[0] <=> $b[0];
+            return $a[0].$a[1] <=> $b[0].$b[1];
         });
 
         $this->assertEquals($map, $expectedSettingsMap);

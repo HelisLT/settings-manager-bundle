@@ -6,6 +6,7 @@ namespace Helis\SettingsManagerBundle\DependencyInjection;
 
 use Helis\SettingsManagerBundle\DataCollector\SettingsCollector;
 use Helis\SettingsManagerBundle\Enqueue\Consumption\WarmupSettingsManagerExtension;
+use Helis\SettingsManagerBundle\Provider\DecoratingInMemorySettingsProvider;
 use Helis\SettingsManagerBundle\Provider\Factory\SimpleSettingsProviderFactory;
 use Helis\SettingsManagerBundle\Provider\LazyReadableSimpleSettingsProvider;
 use Helis\SettingsManagerBundle\Provider\SettingsProviderInterface;
@@ -116,30 +117,43 @@ class HelisSettingsManagerExtension extends Extension
                     'provider' => SettingsProviderInterface::DEFAULT_PROVIDER,
                     'priority' => $config['settings_config']['priority'],
                 ]);
+        } else {
+            $normDomains = [];
+            $normSettings = [];
+            $settingsKeyMap = [];
+            $domainsKeyMap = [];
 
-            return;
-        }
+            foreach ($settings as $setting) {
+                $domainName = $setting['domain']['name'];
+                $settingName = $setting['name'];
+                $settingKey = $domainName.'_'.$settingName;
 
-        $normalizedDomains = [];
-        $normalizedSettingsByDomain = [];
+                $normDomains[$domainName] = $setting['domain'];
+                $normSettings[$settingKey] = $setting;
+                $settingsKeyMap[$settingName][] = $domainsKeyMap[$domainName][] = $settingKey;
+            }
 
-        foreach ($settings as $setting) {
-            $normalizedDomains[$setting['domain']['name']] = $setting['domain'];
-            $normalizedSettingsByDomain[$setting['domain']['name']][$setting['name']] = $setting;
+            $container
+                ->register('settings_manager.provider.config', LazyReadableSimpleSettingsProvider::class)
+                ->setArguments([
+                    new Reference('settings_manager.serializer'),
+                    $normDomains,
+                    $normSettings,
+                    $settingsKeyMap,
+                    $domainsKeyMap,
+                ])
+                ->setPublic(false)
+                ->addTag('settings_manager.provider', [
+                    'provider' => SettingsProviderInterface::DEFAULT_PROVIDER,
+                    'priority' => $config['settings_config']['priority'],
+                ]);
         }
 
         $container
-            ->register('settings_manager.provider.config', LazyReadableSimpleSettingsProvider::class)
-            ->setArguments([
-                new Reference('settings_manager.serializer'),
-                $normalizedSettingsByDomain,
-                $normalizedDomains,
-            ])
-            ->setPublic(false)
-            ->addTag('settings_manager.provider', [
-                'provider' => SettingsProviderInterface::DEFAULT_PROVIDER,
-                'priority' => $config['settings_config']['priority'],
-            ]);
+            ->register('settings_manager.provider.config.decorating', DecoratingInMemorySettingsProvider::class)
+            ->setArguments([new Reference('settings_manager.provider.config.decorating.inner')])
+            ->setDecoratedService('settings_manager.provider.config')
+            ->setPublic(false);
     }
 
     private function loadSettingsFromFiles(array $files, ContainerBuilder $container): array
