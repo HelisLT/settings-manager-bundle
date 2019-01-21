@@ -92,7 +92,9 @@ class SettingFormType extends AbstractType
                         'translation_domain' => 'HelisSettingsManager',
                         'label' => 'edit.form.value',
                         'placeholder' => 'edit.form.choice_placeholder',
-                        'choices' => $model->getChoices()
+                        'choices' => array_values($model->getChoices()) === $model->getChoices()
+                            ? array_combine($model->getChoices(), $model->getChoices())
+                            : $model->getChoices()
                     ]);
             } else {
                 $event
