@@ -53,7 +53,9 @@
         "liip/functional-test-bundle": ">=2.0.0-alpha1 <=2.0.0-alpha8",
         "paragonie/paseto": "^1.0",
         "phpbench/phpbench": "^0.15.0",
-        "phpunit/phpunit": "^6.5",
+        "phpstan/phpstan": "^0.11.1",
+        "phpstan/phpstan-phpunit": "^0.11.0",
+        "phpunit/phpunit": "^7.2",
         "predis/predis": "^1.1",
         "symfony/asset": "^3.4|^4.0",
         "symfony/framework-bundle": "^3.4|^4.0",
@@ -87,6 +89,7 @@
         "phpcs-fix": [
             "@install-phpcs",
             "@php php-cs-fixer.phar fix --diff -v --allow-risky=yes --ansi"
-        ]
+        ],
+        "phpstan": "phpstan analyse --ansi"
     }
 }

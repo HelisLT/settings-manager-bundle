@@ -132,7 +132,7 @@ class DecoratingPredisSettingsProvider implements SettingsProviderInterface
     {
         $output = $this->decoratingProvider->delete($settingModel);
 
-        $this->redis->pipeline(function (Pipeline $pipe) use ($output, $settingModel) {
+        $this->redis->pipeline(function (Pipeline $pipe) use ($settingModel) {
             $pipe->hdel($this->getNamespacedKey($settingModel->getDomain()->getName()), [$settingModel->getName()]);
             $domainName = $settingModel->getDomain()->getName();
             $domainNames = $this->extractDomainNames($this->decoratingProvider->getDomains());
