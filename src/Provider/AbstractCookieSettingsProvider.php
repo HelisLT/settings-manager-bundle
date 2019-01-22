@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Helis\SettingsManagerBundle\Provider;
@@ -62,9 +63,9 @@ abstract class AbstractCookieSettingsProvider extends SimpleSettingsProvider imp
         parent::__construct([]);
     }
 
-    protected abstract function getTokenParser(): Parser;
+    abstract protected function getTokenParser(): Parser;
 
-    protected abstract function getTokenBuilder(): Builder;
+    abstract protected function getTokenBuilder(): Builder;
 
     public function onKernelRequest(GetResponseEvent $event): void
     {
@@ -94,9 +95,9 @@ abstract class AbstractCookieSettingsProvider extends SimpleSettingsProvider imp
         try {
             $this->settings = $this
                 ->serializer
-                ->deserialize($token->get('dt'), SettingModel::class . '[]', 'json');
+                ->deserialize($token->get('dt'), SettingModel::class.'[]', 'json');
         } catch (PasetoException $e) {
-            $this->logger && $this->logger->warning(sprintf('%s: '. strtolower($e), (new \ReflectionObject($this))->getShortName()) , [
+            $this->logger && $this->logger->warning(sprintf('%s: '.strtolower($e), (new \ReflectionObject($this))->getShortName()), [
                 'sRawToken' => $rawToken,
             ]);
         }
@@ -131,9 +132,9 @@ abstract class AbstractCookieSettingsProvider extends SimpleSettingsProvider imp
             ->setNotBefore($now)
             ->setIssuer($this->issuer)
             ->setSubject($this->subject)
-            ->setExpiration($now->add(new \DateInterval('PT' . $this->ttl . 'S')))
+            ->setExpiration($now->add(new \DateInterval('PT'.$this->ttl.'S')))
             ->setClaims([
-                'dt' => $this->serializer->serialize($this->settings, 'json')
+                'dt' => $this->serializer->serialize($this->settings, 'json'),
             ]);
 
         $this->footer !== null && $token->setFooter($this->footer);
@@ -141,7 +142,7 @@ abstract class AbstractCookieSettingsProvider extends SimpleSettingsProvider imp
         $event
             ->getResponse()
             ->headers
-            ->setCookie(new Cookie($this->cookieName, (string) $token, time() + $this->ttl, $this->cookiePath, $this->cookieDomain));
+            ->setCookie(new Cookie($this->cookieName, (string)$token, time() + $this->ttl, $this->cookiePath, $this->cookieDomain));
     }
 
     public function save(SettingModel $settingModel): bool

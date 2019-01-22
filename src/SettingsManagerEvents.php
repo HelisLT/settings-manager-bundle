@@ -22,7 +22,7 @@ final class SettingsManagerEvents
 
     /**
      * Provides an ability to modify setting just before putting it into form.
-     * Could be used to modify choices
+     * Could be used to modify choices.
      *
      * Event class \Helis\SettingsManagerBundle\Event\SettingChangeEvent
      */

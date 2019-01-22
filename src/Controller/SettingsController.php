@@ -60,7 +60,7 @@ class SettingsController extends AbstractController
         $setting = $this->settingsManager->getSettingsByName([$domainName], [$settingName]);
         $setting = array_shift($setting);
         if ($setting === null) {
-            throw $this->createNotFoundException('Setting not found in ' . $domainName . 'domain');
+            throw $this->createNotFoundException('Setting not found in '.$domainName.' domain');
         }
 
         if ($setting->getType()->equals(Type::BOOL())) {
@@ -81,7 +81,7 @@ class SettingsController extends AbstractController
         $setting = array_shift($setting);
 
         if ($setting === null) {
-            throw $this->createNotFoundException('Setting not found in ' . $domainName . 'domain');
+            throw $this->createNotFoundException('Setting not found in '.$domainName.' domain');
         }
 
         $this->eventManager->dispatch(SettingsManagerEvents::PRE_EDIT_SETTING, new SettingChangeEvent($setting));
@@ -107,7 +107,7 @@ class SettingsController extends AbstractController
         $setting = array_shift($setting);
 
         if ($setting === null) {
-            throw $this->createNotFoundException('Setting not found in ' . $domainName . 'domain');
+            throw $this->createNotFoundException('Setting not found in '.$domainName.' domain');
         }
 
         $this->settingsManager->delete($setting);
@@ -121,7 +121,7 @@ class SettingsController extends AbstractController
         $setting = array_shift($setting);
 
         if ($setting === null) {
-            throw $this->createNotFoundException('Setting not found in ' . $domainName . 'domain');
+            throw $this->createNotFoundException('Setting not found in '.$domainName.' domain');
         }
 
         $setting = clone $setting;

@@ -31,7 +31,7 @@ class ProvidersManager
         $sourceSettings = $this->getSourceSettings($sourceProvider, $domains);
 
         foreach ($this->settingsManager->getProviders() as $name => $provider) {
-            if (!\in_array($name, $targetProviders, true)) {
+            if (!in_array($name, $targetProviders, true)) {
                 continue;
             }
 
@@ -41,6 +41,7 @@ class ProvidersManager
 
     /**
      * @param string[] $domains
+     *
      * @return SettingModel[]
      */
     private function getSourceSettings(string $provider, array $domains): array
@@ -76,6 +77,7 @@ class ProvidersManager
     /**
      * @param SettingModel[] $sourceSettings
      * @param SettingModel[] $settings
+     *
      * @return SettingModel[]
      */
     private function getDiff(array $sourceSettings, array $settings): array

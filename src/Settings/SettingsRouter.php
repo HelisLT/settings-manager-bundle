@@ -161,7 +161,7 @@ class SettingsRouter
     }
 
     /**
-     * Warm up domains from providers
+     * Warm up domains from providers.
      *
      * @param bool $force
      */
@@ -178,7 +178,7 @@ class SettingsRouter
     }
 
     /**
-     * Warmup settings from providers
+     * Warmup settings from providers.
      *
      * @param array $settingNames
      */

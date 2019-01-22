@@ -77,5 +77,16 @@
     },
     "config": {
         "sort-packages": true
+    },
+    "scripts": {
+        "install-phpcs": "test -f php-cs-fixer.phar || wget https://cs.sensiolabs.org/download/php-cs-fixer-v2.phar -O php-cs-fixer.phar",
+        "phpcs": [
+            "@install-phpcs",
+            "@php php-cs-fixer.phar fix --dry-run --diff -v --allow-risky=yes --ansi"
+        ],
+        "phpcs-fix": [
+            "@install-phpcs",
+            "@php php-cs-fixer.phar fix --diff -v --allow-risky=yes --ansi"
+        ]
     }
 }

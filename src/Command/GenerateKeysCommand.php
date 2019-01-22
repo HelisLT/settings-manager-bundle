@@ -43,12 +43,14 @@ class GenerateKeysCommand extends Command
         $writePrivateResult = file_put_contents($input->getArgument('private_key_path'), $rawPrivate);
         if (false === $writePrivateResult) {
             $io->error('Could not write to private key path');
+
             return;
         }
 
         $writePublicResult = file_put_contents($input->getArgument('public_key_path'), $rawPublic);
         if (false === $writePublicResult) {
             $io->error('Could not write to public key path');
+
             return;
         }
 

@@ -154,6 +154,7 @@ class DecoratingPredisSettingsProvider implements SettingsProviderInterface
             foreach ($domains as &$domain) {
                 $domain = $this->serializer->deserialize($domain, DomainModel::class, 'json');
             }
+
             return array_values($domains);
         }
 
@@ -204,7 +205,7 @@ class DecoratingPredisSettingsProvider implements SettingsProviderInterface
 
     private function getDomainKey(bool $onlyEnabled = false): string
     {
-        return $this->getNamespacedKey(self::DOMAIN_KEY . ($onlyEnabled ? '_oe' : ''));
+        return $this->getNamespacedKey(self::DOMAIN_KEY.($onlyEnabled ? '_oe' : ''));
     }
 
     private function getHashMapKey(): string
