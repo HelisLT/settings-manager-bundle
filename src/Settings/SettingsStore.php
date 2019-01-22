@@ -80,6 +80,6 @@ class SettingsStore extends ArrayCollection
         $this->settingsByProvider = [];
         $this->domainNames = [];
 
-        return parent::clear();
+        parent::clear();
     }
 }
