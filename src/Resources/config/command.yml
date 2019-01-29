@@ -6,3 +6,4 @@ services:
 
     Helis\SettingsManagerBundle\Command\WarmUpProvidersCommand: ~
     Helis\SettingsManagerBundle\Command\GenerateKeysCommand: ~
+    Helis\SettingsManagerBundle\Command\SettingsDebugCommand: ~
