@@ -53,7 +53,7 @@ The <info>%command.name%</info> command displays all available settings:
 
 Use the <info>--domains</info> option to display all configured domains:
 
-  <info>php %command.full_name% --parameters</info>
+  <info>php %command.full_name% --domains</info>
 
 Display settings for a specific domain by specifying its name with the <info>--domain</info> option:
 
