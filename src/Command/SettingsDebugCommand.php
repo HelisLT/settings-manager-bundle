@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Helis\SettingsManagerBundle\Command;
 
 use Helis\SettingsManagerBundle\Model\SettingModel;
-use Helis\SettingsManagerBundle\Provider\SettingsProviderInterface;
 use Helis\SettingsManagerBundle\Settings\SettingsManager;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -119,11 +118,8 @@ EOF
                 }
             } // Display all settings
             else {
-                /** @var SettingsProviderInterface $provider */
-                foreach (array_reverse($this->settingsManager->getProviders()) as $pName => $provider) {
-                    foreach ($provider->getSettings($domains) as $settingModel) {
-                        $tableRows[] = $this->_renderSettingsRow($settingModel);
-                    }
+                foreach ($this->settingsManager->getSettingsByDomain($domains) as $settingModel) {
+                    $tableRows[] = $this->_renderSettingsRow($settingModel);
                 }
             }
 
