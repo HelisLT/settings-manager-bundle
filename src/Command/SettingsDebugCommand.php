@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Helis\SettingsManagerBundle\Command;
 
 use Helis\SettingsManagerBundle\Model\SettingModel;
@@ -13,13 +15,10 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
- * Class SettingsDebugCommand
- *
- * @package Helis\SettingsManagerBundle\Command
+ * Class SettingsDebugCommand.
  */
 class SettingsDebugCommand extends Command
 {
-
     protected static $defaultName = 'debug:settings';
 
     /** @var SettingsManager $settingsManager */
@@ -46,7 +45,8 @@ class SettingsDebugCommand extends Command
             new InputOption('domain', null, InputOption::VALUE_REQUIRED, 'Displays settings for a specific domain'),
             new InputOption('domains', null, InputOption::VALUE_NONE, 'Displays all configured domains'),
             new InputOption('tag', null, InputOption::VALUE_REQUIRED, 'Shows all settings with a specific tag'),
-        ])->setDescription('Displays current settings for an application')->setHelp(<<<'EOF'
+        ])->setDescription('Displays current settings for an application')->setHelp(
+            <<<'EOF'
 The <info>%command.name%</info> command displays all available settings:
 
   <info>php %command.full_name%</info>
@@ -77,7 +77,6 @@ EOF
      * @param InputInterface  $input
      * @param OutputInterface $output
      *
-     * @return void null or 0 if everything went fine, or an error code
      * @see setCode()
      */
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -87,13 +86,13 @@ EOF
         // // Displays all configured domains
         if ($input->getOption('domains')) {
             $tableHeaders = ['Name', 'Priority', 'Enabled', 'Read only'];
-            $tableRows    = [];
+            $tableRows = [];
             foreach ($this->settingsManager->getDomains() as $key => $domain) {
                 $tableRows[] = [
                     $domain->getName(),
                     $domain->getPriority(),
                     $domain->isEnabled(),
-                    $domain->isReadOnly()
+                    $domain->isReadOnly(),
                 ];
             }
             $io->table($tableHeaders, $tableRows);
@@ -108,12 +107,14 @@ EOF
         // Displays table of settings
         if (!$input->getOption('domains') && !$input->getArgument('name')) {
             $tableHeaders = ['Name', 'Description', 'Domain', 'Type', 'Data', 'Provider name', 'Tags'];
-            $tableRows    = [];
+            $tableRows = [];
 
             // Display settings filtered by tags
             if ($tag = $input->getOption('tag')) {
-                foreach (array_reverse($this->settingsManager->getEnabledSettingsByTag($domains,
-                    $tag)) as $settingModel) {
+                foreach (array_reverse($this->settingsManager->getEnabledSettingsByTag(
+                    $domains,
+                    $tag
+                )) as $settingModel) {
                     $tableRows[] = $this->_renderSettingsRow($settingModel);
                 }
             } // Display all settings
@@ -137,11 +138,11 @@ EOF
             $setting = array_shift($setting);
 
             $tableHeaders = ['Option', 'Value'];
-            $tableRows[]  = ['Name', $setting->getName()];
-            $tableRows[]  = ['Description', $setting->getDescription() ?? '-'];
-            $tableRows[]  = ['Domain', $setting->getDomain()->getName()];
-            $tableRows[]  = ['Provider Name', $setting->getProviderName() ?? 'config'];
-            $tableRows[]  = ['Type', $setting->getType()->getValue()];
+            $tableRows[] = ['Name', $setting->getName()];
+            $tableRows[] = ['Description', $setting->getDescription() ?? '-'];
+            $tableRows[] = ['Domain', $setting->getDomain()->getName()];
+            $tableRows[] = ['Provider Name', $setting->getProviderName() ?? 'config'];
+            $tableRows[] = ['Type', $setting->getType()->getValue()];
 
             if ($tags = $setting->getTags()) {
                 $tagInformation = [];
@@ -184,7 +185,7 @@ EOF
             $settingModel->getType()->getValue(),
             $settingModel->getData(),
             $settingModel->getProviderName() ?? 'config',
-            $tagInformation
+            $tagInformation,
         ];
     }
 }
