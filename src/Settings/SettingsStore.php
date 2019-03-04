@@ -67,7 +67,7 @@ class SettingsStore extends ArrayCollection
     }
 
     /**
-     * Checks if settings store is not empty
+     * Checks if settings store is not empty.
      *
      * @return bool
      */
