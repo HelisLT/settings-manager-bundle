@@ -51,6 +51,29 @@ abstract class AbstractSettingsProviderTest extends AbstractReadableSettingsProv
         $this->assertEquals('sea', $setting->getDomain()->getName());
     }
 
+    public function testSaveExistingSettingNameNewDomain()
+    {
+        $settings = $this->provider->getSettings(['sea']);
+        $this->assertCount(1, $settings);
+        /** @var SettingModel $setting */
+        $setting = reset($settings);
+        $this->assertInstanceOf(SettingModel::class, $setting);
+
+        $clonedSetting = clone $setting;
+        $clonedSetting->getDomain()->setName('salt_sea');
+        $clonedSetting->getDomain()->setPriority(1);
+
+        $this->provider->save($clonedSetting);
+        $settings = $this->provider->getSettingsByName(['sea', 'salt_sea'], ['tuna']);
+        $this->assertCount(2, $settings);
+
+        $settingMap = $this->buildSettingHashmap(...$settings);
+        $this->assertArrayHasKey('salt_sea', $settingMap);
+        $this->assertArrayHasKey('tuna', $settingMap['salt_sea']);
+        $this->assertArrayHasKey('sea', $settingMap);
+        $this->assertArrayHasKey('tuna', $settingMap['sea']);
+    }
+
     public function testSaveWithNewDomain()
     {
         $settings = $this->provider->getSettings(['water']);
