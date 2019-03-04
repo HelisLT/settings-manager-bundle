@@ -404,7 +404,7 @@ User interface can be used to change setting values, enable or disable domains.
 
  1. Bundled user interface requires [knp-menu-bundle](https://github.com/KnpLabs/KnpMenu), [jsrouting-bundle](https://github.com/FriendsOfSymfony/FOSJsRoutingBundle).
 
-    `composer require knplabs/knp-menu-bundle friendsofsymfony/jsrouting-bundle`
+    `composer require symfony/translation symfony/twig-bundle symfony/asset knplabs/knp-menu-bundle friendsofsymfony/jsrouting-bundle`
 
  2. Include routing file.
 

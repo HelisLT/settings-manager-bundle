@@ -14,6 +14,12 @@ settings_domain_quick_edit:
     defaults:
         _controller: HelisSettingsManagerBundle:Domain:quickEdit
 
+settings_domain_edit:
+    path: /domains/{domainName}/{providerName}
+    methods: [GET, POST]
+    defaults:
+        _controller: HelisSettingsManagerBundle:Domain:edit
+
 settings_domain_copy:
     path: /domains/{domainName}/copy/{providerName}
     methods: [POST]

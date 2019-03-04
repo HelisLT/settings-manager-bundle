@@ -125,7 +125,7 @@ class SettingsController extends AbstractController
         }
 
         $setting = clone $setting;
-        $setting->getDomain()->setName($toDomainName);
+        $setting->setDomain((new DomainModel())->setName($toDomainName));
 
         $violations = $this->validator->validate($setting, null, ['Default', 'Duplication']);
         if ($violations->count() !== 0) {

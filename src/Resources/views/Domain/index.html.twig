@@ -36,9 +36,14 @@
                                             {% if pDomain.isEnabled() is same as(true) %}checked{% endif %}
                                             {% if pDomain.isReadOnly() or provider.isReadOnly() %}disabled{% endif %}>
                                     {% if not provider.isReadOnly() %}
+                                        <a href="{{ path('settings_domain_edit', { domainName: domain.getName(), providerName: pName }) }}"
+                                           class="btn btn-link btn-sm">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
                                         <button
                                                 type="button"
                                                 class="btn btn-link btn-sm js-provider-domain-delete-button"
+                                                data-confirm-message="Are you sure to delete {{ pDomain.getName() }} domain from {{ pName }} provider?"
                                                 data-url="{{ path('settings_domain_delete', {domainName: pDomain.getName(), providerName: pName}) }}">
                                             <i class="fa fa-trash" aria-hidden="true"></i>
                                         </button>
@@ -115,13 +120,15 @@
             });
 
             $('.js-provider-domain-delete-button').on('click', function() {
-                $.ajax({
-                    method: 'DELETE',
-                    url: $(this).data('url'),
-                    success: function () {
-                        window.location.reload();
-                    }
-                });
+                if (confirm($(this).data('confirm-message'))) {
+                    $.ajax({
+                        method: 'DELETE',
+                        url: $(this).data('url'),
+                        success: function () {
+                            window.location.reload();
+                        }
+                    });
+                }
             });
 
             $('.js-domain-delete-button').on('click', function () {
