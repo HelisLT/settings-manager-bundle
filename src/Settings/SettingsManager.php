@@ -86,8 +86,17 @@ class SettingsManager implements LoggerAwareInterface
             foreach ($provider->getSettingsByName($domainNames, $settingNames) as $settingModel) {
                 if ($settingModel instanceof SettingModel) {
                     $settingModel->setProviderName($pName);
-                    $providerSettings[] = $settingModel;
-                    unset($settingNames[array_search($settingModel->getName(), $settingNames, true)]);
+
+                    if ((isset($providerSettings[$settingModel->getName()])
+                        && $providerSettings[$settingModel->getName()]->getDomain()->getPriority() < $settingModel->getDomain()->getPriority())
+                        || !isset($providerSettings[$settingModel->getName()])
+                    ) {
+                        $providerSettings[$settingModel->getName()] = $settingModel;
+                    }
+
+                    if (($k = array_search($settingModel->getName(), $settingNames, true)) !== false) {
+                        unset($settingNames[$k]);
+                    }
                 } else {
                     $this->logger && $this->logger->warning('SettingsManager: received null setting', [
                         'sProviderName' => $pName,
@@ -96,7 +105,7 @@ class SettingsManager implements LoggerAwareInterface
                 }
             }
 
-            $settings[] = $providerSettings;
+            $settings[] = array_values($providerSettings);
 
             // check if already has enough
             if (count($settingNames) === 0) {
@@ -120,7 +129,13 @@ class SettingsManager implements LoggerAwareInterface
             $providerSettings = [];
             foreach ($provider->getSettings($domainNames) as $settingModel) {
                 $settingModel->setProviderName($pName);
-                $providerSettings[$settingModel->getName()] = $settingModel;
+
+                if ((isset($providerSettings[$settingModel->getName()])
+                        && $providerSettings[$settingModel->getName()]->getDomain()->getPriority() < $settingModel->getDomain()->getPriority())
+                    || !isset($providerSettings[$settingModel->getName()])
+                ) {
+                    $providerSettings[$settingModel->getName()] = $settingModel;
+                }
             }
 
             $settings[] = $providerSettings;
@@ -144,7 +159,13 @@ class SettingsManager implements LoggerAwareInterface
             foreach ($provider->getSettings($domainNames) as $settingModel) {
                 if ($settingModel->hasTag($tagName)) {
                     $settingModel->setProviderName($pName);
-                    $providerSettings[$settingModel->getName()] = $settingModel;
+
+                    if ((isset($providerSettings[$settingModel->getName()])
+                            && $providerSettings[$settingModel->getName()]->getDomain()->getPriority() < $settingModel->getDomain()->getPriority())
+                        || !isset($providerSettings[$settingModel->getName()])
+                    ) {
+                        $providerSettings[$settingModel->getName()] = $settingModel;
+                    }
                 }
             }
 

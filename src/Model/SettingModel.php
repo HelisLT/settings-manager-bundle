@@ -23,6 +23,13 @@ class SettingModel
         $this->tags = new ArrayCollection();
     }
 
+    public function __clone()
+    {
+        if ($this->domain instanceof DomainModel) {
+            $this->domain = clone $this->domain;
+        }
+    }
+
     public function getName(): ?string
     {
         return $this->name;

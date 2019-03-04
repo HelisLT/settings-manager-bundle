@@ -187,4 +187,44 @@ class SettingsManagerTest extends WebTestCase
         $domains = $this->settingsManager->getDomains();
         $this->assertArrayNotHasKey('sea', $domains);
     }
+
+    public function testGetSettingsByNameWithHigherPriorityDomain()
+    {
+        $this->loadFixtures([LoadSettingsData::class]);
+
+        $settings = $this->settingsManager->getSettingsByName(['default', 'vip'], ['bazinga']);
+        /** @var Setting $setting */
+        $setting = reset($settings);
+        $this->assertInstanceOf(Setting::class, $setting);
+        $this->assertEquals('orm', $setting->getProviderName());
+        $this->assertFalse($setting->getData());
+
+        $setting = clone $setting;
+        $setting->getDomain()->setName('vip');
+        $setting->getDomain()->setPriority(1);
+        $setting->setData(true);
+        $this->settingsManager->save($setting);
+
+        // assert with new domain
+
+        $settings = $this->settingsManager->getSettingsByName(['default', 'vip'], ['bazinga']);
+        /** @var Setting $setting */
+        $setting = reset($settings);
+        $this->assertInstanceOf(Setting::class, $setting);
+        $this->assertEquals('orm', $setting->getProviderName());
+        $this->assertEquals('vip', $setting->getDomain()->getName());
+        $this->assertEquals(1, $setting->getDomain()->getPriority());
+        $this->assertTrue($setting->getData());
+
+        // assert without new domain
+
+        $settings = $this->settingsManager->getSettingsByName(['default'], ['bazinga']);
+        /** @var Setting $setting */
+        $setting = reset($settings);
+        $this->assertInstanceOf(Setting::class, $setting);
+        $this->assertEquals('orm', $setting->getProviderName());
+        $this->assertEquals('default', $setting->getDomain()->getName());
+        $this->assertEquals(0, $setting->getDomain()->getPriority());
+        $this->assertFalse($setting->getData());
+    }
 }
