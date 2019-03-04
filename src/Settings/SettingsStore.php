@@ -19,12 +19,18 @@ class SettingsStore extends ArrayCollection
      */
     private $domainNames;
 
+    /**
+     * @var string[]
+     */
+    private $additionalDomainNames;
+
     public function __construct(array $elements = [])
     {
         parent::__construct($elements);
 
         $this->settingsByProvider = [];
         $this->domainNames = [];
+        $this->additionalDomainNames = [];
     }
 
     /**
@@ -60,6 +66,11 @@ class SettingsStore extends ArrayCollection
         return $this->settingsByProvider[$providerName] ?? [];
     }
 
+    /**
+     * Checks if settings store is not empty.
+     *
+     * @return bool
+     */
     public function isWarm(): bool
     {
         return $this->count() > 0;
@@ -67,12 +78,28 @@ class SettingsStore extends ArrayCollection
 
     public function getDomainNames(): array
     {
-        return $this->domainNames;
+        if (empty($this->additionalDomainNames)) {
+            return $this->domainNames;
+        }
+
+        return array_values(array_unique(array_merge($this->domainNames, $this->additionalDomainNames)));
     }
 
     public function setDomainNames(array $domainNames): void
     {
         $this->domainNames = $domainNames;
+    }
+
+    public function setAdditionalDomainNames(array $additionalDomainNames): void
+    {
+        $this->additionalDomainNames = $additionalDomainNames;
+    }
+
+    public function addAdditionalDomainName(string $domainName): void
+    {
+        if (!in_array($domainName, $this->additionalDomainNames)) {
+            $this->additionalDomainNames[] = $domainName;
+        }
     }
 
     public function clear()
