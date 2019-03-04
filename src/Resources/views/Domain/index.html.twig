@@ -19,7 +19,12 @@
                 <tbody>
                 {% for domain in domains %}
                     <tr>
-                        <td>{{ domain.getName() }}</td>
+                        <td>
+                            {{ domain.getName() }}
+                            <p style="margin-bottom: 0">
+                                <small class="text-muted">Priority: <strong>{{ domain.getPriority() }}</strong></small>
+                            </p>
+                        </td>
                         {% for pName, provider in providers %}
                             <td>
                                 {% for pDomain in provider.getDomains() if pDomain.getName() is same as(domain.getName()) %}
