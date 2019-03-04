@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Helis\SettingsManagerBundle\Controller;
 
+use Helis\SettingsManagerBundle\Form\DomainFormType;
 use Helis\SettingsManagerBundle\Settings\SettingsManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -46,6 +47,29 @@ class DomainController extends AbstractController
         $this->settingsManager->updateDomain($domain, $providerName);
 
         return new JsonResponse();
+    }
+
+    public function editAction(Request $request, string $domainName, string $providerName): Response
+    {
+        $domains = $this->settingsManager->getDomains($providerName);
+
+        if (!isset($domains[$domainName])) {
+            throw $this->createNotFoundException("Domain {$domainName} not found");
+        }
+
+        $form = $this->createForm(DomainFormType::class, $domains[$domainName]);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->settingsManager->updateDomain($form->getData(), $providerName);
+
+            return $this->redirectToRoute('settings_domain_index');
+        }
+
+        return $this->render('@HelisSettingsManager/Domain/edit.html.twig', [
+            'form' => $form->createView(),
+            'domainName' => $domainName,
+        ]);
     }
 
     public function copyAction(string $domainName, string $providerName): Response

@@ -1,0 +1,31 @@
+{% extends '@HelisSettingsManager/layout.html.twig' %}
+
+{% trans_default_domain 'HelisSettingsManager' %}
+
+{% form_theme form 'bootstrap_4_layout.html.twig' %}
+
+{% block contents %}
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6 offset-lg-3 col-md-8 offset-md-2 col-sm-8 offset-sm-2 col-xs-10 offset-xs-1">
+                <br>
+                <h1 class="display-4">{{ 'edit.domain_title' | trans }}</h1>
+
+                {{ form_start(form) }}
+                {{ form_errors(form) }}
+
+                {{ form_row(form.name) }}
+                {{ form_row(form.priority) }}
+                {{ form_row(form.enabled) }}
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success" id="submit-button">Save</button>
+                    <a href="{{ path('settings_domain_index', {domainName: domainName}) }}" class="btn btn-outline-danger">Back</a>
+                </div>
+
+                {{ form_rest(form) }}
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}

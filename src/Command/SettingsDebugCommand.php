@@ -90,8 +90,8 @@ EOF
                 $tableRows[] = [
                     $domain->getName(),
                     $domain->getPriority(),
-                    $domain->isEnabled(),
-                    $domain->isReadOnly(),
+                    $domain->isEnabled() ? 'true' : 'false',
+                    $domain->isReadOnly() ? 'true' : 'false',
                 ];
             }
             $io->table($tableHeaders, $tableRows);
