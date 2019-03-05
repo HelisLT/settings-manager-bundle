@@ -167,7 +167,7 @@ class SettingsRouter
      */
     private function warmupDomains(bool $force = false): void
     {
-        if (empty($this->settingsStore->getDomainNames()) || $force) {
+        if (empty($this->settingsStore->getDomainNames(false)) || $force) {
             $this->settingsStore->setDomainNames(array_map(
                 function (DomainModel $domainModel) {
                     return $domainModel->getName();
