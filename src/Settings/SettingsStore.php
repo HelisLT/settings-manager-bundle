@@ -76,9 +76,9 @@ class SettingsStore extends ArrayCollection
         return $this->count() > 0;
     }
 
-    public function getDomainNames(): array
+    public function getDomainNames(bool $includeAdditional = true): array
     {
-        if (empty($this->additionalDomainNames)) {
+        if (empty($this->additionalDomainNames) || $includeAdditional === false) {
             return $this->domainNames;
         }
 
