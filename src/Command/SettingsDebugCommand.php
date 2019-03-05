@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Helis\SettingsManagerBundle\Command;
 
 use Helis\SettingsManagerBundle\Model\SettingModel;
+use Helis\SettingsManagerBundle\Model\TagModel;
 use Helis\SettingsManagerBundle\Settings\SettingsManager;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -20,7 +21,9 @@ class SettingsDebugCommand extends Command
 {
     protected static $defaultName = 'debug:settings';
 
-    /** @var SettingsManager $settingsManager */
+    /**
+     * @var SettingsManager
+     */
     protected $settingsManager;
 
     /**
@@ -35,7 +38,7 @@ class SettingsDebugCommand extends Command
     }
 
     /**
-     * Configures the current command.
+     * {@inheritdoc}
      */
     protected function configure()
     {
@@ -67,16 +70,7 @@ EOF
     }
 
     /**
-     * Executes the current command.
-     * This method is not abstract because you can use this class
-     * as a concrete class. In this case, instead of defining the
-     * execute() method, you set the code to execute by passing
-     * a Closure to the setCode() method.
-     *
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     *
-     * @see setCode()
+     * {@inheritdoc}
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -90,8 +84,8 @@ EOF
                 $tableRows[] = [
                     $domain->getName(),
                     $domain->getPriority(),
-                    $domain->isEnabled() ? 'true' : 'false',
-                    $domain->isReadOnly() ? 'true' : 'false',
+                    $this->dataToScalar($domain->isEnabled()),
+                    $this->dataToScalar($domain->isReadOnly()),
                 ];
             }
             $io->table($tableHeaders, $tableRows);
@@ -108,16 +102,16 @@ EOF
             $tableHeaders = ['Name', 'Description', 'Domain', 'Type', 'Data', 'Provider name', 'Tags'];
             $tableRows = [];
 
-            // Display settings filtered by tags
             if ($tag = $input->getOption('tag')) {
+                // Display settings filtered by tags
                 foreach (array_reverse($this->settingsManager->getEnabledSettingsByTag(
                     $domains,
                     $tag
                 )) as $settingModel) {
                     $tableRows[] = $this->_renderSettingsRow($settingModel);
                 }
-            } // Display all settings
-            else {
+            } else {
+                // Display all settings
                 foreach ($this->settingsManager->getSettingsByDomain($domains) as $settingModel) {
                     $tableRows[] = $this->_renderSettingsRow($settingModel);
                 }
@@ -139,49 +133,49 @@ EOF
             $tableRows[] = ['Domain', $setting->getDomain()->getName()];
             $tableRows[] = ['Provider Name', $setting->getProviderName() ?? 'config'];
             $tableRows[] = ['Type', $setting->getType()->getValue()];
-
-            if ($tags = $setting->getTags()) {
-                $tagInformation = [];
-                foreach ($tags as $tag) {
-                    $tagInformation[] = $tag->getName();
-                }
-                $tagInformation = implode("\n", $tagInformation);
-            } else {
-                $tagInformation = '-';
-            }
-            $tableRows[] = ['Tags', $tagInformation];
-            $tableRows[] = ['Choices', ($choices = $setting->getChoices()) ? var_export($choices, true) : '-'];
-            $tableRows[] = ['Data', $setting->getData()];
+            $tableRows[] = ['Tags', $this->implodeTags($setting)];
+            $tableRows[] = ['Choices', $this->dataToScalar($setting->getChoices())];
+            $tableRows[] = ['Data', $this->dataToScalar($setting->getData())];
 
             $io->table($tableHeaders, $tableRows);
         }
     }
 
-    /**
-     * @param SettingModel $settingModel
-     *
-     * @return array
-     */
     private function _renderSettingsRow(SettingModel $settingModel): array
     {
-        if ($tags = $settingModel->getTags()) {
-            $tagInformation = [];
-            foreach ($tags as $tag) {
-                $tagInformation[] = $tag->getName();
-            }
-            $tagInformation = implode("\n", $tagInformation);
-        } else {
-            $tagInformation = '-';
-        }
-
         return [
             $settingModel->getName(),
             $settingModel->getDescription(),
             $settingModel->getDomain()->getName(),
             $settingModel->getType()->getValue(),
-            $settingModel->getData(),
+            $this->dataToScalar($settingModel->getData()),
             $settingModel->getProviderName() ?? 'config',
-            $tagInformation,
+            $this->implodeTags($settingModel),
         ];
+    }
+
+    private function dataToScalar($data)
+    {
+        if (is_array($data)) {
+            $data = empty($data) ? '-' : var_export($data, true);
+        }
+
+        if (is_bool($data)) {
+            $data = $data === true ? 'true' : 'false';
+        }
+
+        return is_scalar($data) ? $data : '-';
+    }
+
+    private function implodeTags(SettingModel $model): string
+    {
+        $tags = $model
+            ->getTags()
+            ->map(function (TagModel $tagModel) {
+                return $tagModel->getName();
+            })
+            ->toArray();
+
+        return empty($tags) ? '-' : implode("\n", $tags);
     }
 }
