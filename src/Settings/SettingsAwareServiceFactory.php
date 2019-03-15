@@ -23,7 +23,7 @@ class SettingsAwareServiceFactory implements LoggerAwareInterface
     {
         foreach ($callMap as $settingName => $setter) {
             try {
-                $setting = $this->settingsRouter->get($settingName);
+                $setting = $this->settingsRouter->get($settingName, null);
             } catch (\Throwable $e) {
                 $this->logger && $this->logger->error('Failed to get setting', [
                     'exception' => $e,
