@@ -13,7 +13,8 @@ use Symfony\Component\Serializer\SerializerAwareTrait;
 
 class TagModelNormalizer implements NormalizerInterface, DenormalizerInterface, SerializerAwareInterface
 {
-    use SerializerAwareTrait, ObjectToPopulateTrait;
+    use SerializerAwareTrait;
+    use ObjectToPopulateTrait;
 
     /**
      * {@inheritdoc}

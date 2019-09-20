@@ -18,13 +18,6 @@ class UniqueSettingValidatorTest extends ConstraintValidatorTestCase
      */
     protected $settingsManager;
 
-    protected function createValidator()
-    {
-        $this->settingsManager = $this->createMock(SettingsManager::class);
-
-        return new UniqueSettingValidator($this->settingsManager);
-    }
-
     public function testValid()
     {
         $this
@@ -61,5 +54,12 @@ class UniqueSettingValidatorTest extends ConstraintValidatorTestCase
             ->setParameter('{{ domainName }}', 'dc')
             ->setParameter('{{ settingName }}', 'batman')
             ->assertRaised();
+    }
+
+    protected function createValidator()
+    {
+        $this->settingsManager = $this->createMock(SettingsManager::class);
+
+        return new UniqueSettingValidator($this->settingsManager);
     }
 }

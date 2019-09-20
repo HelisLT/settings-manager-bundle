@@ -37,7 +37,7 @@ class SettingFormType extends AbstractType
                 'translation_domain' => 'HelisSettingsManager',
                 'choice_translation_domain' => 'HelisSettingsManager',
                 'choice_label' => function (string $type) {
-                    return 'type.'.strtolower($type);
+                    return 'type.' . strtolower($type);
                 },
                 'label' => 'edit.form.type',
             ])

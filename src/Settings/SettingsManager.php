@@ -4,15 +4,16 @@ declare(strict_types=1);
 
 namespace Helis\SettingsManagerBundle\Settings;
 
-use Helis\SettingsManagerBundle\Event\SettingChangeEvent;
+use Helis\SettingsManagerBundle\Event\SettingDeleteEvent;
+use Helis\SettingsManagerBundle\Event\SettingSaveEvent;
 use Helis\SettingsManagerBundle\Exception\ProviderNotFoundException;
 use Helis\SettingsManagerBundle\Exception\ReadOnlyProviderException;
 use Helis\SettingsManagerBundle\Model\DomainModel;
 use Helis\SettingsManagerBundle\Model\SettingModel;
 use Helis\SettingsManagerBundle\Provider\SettingsProviderInterface;
-use Helis\SettingsManagerBundle\SettingsManagerEvents;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class SettingsManager implements LoggerAwareInterface
 {
@@ -22,20 +23,15 @@ class SettingsManager implements LoggerAwareInterface
      * @var SettingsProviderInterface[]
      */
     private $providers;
-
-    /**
-     * @var EventManagerInterface
-     */
-    private $eventManager;
+    private $eventDispatcher;
 
     /**
      * @param SettingsProviderInterface[] $providers
-     * @param EventManagerInterface       $eventManager
      */
-    public function __construct(array $providers, EventManagerInterface $eventManager)
+    public function __construct(array $providers, EventDispatcherInterface $eventDispatcher)
     {
         $this->providers = $providers;
-        $this->eventManager = $eventManager;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -88,7 +84,7 @@ class SettingsManager implements LoggerAwareInterface
                     $settingModel->setProviderName($pName);
 
                     if ((isset($providerSettings[$settingModel->getName()])
-                        && $providerSettings[$settingModel->getName()]->getDomain()->getPriority() < $settingModel->getDomain()->getPriority())
+                            && $providerSettings[$settingModel->getName()]->getDomain()->getPriority() < $settingModel->getDomain()->getPriority())
                         || !isset($providerSettings[$settingModel->getName()])
                     ) {
                         $providerSettings[$settingModel->getName()] = $settingModel;
@@ -200,10 +196,7 @@ class SettingsManager implements LoggerAwareInterface
                     'sDomainEnabled' => $settingModel->getDomain()->isReadOnly(),
                     'sProviderName' => $settingModel->getProviderName(),
                 ]);
-                $this->eventManager->dispatch(
-                    SettingsManagerEvents::SAVE_SETTING,
-                    new SettingChangeEvent($settingModel)
-                );
+                $this->eventDispatcher->dispatch(new SettingSaveEvent($settingModel));
 
                 return $result;
             }
@@ -230,10 +223,7 @@ class SettingsManager implements LoggerAwareInterface
                         'sDomainEnabled' => $settingModel->getDomain()->isReadOnly(),
                         'sProviderName' => $settingModel->getProviderName(),
                     ]);
-                    $this->eventManager->dispatch(
-                        SettingsManagerEvents::SAVE_SETTING,
-                        new SettingChangeEvent($settingModel)
-                    );
+                    $this->eventDispatcher->dispatch(new SettingSaveEvent($settingModel));
 
                     return true;
                 }
@@ -243,18 +233,6 @@ class SettingsManager implements LoggerAwareInterface
         }
 
         return false;
-    }
-
-    /**
-     * @deprecated use save()
-     *
-     * @param SettingModel $settingModel
-     *
-     * @return bool
-     */
-    public function update(SettingModel $settingModel): bool
-    {
-        return $this->save($settingModel);
     }
 
     /**
@@ -279,10 +257,7 @@ class SettingsManager implements LoggerAwareInterface
         }
 
         if ($changed) {
-            $this->eventManager->dispatch(
-                SettingsManagerEvents::DELETE_SETTING,
-                new SettingChangeEvent($settingModel)
-            );
+            $this->eventDispatcher->dispatch(new SettingDeleteEvent($settingModel));
         }
 
         return $changed;

@@ -40,7 +40,7 @@ class LazyReadableSimpleSettingsProviderBench extends Benchmark
         for ($i = 0; $i < 300; $i++) {
             $domainName = 'domain_' . $i % 150;
             $settingName = 'setting_' . $i;
-            $settingKey = $domainName.'_'.$settingName;
+            $settingKey = $domainName . '_' . $settingName;
             $normSettings[$settingKey] = [
                 'name' => $settingName,
                 'description' => 'It\'s not who I am underneath but what I do that defines me.',
@@ -61,7 +61,7 @@ class LazyReadableSimpleSettingsProviderBench extends Benchmark
                     new TagModelNormalizer(),
                 ],
                 [
-                    new JsonEncoder()
+                    new JsonEncoder(),
                 ]
             ),
             $normDomains,

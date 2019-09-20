@@ -52,7 +52,7 @@ class LazyReadableSimpleSettingsProvider extends ReadableSimpleSettingsProvider
         $normSettings = array_intersect_key($this->normSettings, array_flip($keys));
 
         if (!empty($normSettings)) {
-            $modelSettings = $this->serializer->denormalize($normSettings, SettingModel::class.'[]');
+            $modelSettings = $this->serializer->denormalize($normSettings, SettingModel::class . '[]');
             $this->modelSettings = array_merge($this->modelSettings, $modelSettings);
             $this->normSettings = array_diff_key($this->normSettings, $modelSettings);
         }
@@ -77,7 +77,7 @@ class LazyReadableSimpleSettingsProvider extends ReadableSimpleSettingsProvider
         $normSettings = array_intersect_key($this->normSettings, $keys);
 
         if (!empty($normSettings)) {
-            $modelSettings = $this->serializer->denormalize($normSettings, SettingModel::class.'[]');
+            $modelSettings = $this->serializer->denormalize($normSettings, SettingModel::class . '[]');
             $this->modelSettings = array_merge($this->modelSettings, $modelSettings);
             $this->normSettings = array_diff_key($this->normSettings, $modelSettings);
         }

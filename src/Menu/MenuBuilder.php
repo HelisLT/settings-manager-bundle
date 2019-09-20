@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace Helis\SettingsManagerBundle\Menu;
 
+use Helis\SettingsManagerBundle\Event\ConfigureMenuEvent;
 use Knp\Menu\FactoryInterface;
 use Knp\Menu\ItemInterface;
-use Helis\SettingsManagerBundle\Event\ConfigureMenuEvent;
-use Helis\SettingsManagerBundle\SettingsManagerEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class MenuBuilder
@@ -31,10 +30,7 @@ class MenuBuilder
             ->addChild('navbar.domain_list', ['route' => 'settings_domain_index'])
             ->setExtra('translation_domain', 'HelisSettingsManager');
 
-        $this->eventDispatcher->dispatch(
-            SettingsManagerEvents::CONFIGURE_MENU,
-            new ConfigureMenuEvent($this->factory, $menu)
-        );
+        $this->eventDispatcher->dispatch(new ConfigureMenuEvent($this->factory, $menu));
 
         return $menu;
     }

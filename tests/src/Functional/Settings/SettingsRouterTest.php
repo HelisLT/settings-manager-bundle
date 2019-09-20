@@ -3,11 +3,11 @@ declare(strict_types=1);
 
 namespace Helis\SettingsManagerBundle\Tests\Functional\Settings;
 
-use Liip\FunctionalTestBundle\Test\WebTestCase;
+use App\DataFixtures\ORM\LoadSettingsData;
 use Helis\SettingsManagerBundle\Model\Type;
 use Helis\SettingsManagerBundle\Settings\SettingsManager;
 use Helis\SettingsManagerBundle\Settings\SettingsRouter;
-use App\DataFixtures\ORM\LoadSettingsData;
+use Liip\FunctionalTestBundle\Test\WebTestCase;
 
 class SettingsRouterTest extends WebTestCase
 {
@@ -15,16 +15,6 @@ class SettingsRouterTest extends WebTestCase
      * @var SettingsRouter
      */
     private $settingsRouter;
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
-    {
-        parent::setUp();
-
-        $this->settingsRouter = $this->getContainer()->get(SettingsRouter::class);
-    }
 
     /**
      * @return array
@@ -41,7 +31,7 @@ class SettingsRouterTest extends WebTestCase
                 [],
                 Type::YAML(),
                 ['amazing' => ['foo', 'foo', 'foo', 'yee'], 'cool' => ['yes' => ['yes', 'no']], 'damn' => 5],
-                'config'
+                'config',
             ],
         ];
     }
@@ -49,9 +39,9 @@ class SettingsRouterTest extends WebTestCase
     /**
      * @param string $settingName
      * @param string $expectedDescription
-     * @param array $expectedTags
-     * @param Type $expectedType
-     * @param mixed $expectedData
+     * @param array  $expectedTags
+     * @param Type   $expectedType
+     * @param mixed  $expectedData
      * @param string $expectedProvider
      *
      * @dataProvider getSettingDataProvider
@@ -123,5 +113,15 @@ class SettingsRouterTest extends WebTestCase
             $this->settingsRouter->getSetting('baz')->getProviderName(),
             'baz should be fetched from config'
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp()
+    {
+        parent::setUp();
+
+        $this->settingsRouter = $this->getContainer()->get(SettingsRouter::class);
     }
 }

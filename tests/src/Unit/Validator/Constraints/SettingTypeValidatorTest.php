@@ -17,15 +17,6 @@ class SettingTypeValidatorTest extends TestCase
      */
     private $validator;
 
-    protected function setUp()
-    {
-        parent::setUp();
-
-        $builder = new ValidatorBuilder();
-        $builder->disableAnnotationMapping();
-        $this->validator = $builder->getValidator();
-    }
-
     public function dataProviderTestValid(): array
     {
         return [
@@ -91,5 +82,14 @@ class SettingTypeValidatorTest extends TestCase
 
         $this->assertCount(1, $violations);
         $this->assertEquals($message, $violations[0]->getMessage());
+    }
+
+    protected function setUp()
+    {
+        parent::setUp();
+
+        $builder = new ValidatorBuilder();
+        $builder->disableAnnotationMapping();
+        $this->validator = $builder->getValidator();
     }
 }

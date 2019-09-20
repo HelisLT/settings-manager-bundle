@@ -15,7 +15,7 @@ services:
         public: true
         arguments:
             $settingsManager: '@Helis\SettingsManagerBundle\Settings\SettingsManager'
-            $eventManager: '@Helis\SettingsManagerBundle\Settings\EventManagerInterface'
+            $eventDispatcher: '@event_dispatcher'
             $validator: '@validator'
         tags:
             - { name: controller.service_arguments }
@@ -31,9 +31,3 @@ services:
     Helis\SettingsManagerBundle\Settings\ProvidersManager:
         arguments:
             $settingsManager: '@Helis\SettingsManagerBundle\Settings\SettingsManager'
-
-    Helis\SettingsManagerBundle\Settings\EventManager:
-        arguments:
-            $eventDispatcher: '@event_dispatcher'
-
-    Helis\SettingsManagerBundle\Settings\EventManagerInterface: '@Helis\SettingsManagerBundle\Settings\EventManager'

@@ -10,7 +10,6 @@ use Helis\SettingsManagerBundle\Provider\DecoratingInMemorySettingsProvider;
 use Helis\SettingsManagerBundle\Provider\Factory\SimpleSettingsProviderFactory;
 use Helis\SettingsManagerBundle\Provider\LazyReadableSimpleSettingsProvider;
 use Helis\SettingsManagerBundle\Provider\SettingsProviderInterface;
-use Helis\SettingsManagerBundle\Settings\EventManagerInterface;
 use Helis\SettingsManagerBundle\Settings\SettingsManager;
 use Helis\SettingsManagerBundle\Settings\SettingsRouter;
 use Helis\SettingsManagerBundle\Settings\SettingsStore;
@@ -32,7 +31,7 @@ class HelisSettingsManagerExtension extends Extension
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
-        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
         $loader->load('serializer.yml');
         $loader->load('validators.yml');
@@ -70,7 +69,7 @@ class HelisSettingsManagerExtension extends Extension
             ->setPublic(true)
             ->setArgument(0, new Reference(SettingsManager::class))
             ->setArgument(1, new Reference(SettingsStore::class))
-            ->setArgument(2, new Reference(EventManagerInterface::class));
+            ->setArgument(2, new Reference('event_dispatcher'));
     }
 
     private function loadEnqueueExtension(array $config, ContainerBuilder $container): void
@@ -92,7 +91,7 @@ class HelisSettingsManagerExtension extends Extension
             ->register(SettingsManager::class, SettingsManager::class)
             ->setPublic(true)
             ->setLazy(true)
-            ->setArgument('$eventManager', new Reference(EventManagerInterface::class))
+            ->setArgument('$eventDispatcher', new Reference('event_dispatcher'))
             ->addMethodCall('setLogger', [
                 new Reference(
                     'settings_manager.logger',
@@ -126,7 +125,7 @@ class HelisSettingsManagerExtension extends Extension
             foreach ($settings as $setting) {
                 $domainName = $setting['domain']['name'];
                 $settingName = $setting['name'];
-                $settingKey = $domainName.'_'.$settingName;
+                $settingKey = $domainName . '_' . $settingName;
 
                 $normDomains[$domainName] = $setting['domain'];
                 $normSettings[$settingKey] = $setting;
