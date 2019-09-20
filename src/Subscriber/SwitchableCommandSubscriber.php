@@ -19,7 +19,7 @@ class SwitchableCommandSubscriber implements EventSubscriberInterface
         $this->settingsRouter = $settingsRouter;
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [ConsoleEvents::COMMAND => ['onConsoleCommand']];
     }

@@ -14,8 +14,10 @@ class Configuration implements ConfigurationInterface
 {
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('helis_settings_manager');
+        $treeBuilder = new TreeBuilder('helis_settings_manager');
+        $rootNode = $treeBuilder->getRootNode();
+
+        // @formatter:off
         $rootNode
             ->children()
                 ->arrayNode('enqueue_extension')
@@ -66,6 +68,7 @@ class Configuration implements ConfigurationInterface
                 ->append($this->getSettingsNode())
                 ->append($this->getListenersNode())
             ->end();
+        // @formatter:on
 
         return $treeBuilder;
     }
@@ -75,8 +78,10 @@ class Configuration implements ConfigurationInterface
      */
     private function getSettingsNode(): NodeDefinition
     {
-        $treeBuilder = new TreeBuilder();
-        $node = $treeBuilder->root('settings');
+        $treeBuilder = new TreeBuilder('settings');
+        $node = $treeBuilder->getRootNode();
+
+        // @formatter:off
         $node
         ->arrayPrototype()
             ->children()
@@ -143,6 +148,7 @@ class Configuration implements ConfigurationInterface
                 ->end()
             ->end()
         ->end();
+        // @formatter:on
 
         return $node;
     }
@@ -152,14 +158,17 @@ class Configuration implements ConfigurationInterface
      */
     private function getListenersNode(): NodeDefinition
     {
-        $treeBuilder = new TreeBuilder();
-        $node = $treeBuilder->root('listeners');
+        $treeBuilder = new TreeBuilder('listeners');
+        $node = $treeBuilder->getRootNode();
+
+        // @formatter:off
         $node
             ->addDefaultsIfNotSet()
             ->children()
                 ->arrayNode('controller')->canBeEnabled()->end()
                 ->arrayNode('command')->canBeEnabled()->end()
             ->end();
+        // @formatter:on
 
         return $node;
     }

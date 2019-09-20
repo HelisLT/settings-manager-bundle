@@ -8,10 +8,9 @@ use Helis\SettingsManagerBundle\Event\SettingChangeEvent;
 use Helis\SettingsManagerBundle\Form\SettingFormType;
 use Helis\SettingsManagerBundle\Model\DomainModel;
 use Helis\SettingsManagerBundle\Model\Type;
-use Helis\SettingsManagerBundle\Settings\EventManagerInterface;
 use Helis\SettingsManagerBundle\Settings\SettingsManager;
-use Helis\SettingsManagerBundle\SettingsManagerEvents;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,16 +20,16 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class SettingsController extends AbstractController
 {
     private $settingsManager;
-    private $eventManager;
+    private $eventDispatcher;
     private $validator;
 
     public function __construct(
         SettingsManager $settingsManager,
-        EventManagerInterface $eventManager,
+        EventDispatcherInterface $eventDispatcher,
         ValidatorInterface $validator
     ) {
         $this->settingsManager = $settingsManager;
-        $this->eventManager = $eventManager;
+        $this->eventDispatcher = $eventDispatcher;
         $this->validator = $validator;
     }
 
@@ -60,7 +59,7 @@ class SettingsController extends AbstractController
         $setting = $this->settingsManager->getSettingsByName([$domainName], [$settingName]);
         $setting = array_shift($setting);
         if ($setting === null) {
-            throw $this->createNotFoundException('Setting not found in '.$domainName.' domain');
+            throw $this->createNotFoundException('Setting not found in ' . $domainName . ' domain');
         }
 
         if ($setting->getType()->equals(Type::BOOL())) {
@@ -81,10 +80,10 @@ class SettingsController extends AbstractController
         $setting = array_shift($setting);
 
         if ($setting === null) {
-            throw $this->createNotFoundException('Setting not found in '.$domainName.' domain');
+            throw $this->createNotFoundException('Setting not found in ' . $domainName . ' domain');
         }
 
-        $this->eventManager->dispatch(SettingsManagerEvents::PRE_EDIT_SETTING, new SettingChangeEvent($setting));
+        $this->eventDispatcher->dispatch(new SettingChangeEvent($setting));
         $form = $this->createForm(SettingFormType::class, $setting);
         $form->handleRequest($request);
 
@@ -107,7 +106,7 @@ class SettingsController extends AbstractController
         $setting = array_shift($setting);
 
         if ($setting === null) {
-            throw $this->createNotFoundException('Setting not found in '.$domainName.' domain');
+            throw $this->createNotFoundException('Setting not found in ' . $domainName . ' domain');
         }
 
         $this->settingsManager->delete($setting);
@@ -121,7 +120,7 @@ class SettingsController extends AbstractController
         $setting = array_shift($setting);
 
         if ($setting === null) {
-            throw $this->createNotFoundException('Setting not found in '.$domainName.' domain');
+            throw $this->createNotFoundException('Setting not found in ' . $domainName . ' domain');
         }
 
         $setting = clone $setting;

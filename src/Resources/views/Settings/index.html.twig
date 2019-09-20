@@ -22,12 +22,15 @@
                             <td>
                                 {{ setting.getName() }}
                                 {% if setting.getDescription() is not empty %}
-                                    <p style="margin-bottom: 0px"><small class="text-muted">{{ setting.getDescription() }}</small></p>
+                                    <p style="margin-bottom: 0px"><small
+                                                class="text-muted">{{ setting.getDescription() }}</small></p>
                                 {% endif %}
                                 <p style="margin-bottom: 0px">
-                                    <span class="badge badge-primary" style="display: inline-block; margin-right: 5px">{{ setting.getProviderName() }}</span>
+                                    <span class="badge badge-primary"
+                                          style="display: inline-block; margin-right: 5px">{{ setting.getProviderName() }}</span>
                                     {% for tag in setting.getTags %}
-                                        <span class="badge badge-secondary" style="display: inline-block; margin-right: 5px">{{ tag.getName() }}</span>
+                                        <span class="badge badge-secondary"
+                                              style="display: inline-block; margin-right: 5px">{{ tag.getName() }}</span>
                                     {% endfor %}
                                 </p>
                             </td>
@@ -40,7 +43,7 @@
                                             name="{{ setting.getName() | lower }}"
                                             data-url-quick-edit="{{ path('settings_quick_edit', {domainName: setting.getDomain().getName(), settingName: setting.getName()}) }}"
                                             {% if setting.getData is same as(true) %}checked{% endif %}>
-                                {% elseif setting.getType.getValue is constant('Helis\\SettingsManagerBundle\\Model\\Type::YAML')  %}
+                                {% elseif setting.getType.getValue is constant('Helis\\SettingsManagerBundle\\Model\\Type::YAML') %}
                                     {{ setting.getData() | json_encode }}
                                 {% else %}
                                     {{ setting.getData() }}
@@ -92,13 +95,16 @@
                     <form id="duplicate-modal-form">
                         <div class="form-group">
                             <label for="duplicate-modal-to-domain-name">{{ 'list.modal.duplicate.message' | trans({'%settingName%': '<span id="duplicate-modal-setting-name" class="badge badge-primary"></span>', '%domainName%': '<span id="duplicate-modal-domain-name" class="badge badge-primary"></span>'}) | raw }}</label>
-                            <input type="text" class="form-control" name="toDomainName" id="duplicate-modal-to-domain-name" placeholder="Domain name">
+                            <input type="text" class="form-control" name="toDomainName"
+                                   id="duplicate-modal-to-domain-name" placeholder="Domain name">
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" id="duplicate-modal-submit">{{ 'list.modal.duplicate.actions.submit' | trans }}</button>
-                    <button type="button" class="btn btn-default" data-dismiss="modal">{{ 'list.modal.duplicate.actions.close' | trans }}</button>
+                    <button type="button" class="btn btn-primary"
+                            id="duplicate-modal-submit">{{ 'list.modal.duplicate.actions.submit' | trans }}</button>
+                    <button type="button" class="btn btn-default"
+                            data-dismiss="modal">{{ 'list.modal.duplicate.actions.close' | trans }}</button>
                 </div>
             </div>
         </div>

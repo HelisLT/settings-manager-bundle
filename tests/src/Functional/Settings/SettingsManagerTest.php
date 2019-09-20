@@ -3,13 +3,13 @@ declare(strict_types=1);
 
 namespace Helis\SettingsManagerBundle\Tests\Functional\Settings;
 
-use Helis\SettingsManagerBundle\Model\SettingModel;
-use Liip\FunctionalTestBundle\Test\WebTestCase;
-use Helis\SettingsManagerBundle\Model\DomainModel;
-use Helis\SettingsManagerBundle\Provider\SettingsProviderInterface;
-use Helis\SettingsManagerBundle\Settings\SettingsManager;
 use App\DataFixtures\ORM\LoadSettingsData;
 use App\Entity\Setting;
+use Helis\SettingsManagerBundle\Model\DomainModel;
+use Helis\SettingsManagerBundle\Model\SettingModel;
+use Helis\SettingsManagerBundle\Provider\SettingsProviderInterface;
+use Helis\SettingsManagerBundle\Settings\SettingsManager;
+use Liip\FunctionalTestBundle\Test\WebTestCase;
 
 class SettingsManagerTest extends WebTestCase
 {
@@ -17,16 +17,6 @@ class SettingsManagerTest extends WebTestCase
      * @var SettingsManager
      */
     private $settingsManager;
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
-    {
-        parent::setUp();
-
-        $this->settingsManager = $this->getContainer()->get(SettingsManager::class);
-    }
 
     public function testGetProviders()
     {
@@ -226,5 +216,15 @@ class SettingsManagerTest extends WebTestCase
         $this->assertEquals('default', $setting->getDomain()->getName());
         $this->assertEquals(0, $setting->getDomain()->getPriority());
         $this->assertFalse($setting->getData());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp()
+    {
+        parent::setUp();
+
+        $this->settingsManager = $this->getContainer()->get(SettingsManager::class);
     }
 }

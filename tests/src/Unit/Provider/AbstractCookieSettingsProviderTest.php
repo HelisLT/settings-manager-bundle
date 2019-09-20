@@ -3,15 +3,15 @@ declare(strict_types=1);
 
 namespace Helis\SettingsManagerBundle\Tests\Unit\Provider;
 
+use Helis\SettingsManagerBundle\Model\DomainModel;
+use Helis\SettingsManagerBundle\Model\SettingModel;
 use Helis\SettingsManagerBundle\Provider\AbstractCookieSettingsProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Helis\SettingsManagerBundle\Model\DomainModel;
-use Helis\SettingsManagerBundle\Model\SettingModel;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\Serializer\SerializerInterface;
 
 abstract class AbstractCookieSettingsProviderTest extends TestCase
@@ -23,19 +23,10 @@ abstract class AbstractCookieSettingsProviderTest extends TestCase
     protected $serializer;
     protected $cookieName;
 
-    protected function setUp()
-    {
-        $this->cookieName = 'Orange';
-        $this->serializer = $this->getMockBuilder(SerializerInterface::class)->getMock();
-        $this->provider = $this->createProvider();
-    }
-
-    abstract protected function createProvider(): AbstractCookieSettingsProvider;
-
     public function testOnKernelResponseNothingChanged()
     {
         $eventMock = $this
-            ->getMockBuilder(FilterResponseEvent::class)
+            ->getMockBuilder(ResponseEvent::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -48,7 +39,7 @@ abstract class AbstractCookieSettingsProviderTest extends TestCase
 
     public function testOnKernelResponse()
     {
-        $eventMock = $this->getMockBuilder(FilterResponseEvent::class)
+        $eventMock = $this->getMockBuilder(ResponseEvent::class)
             ->disableOriginalConstructor()
             ->getMock();
         $eventMock->expects($this->once())->method('isMasterRequest')->willReturn(true);
@@ -84,7 +75,7 @@ abstract class AbstractCookieSettingsProviderTest extends TestCase
     public function testOnKernelRequest(Cookie $cookie)
     {
         $eventMock = $this
-            ->getMockBuilder(GetResponseEvent::class)
+            ->getMockBuilder(RequestEvent::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -115,7 +106,7 @@ abstract class AbstractCookieSettingsProviderTest extends TestCase
     public function testOnKernelRequestWithoutCookie()
     {
         $eventMock = $this
-            ->getMockBuilder(GetResponseEvent::class)
+            ->getMockBuilder(RequestEvent::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -125,4 +116,13 @@ abstract class AbstractCookieSettingsProviderTest extends TestCase
 
         $this->provider->onKernelRequest($eventMock);
     }
+
+    protected function setUp()
+    {
+        $this->cookieName = 'Orange';
+        $this->serializer = $this->getMockBuilder(SerializerInterface::class)->getMock();
+        $this->provider = $this->createProvider();
+    }
+
+    abstract protected function createProvider(): AbstractCookieSettingsProvider;
 }

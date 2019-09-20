@@ -199,21 +199,6 @@ class DecoratingRedisSettingsProvider implements SettingsProviderInterface
         return $output;
     }
 
-    private function getDomainKey(bool $onlyEnabled = false): string
-    {
-        return $this->getNamespacedKey(self::DOMAIN_KEY.($onlyEnabled ? '_oe' : ''));
-    }
-
-    private function getHashMapKey(): string
-    {
-        return $this->getNamespacedKey(self::HASHMAP_KEY);
-    }
-
-    private function getNamespacedKey(string $key): string
-    {
-        return sprintf('%s[%s]', $this->namespace, $key);
-    }
-
     protected function buildHashmap(bool $force = false, ?string $domainName = null): void
     {
         $key = $this->getHashMapKey();
@@ -249,5 +234,20 @@ class DecoratingRedisSettingsProvider implements SettingsProviderInterface
                 $this->redis->setex($key, $this->ttl, 1);
             }
         }
+    }
+
+    private function getDomainKey(bool $onlyEnabled = false): string
+    {
+        return $this->getNamespacedKey(self::DOMAIN_KEY . ($onlyEnabled ? '_oe' : ''));
+    }
+
+    private function getHashMapKey(): string
+    {
+        return $this->getNamespacedKey(self::HASHMAP_KEY);
+    }
+
+    private function getNamespacedKey(string $key): string
+    {
+        return sprintf('%s[%s]', $this->namespace, $key);
     }
 }
