@@ -3,19 +3,18 @@ declare(strict_types=1);
 
 namespace Helis\SettingsManagerBundle\Tests\Functional\Provider;
 
-use App\Entity\Setting;
-use App\Entity\Tag;
-use Helis\SettingsManagerBundle\Provider\DecoratingPredisSettingsProvider;
 use Helis\SettingsManagerBundle\Provider\DoctrineOrmSettingsProvider;
 use Helis\SettingsManagerBundle\Provider\SettingsProviderInterface;
 use Predis\Client;
 use Predis\CommunicationException;
-use Redis;
+use Helis\SettingsManagerBundle\Provider\DecoratingPredisSettingsProvider;
+use App\Entity\Setting;
+use App\Entity\Tag;
 
 class DecoratingPredisSettingsProviderTest extends AbstractSettingsProviderTest
 {
     /**
-     * @var Client|Redis
+     * @var Client|\Redis
      */
     protected $redis;
 

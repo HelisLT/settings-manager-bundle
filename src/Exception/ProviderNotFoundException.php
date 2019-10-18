@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Helis\SettingsManagerBundle\Exception;
 
-use LogicException;
-
-class ProviderNotFoundException extends LogicException implements SettingsException
+class ProviderNotFoundException extends \LogicException implements SettingsException
 {
     public function __construct(string $providerName)
     {

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Helis\SettingsManagerBundle\DataCollector;
 
-use Exception;
 use Helis\SettingsManagerBundle\Settings\SettingsStore;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,7 +20,7 @@ class SettingsCollector implements DataCollectorInterface
         $this->data = [];
     }
 
-    public function collect(Request $request, Response $response, Exception $exception = null)
+    public function collect(Request $request, Response $response, \Exception $exception = null)
     {
         $this->data = $this->settingsStore->getValues();
     }

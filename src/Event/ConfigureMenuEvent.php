@@ -6,7 +6,7 @@ namespace Helis\SettingsManagerBundle\Event;
 
 use Knp\Menu\FactoryInterface;
 use Knp\Menu\ItemInterface;
-use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Component\EventDispatcher\Event;
 
 class ConfigureMenuEvent extends Event
 {

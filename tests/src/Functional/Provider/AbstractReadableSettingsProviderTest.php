@@ -18,172 +18,6 @@ abstract class AbstractReadableSettingsProviderTest extends WebTestCase
      */
     protected $provider;
 
-    public function dataProviderTestGetSettings(): array
-    {
-        return [
-            [
-                ['default'],
-                [
-                    ['bazinga', 'default', 'bool', false],
-                    ['foo', 'default', 'bool', true],
-                ],
-            ],
-            [
-                ['default', 'apples'],
-                [
-                    ['banana', 'apples', 'int', 10],
-                    ['bazinga', 'default', 'bool', false],
-                    ['bazinga', 'apples', 'bool', true],
-                    ['foo', 'default', 'bool', true],
-                    ['kiwi', 'apples', 'float', 1.2],
-                ],
-            ],
-            [
-                ['default', 'apples', 'sea'],
-                [
-                    ['banana', 'apples', 'int', 10],
-                    ['bazinga', 'default', 'bool', false],
-                    ['bazinga', 'apples', 'bool', true],
-                    ['foo', 'default', 'bool', true],
-                    ['kiwi', 'apples', 'float', 1.2],
-                    ['tuna', 'sea', 'string', 'fishing'],
-                ],
-            ],
-        ];
-    }
-
-    /**
-     * @dataProvider dataProviderTestGetSettings
-     */
-    public function testGetSettings(array $domainNames, array $expectedSettingsMap)
-    {
-        $settings = $this->provider->getSettings($domainNames);
-
-        $map = array_map(function (SettingModel $model) {
-            return [
-                $model->getName(),
-                $model->getDomain()->getName(),
-                $model->getType()->getValue(),
-                $model->getData(),
-            ];
-        }, $settings);
-
-        usort($map, function ($a, $b) {
-            return $a[0] . $a[1] <=> $b[0] . $b[1];
-        });
-
-        usort($expectedSettingsMap, function ($a, $b) {
-            return $a[0] . $a[1] <=> $b[0] . $b[1];
-        });
-
-        $this->assertEquals($expectedSettingsMap, $map);
-    }
-
-    public function dataProviderTestGetSettingsByName(): array
-    {
-        return [
-            [
-                ['default'],
-                ['bazinga'],
-                [
-                    ['bazinga', 'default', 'bool', false],
-                ],
-            ],
-            [
-                ['default'],
-                ['bazinga', 'foo'],
-                [
-                    ['bazinga', 'default', 'bool', false],
-                    ['foo', 'default', 'bool', true],
-                ],
-            ],
-            [
-                ['default', 'apples'],
-                ['bazinga', 'foo'],
-                [
-                    ['bazinga', 'default', 'bool', false],
-                    ['bazinga', 'apples', 'bool', true],
-                    ['foo', 'default', 'bool', true],
-                ],
-            ],
-            [
-                ['default', 'sea'],
-                ['foo', 'tuna'],
-                [
-                    ['foo', 'default', 'bool', true],
-                    ['tuna', 'sea', 'string', 'fishing'],
-                ],
-            ],
-            [
-                ['default', 'sea', 'apples'],
-                ['foo', 'tuna', 'kiwi', 'persimon'],
-                [
-                    ['foo', 'default', 'bool', true],
-                    ['tuna', 'sea', 'string', 'fishing'],
-                    ['kiwi', 'apples', 'float', 1.2],
-                ],
-            ],
-            [
-                ['default', 'sea', 'apples', 'pear'],
-                ['foo', 'tuna', 'kiwi'],
-                [
-                    ['foo', 'default', 'bool', true],
-                    ['tuna', 'sea', 'string', 'fishing'],
-                    ['kiwi', 'apples', 'float', 1.2],
-                ],
-            ],
-        ];
-    }
-
-    /**
-     * @dataProvider dataProviderTestGetSettingsByName
-     */
-    public function testGetSettingsByName(array $domainNames, array $settingNames, array $expectedSettingsMap)
-    {
-        $settings = $this->provider->getSettingsByName($domainNames, $settingNames);
-
-        $map = array_map(function (SettingModel $model) {
-            return [
-                $model->getName(),
-                $model->getDomain()->getName(),
-                $model->getType()->getValue(),
-                $model->getData(),
-            ];
-        }, $settings);
-
-        usort($map, function ($a, $b) {
-            return $a[0] . $a[1] <=> $b[0] . $b[1];
-        });
-
-        usort($expectedSettingsMap, function ($a, $b) {
-            return $a[0] . $a[1] <=> $b[0] . $b[1];
-        });
-
-        $this->assertEquals($map, $expectedSettingsMap);
-    }
-
-    public function testGetDomains()
-    {
-        $domainNames = array_map(function (DomainModel $model) {
-            return $model->getName();
-        }, $this->provider->getDomains(false));
-
-        sort($domainNames);
-
-        $this->assertEquals(['apples', 'default', 'sea',], $domainNames);
-    }
-
-    public function testGetOnlyEnabledDomains()
-    {
-        $domainNames = array_map(function (DomainModel $model) {
-            return $model->getName();
-        }, $this->provider->getDomains(true));
-
-        sort($domainNames);
-
-        $this->assertEquals(['default', 'sea'], $domainNames);
-    }
-
     protected function setUp()
     {
         parent::setUp();
@@ -268,5 +102,171 @@ abstract class AbstractReadableSettingsProviderTest extends WebTestCase
             $setting4,
             $setting5,
         ];
+    }
+
+    public function dataProviderTestGetSettings(): array
+    {
+        return [
+            [
+                ['default'],
+                [
+                    ['bazinga', 'default', 'bool', false],
+                    ['foo', 'default', 'bool', true],
+                ],
+            ],
+            [
+                ['default', 'apples'],
+                [
+                    ['banana', 'apples', 'int', 10],
+                    ['bazinga', 'default', 'bool', false],
+                    ['bazinga', 'apples', 'bool', true],
+                    ['foo', 'default', 'bool', true],
+                    ['kiwi', 'apples', 'float', 1.2],
+                ],
+            ],
+            [
+                ['default', 'apples', 'sea'],
+                [
+                    ['banana', 'apples', 'int', 10],
+                    ['bazinga', 'default', 'bool', false],
+                    ['bazinga', 'apples', 'bool', true],
+                    ['foo', 'default', 'bool', true],
+                    ['kiwi', 'apples', 'float', 1.2],
+                    ['tuna', 'sea', 'string', 'fishing'],
+                ],
+            ]
+        ];
+    }
+
+    /**
+     * @dataProvider dataProviderTestGetSettings
+     */
+    public function testGetSettings(array $domainNames, array $expectedSettingsMap)
+    {
+        $settings = $this->provider->getSettings($domainNames);
+
+        $map =  array_map(function (SettingModel $model) {
+            return [
+                $model->getName(),
+                $model->getDomain()->getName(),
+                $model->getType()->getValue(),
+                $model->getData(),
+            ];
+        }, $settings);
+
+        usort($map, function ($a, $b) {
+            return $a[0].$a[1] <=> $b[0].$b[1];
+        });
+
+        usort($expectedSettingsMap, function ($a, $b) {
+            return $a[0].$a[1] <=> $b[0].$b[1];
+        });
+
+        $this->assertEquals($expectedSettingsMap, $map);
+    }
+
+    public function dataProviderTestGetSettingsByName(): array
+    {
+        return [
+            [
+                ['default'],
+                ['bazinga'],
+                [
+                    ['bazinga', 'default', 'bool', false],
+                ]
+            ],
+            [
+                ['default'],
+                ['bazinga', 'foo'],
+                [
+                    ['bazinga', 'default', 'bool', false],
+                    ['foo', 'default', 'bool', true],
+                ]
+            ],
+            [
+                ['default', 'apples'],
+                ['bazinga', 'foo'],
+                [
+                    ['bazinga', 'default', 'bool', false],
+                    ['bazinga', 'apples', 'bool', true],
+                    ['foo', 'default', 'bool', true],
+                ]
+            ],
+            [
+                ['default', 'sea'],
+                ['foo', 'tuna'],
+                [
+                    ['foo', 'default', 'bool', true],
+                    ['tuna', 'sea', 'string', 'fishing'],
+                ]
+            ],
+            [
+                ['default', 'sea', 'apples'],
+                ['foo', 'tuna', 'kiwi', 'persimon'],
+                [
+                    ['foo', 'default', 'bool', true],
+                    ['tuna', 'sea', 'string', 'fishing'],
+                    ['kiwi', 'apples', 'float', 1.2],
+                ]
+            ],
+            [
+                ['default', 'sea', 'apples', 'pear'],
+                ['foo', 'tuna', 'kiwi'],
+                [
+                    ['foo', 'default', 'bool', true],
+                    ['tuna', 'sea', 'string', 'fishing'],
+                    ['kiwi', 'apples', 'float', 1.2],
+                ]
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider dataProviderTestGetSettingsByName
+     */
+    public function testGetSettingsByName(array $domainNames, array $settingNames, array $expectedSettingsMap)
+    {
+        $settings = $this->provider->getSettingsByName($domainNames, $settingNames);
+
+        $map =  array_map(function (SettingModel $model) {
+            return [
+                $model->getName(),
+                $model->getDomain()->getName(),
+                $model->getType()->getValue(),
+                $model->getData(),
+            ];
+        }, $settings);
+
+        usort($map, function ($a, $b) {
+            return $a[0].$a[1] <=> $b[0].$b[1];
+        });
+
+        usort($expectedSettingsMap, function ($a, $b) {
+            return $a[0].$a[1] <=> $b[0].$b[1];
+        });
+
+        $this->assertEquals($map, $expectedSettingsMap);
+    }
+
+    public function testGetDomains()
+    {
+        $domainNames = array_map(function (DomainModel $model) {
+            return $model->getName();
+        }, $this->provider->getDomains(false));
+
+        sort($domainNames);
+
+        $this->assertEquals(['apples', 'default', 'sea',], $domainNames);
+    }
+
+    public function testGetOnlyEnabledDomains()
+    {
+        $domainNames = array_map(function (DomainModel $model) {
+            return $model->getName();
+        }, $this->provider->getDomains(true));
+
+        sort($domainNames);
+
+        $this->assertEquals(['default', 'sea'], $domainNames);
     }
 }

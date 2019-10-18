@@ -4,31 +4,27 @@ declare(strict_types=1);
 
 namespace Helis\SettingsManagerBundle\Provider;
 
-use DateInterval;
-use DateTime;
 use Helis\SettingsManagerBundle\Model\DomainModel;
 use Helis\SettingsManagerBundle\Model\SettingModel;
 use Helis\SettingsManagerBundle\Provider\Traits\WritableProviderTrait;
 use ParagonIE\Paseto\Builder;
 use ParagonIE\Paseto\Exception\PasetoException;
 use ParagonIE\Paseto\Parser;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\Cookie;
+use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\Serializer\SerializerInterface;
 use ParagonIE\Paseto\Rules\IssuedBy;
 use ParagonIE\Paseto\Rules\NotExpired;
 use ParagonIE\Paseto\Rules\Subject;
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerAwareTrait;
-use ReflectionObject;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpFoundation\Cookie;
-use Symfony\Component\HttpKernel\Event\RequestEvent;
-use Symfony\Component\HttpKernel\Event\ResponseEvent;
-use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\Serializer\SerializerInterface;
 
 abstract class AbstractCookieSettingsProvider extends SimpleSettingsProvider implements EventSubscriberInterface, LoggerAwareInterface
 {
-    use LoggerAwareTrait;
-    use WritableProviderTrait;
+    use LoggerAwareTrait, WritableProviderTrait;
 
     private $serializer;
     private $publicKeyMaterial;
@@ -67,15 +63,11 @@ abstract class AbstractCookieSettingsProvider extends SimpleSettingsProvider imp
         parent::__construct([]);
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            KernelEvents::REQUEST => [['onKernelRequest', 15]],
-            KernelEvents::RESPONSE => ['onKernelResponse'],
-        ];
-    }
+    abstract protected function getTokenParser(): Parser;
 
-    public function onKernelRequest(RequestEvent $event): void
+    abstract protected function getTokenBuilder(): Builder;
+
+    public function onKernelRequest(GetResponseEvent $event): void
     {
         if (!$event->isMasterRequest()
             || ($rawToken = $event->getRequest()->cookies->get($this->cookieName)) === null
@@ -92,13 +84,10 @@ abstract class AbstractCookieSettingsProvider extends SimpleSettingsProvider imp
         try {
             $token = $parser->parse($rawToken);
         } catch (PasetoException $e) {
-            $this->logger && $this->logger->warning(
-                sprintf('%s: failed to parse token', (new \ReflectionObject($this))->getShortName()),
-                [
-                    'sRawToken' => $rawToken,
-                    'sErrorMessage' => $e->getMessage(),
-                ]
-            );
+            $this->logger && $this->logger->warning(sprintf('%s: failed to parse token', (new \ReflectionObject($this))->getShortName()), [
+                'sRawToken' => $rawToken,
+                'sErrorMessage' => $e->getMessage(),
+            ]);
 
             return;
         }
@@ -106,16 +95,15 @@ abstract class AbstractCookieSettingsProvider extends SimpleSettingsProvider imp
         try {
             $this->settings = $this
                 ->serializer
-                ->deserialize($token->get('dt'), SettingModel::class . '[]', 'json');
+                ->deserialize($token->get('dt'), SettingModel::class.'[]', 'json');
         } catch (PasetoException $e) {
-            $this->logger && $this->logger->warning(
-                sprintf('%s: ' . strtolower($e), (new ReflectionObject($this))->getShortName()),
-                ['sRawToken' => $rawToken]
-            );
+            $this->logger && $this->logger->warning(sprintf('%s: '.strtolower($e), (new \ReflectionObject($this))->getShortName()), [
+                'sRawToken' => $rawToken,
+            ]);
         }
     }
 
-    public function onKernelResponse(ResponseEvent $event): void
+    public function onKernelResponse(FilterResponseEvent $event): void
     {
         if (!$event->isMasterRequest() || $event->getResponse() === null || !$this->changed) {
             return;
@@ -136,7 +124,7 @@ abstract class AbstractCookieSettingsProvider extends SimpleSettingsProvider imp
             return;
         }
 
-        $now = new DateTime();
+        $now = new \DateTime();
 
         $token = $this->getTokenBuilder();
         $token
@@ -144,7 +132,7 @@ abstract class AbstractCookieSettingsProvider extends SimpleSettingsProvider imp
             ->setNotBefore($now)
             ->setIssuer($this->issuer)
             ->setSubject($this->subject)
-            ->setExpiration($now->add(new DateInterval('PT' . $this->ttl . 'S')))
+            ->setExpiration($now->add(new \DateInterval('PT'.$this->ttl.'S')))
             ->setClaims([
                 'dt' => $this->serializer->serialize($this->settings, 'json'),
             ]);
@@ -154,13 +142,7 @@ abstract class AbstractCookieSettingsProvider extends SimpleSettingsProvider imp
         $event
             ->getResponse()
             ->headers
-            ->setCookie(new Cookie(
-                $this->cookieName,
-                (string)$token,
-                time() + $this->ttl,
-                $this->cookiePath,
-                $this->cookieDomain
-            ));
+            ->setCookie(new Cookie($this->cookieName, (string)$token, time() + $this->ttl, $this->cookiePath, $this->cookieDomain));
     }
 
     public function save(SettingModel $settingModel): bool
@@ -185,6 +167,14 @@ abstract class AbstractCookieSettingsProvider extends SimpleSettingsProvider imp
         $output && $this->changed = true;
 
         return $output;
+    }
+
+    public static function getSubscribedEvents(): array
+    {
+        return [
+            KernelEvents::REQUEST => [['onKernelRequest', 15]],
+            KernelEvents::RESPONSE => ['onKernelResponse'],
+        ];
     }
 
     public function setTtl(int $ttl): void
@@ -216,8 +206,4 @@ abstract class AbstractCookieSettingsProvider extends SimpleSettingsProvider imp
     {
         $this->cookieDomain = $cookieDomain;
     }
-
-    abstract protected function getTokenParser(): Parser;
-
-    abstract protected function getTokenBuilder(): Builder;
 }

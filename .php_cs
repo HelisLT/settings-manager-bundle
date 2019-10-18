@@ -11,7 +11,7 @@ return PhpCsFixer\Config::create()
         'cast_spaces' => ['space' => 'none'],
         'declare_equal_normalize' => ['space' => 'none'],
         'array_syntax' => ['syntax' => 'short'],
-        'concat_space' => ['spacing' => 'one'],
+        'concat_space' => ['spacing' => 'none'],
         'yoda_style' => false,
         'no_null_property_initialization' => true,
         'declare_strict_types' => true,

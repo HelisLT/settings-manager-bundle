@@ -32,7 +32,7 @@ class SettingsAwarePass implements CompilerPassInterface
             $callMap = [];
             foreach ($tags as $tag) {
                 if (!isset($tag['method'])) {
-                    throw new LogicException($serviceId . ' tag ' . $this->tag . ' is missing method property');
+                    throw new LogicException($serviceId.' tag '.$this->tag.' is missing method property');
                 }
                 $callMap[$tag['setting']] = $tag['method'];
             }

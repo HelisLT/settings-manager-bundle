@@ -17,8 +17,7 @@ use Symfony\Component\Serializer\SerializerAwareTrait;
 
 class SettingModelNormalizer implements NormalizerInterface, DenormalizerInterface, SerializerAwareInterface
 {
-    use SerializerAwareTrait;
-    use ObjectToPopulateTrait;
+    use SerializerAwareTrait, ObjectToPopulateTrait;
 
     /**
      * {@inheritdoc}
@@ -35,7 +34,7 @@ class SettingModelNormalizer implements NormalizerInterface, DenormalizerInterfa
         isset($data['type']) && $object->setType(new Type($data['type']));
         isset($data['data']) && $object->setDataValue($data['data']);
         isset($data['tags']) && $object->setTags(new ArrayCollection(
-            $this->serializer->denormalize($data['tags'], TagModel::class . '[]', $format, $context)
+            $this->serializer->denormalize($data['tags'], TagModel::class.'[]', $format, $context)
         ));
         isset($data['choices']) && $object->setChoices($data['choices']);
 

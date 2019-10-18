@@ -9,6 +9,15 @@ use Helis\SettingsManagerBundle\Model\Type;
 
 abstract class AbstractSettingsProviderTest extends AbstractReadableSettingsProviderTest
 {
+    protected function setUp()
+    {
+        parent::setUp();
+
+        foreach ($this->getSettingFixtures() as $i => $setting) {
+            $this->assertTrue($this->provider->save($setting), sprintf('Setting %s failed to save', $i));
+        }
+    }
+
     public function testSave()
     {
         $settings = $this->provider->getSettings(['sea']);
@@ -104,9 +113,8 @@ abstract class AbstractSettingsProviderTest extends AbstractReadableSettingsProv
 
     public function testDelete()
     {
-        $sortCallback = function (SettingModel $a, SettingModel $b) {
+        $sortCallback = function (SettingModel $a, SettingModel$b) {
             $v = $a->getName() <=> $b->getName();
-
             return $v !== 0 ? $v * -1 : $v;
         };
 
@@ -201,15 +209,6 @@ abstract class AbstractSettingsProviderTest extends AbstractReadableSettingsProv
 
         // check if domain is missing
         $this->assertArrayNotHasKey('default', $this->buildDomainMap(...$this->provider->getDomains()));
-    }
-
-    protected function setUp()
-    {
-        parent::setUp();
-
-        foreach ($this->getSettingFixtures() as $i => $setting) {
-            $this->assertTrue($this->provider->save($setting), sprintf('Setting %s failed to save', $i));
-        }
     }
 
     private function buildSettingHashmap(SettingModel ...$models): array

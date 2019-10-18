@@ -5,10 +5,8 @@ declare(strict_types=1);
 namespace Helis\SettingsManagerBundle\Twig;
 
 use Helis\SettingsManagerBundle\Settings\SettingsRouter;
-use Twig\Extension\AbstractExtension;
-use Twig\TwigFunction;
 
-class SettingsExtension extends AbstractExtension
+class SettingsExtension extends \Twig_Extension
 {
     private $settingsRouter;
 
@@ -20,7 +18,7 @@ class SettingsExtension extends AbstractExtension
     public function getFunctions()
     {
         return [
-            new TwigFunction('setting_get', [$this, 'getSetting']),
+            new \Twig_SimpleFunction('setting_get', [$this, 'getSetting']),
         ];
     }
 

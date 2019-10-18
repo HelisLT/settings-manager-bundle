@@ -6,7 +6,6 @@ namespace Helis\SettingsManagerBundle\Settings;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Helis\SettingsManagerBundle\Model\SettingModel;
-use LogicException;
 
 class SettingsStore extends ArrayCollection
 {
@@ -48,7 +47,7 @@ class SettingsStore extends ArrayCollection
     {
         if ($settingModel !== null) {
             if ($settingName !== $settingModel->getName()) {
-                throw new LogicException('SettingModel name does not match provided name');
+                throw new \LogicException('SettingModel name does not match provided name');
             }
 
             $this->settingsByProvider[$settingModel->getProviderName()][$settingName] = $settingModel;
