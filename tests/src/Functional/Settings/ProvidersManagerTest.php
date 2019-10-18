@@ -9,9 +9,15 @@ use Helis\SettingsManagerBundle\Settings\ProvidersManager;
 use Helis\SettingsManagerBundle\Settings\SettingsManager;
 use App\Entity\Setting;
 use Liip\FunctionalTestBundle\Test\WebTestCase;
+use Liip\TestFixturesBundle\Test\FixturesTrait;
 
+/**
+ * @IgnoreAnnotation("dataProvider")
+ */
 class ProvidersManagerTest extends WebTestCase
 {
+    use FixturesTrait;
+
     /**
      * @var ProvidersManager
      */

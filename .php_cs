@@ -15,6 +15,7 @@ return PhpCsFixer\Config::create()
         'yoda_style' => false,
         'no_null_property_initialization' => true,
         'declare_strict_types' => true,
+        'single_trait_insert_per_statement' => false,
     ])
     ->setRiskyAllowed(true)
     ->setFinder($finder)

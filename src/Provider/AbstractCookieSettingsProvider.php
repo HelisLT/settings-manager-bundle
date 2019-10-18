@@ -142,7 +142,17 @@ abstract class AbstractCookieSettingsProvider extends SimpleSettingsProvider imp
         $event
             ->getResponse()
             ->headers
-            ->setCookie(new Cookie($this->cookieName, (string)$token, time() + $this->ttl, $this->cookiePath, $this->cookieDomain));
+            ->setCookie(new Cookie(
+                $this->cookieName,
+                (string)$token,
+                time() + $this->ttl,
+                $this->cookiePath,
+                $this->cookieDomain,
+                false,
+                true,
+                false,
+                null
+            ));
     }
 
     public function save(SettingModel $settingModel): bool

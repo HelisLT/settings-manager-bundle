@@ -2,7 +2,7 @@ language: php
 
 sudo: false
 
-dist: trusty
+dist: xenial
 
 cache:
   directories:
@@ -18,23 +18,17 @@ php:
 
 env:
   - SYMFONY_VERSION=3.4.*@dev
-  - SYMFONY_VERSION=4.0.*@dev
   - SYMFONY_VERSION=4.1.*@dev
   - SYMFONY_VERSION=4.2.*@dev
-
-matrix:
-  exclude:
-    - php: 7.3
-      env: SYMFONY_VERSION=4.0.*@dev
-
-addons:
-  apt:
-    sources:
-    - sourceline: 'ppa:ondrej/php'
-    packages:
-    - libsodium-dev
+  - SYMFONY_VERSION=4.3.*@dev
 
 before_install:
+  - |
+    sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 6B05F25D762E3157
+    sudo add-apt-repository -y ppa:ondrej/php
+    sudo apt update
+    sudo apt install -y librabbitmq-dev libsodium-dev
+
   - if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.1" ]]; then pecl install libsodium; fi
   - pecl info redis
   - echo "extension = redis.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini

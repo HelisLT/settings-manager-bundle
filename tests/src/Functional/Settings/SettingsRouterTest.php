@@ -8,9 +8,15 @@ use Helis\SettingsManagerBundle\Model\Type;
 use Helis\SettingsManagerBundle\Settings\SettingsManager;
 use Helis\SettingsManagerBundle\Settings\SettingsRouter;
 use App\DataFixtures\ORM\LoadSettingsData;
+use Liip\TestFixturesBundle\Test\FixturesTrait;
 
+/**
+ * @IgnoreAnnotation("dataProvider")
+ */
 class SettingsRouterTest extends WebTestCase
 {
+    use FixturesTrait;
+
     /**
      * @var SettingsRouter
      */

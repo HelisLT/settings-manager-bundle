@@ -25,6 +25,7 @@ class AppKernel extends Kernel
             // for testing
             new \Doctrine\Bundle\FixturesBundle\DoctrineFixturesBundle(),
             new \Liip\FunctionalTestBundle\LiipFunctionalTestBundle(),
+            new \Liip\TestFixturesBundle\LiipTestFixturesBundle(),
             new \App\AppBundle(),
         ];
     }

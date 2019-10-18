@@ -10,9 +10,15 @@ use Helis\SettingsManagerBundle\Provider\SettingsProviderInterface;
 use Helis\SettingsManagerBundle\Settings\SettingsManager;
 use App\DataFixtures\ORM\LoadSettingsData;
 use App\Entity\Setting;
+use Liip\TestFixturesBundle\Test\FixturesTrait;
 
+/**
+ * @IgnoreAnnotation("dataProvider")
+ */
 class SettingsManagerTest extends WebTestCase
 {
+    use FixturesTrait;
+
     /**
      * @var SettingsManager
      */

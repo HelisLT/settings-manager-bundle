@@ -19,11 +19,17 @@ security:
         main:
             pattern: ^/
             anonymous: ~
+            logout_on_user_change: true
 
 liip_functional_test:
     command_verbosity: normal
+
+liip_test_fixtures:
     cache_db:
-        sqlite: liip_functional_test.services_database_backup.sqlite
+        sqlite: liip_test_fixtures.services_database_backup.sqlite
+
+twig:
+    strict_variables: "%kernel.debug%"
 
 doctrine:
     dbal:

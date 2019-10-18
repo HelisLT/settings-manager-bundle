@@ -6,10 +6,9 @@ namespace App\Controller;
 
 use Helis\SettingsManagerBundle\Settings\SettingsRouter;
 use Helis\SettingsManagerBundle\Settings\Switchable\SwitchableControllerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 
-class SwitchableController extends AbstractController implements SwitchableControllerInterface
+class SwitchableController implements SwitchableControllerInterface
 {
     public static function isControllerEnabled(SettingsRouter $router): bool
     {
