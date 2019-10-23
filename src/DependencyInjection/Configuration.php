@@ -6,6 +6,7 @@ namespace Helis\SettingsManagerBundle\DependencyInjection;
 
 use Helis\SettingsManagerBundle\Model\DomainModel;
 use Helis\SettingsManagerBundle\Model\Type;
+use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -14,10 +15,8 @@ class Configuration implements ConfigurationInterface
 {
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder('helis_settings_manager');
-        $rootNode = $treeBuilder->getRootNode();
-
-        // @formatter:off
+        $treeBuilder = new TreeBuilder('helis_settings_manager', 'array');
+        $rootNode = $this->getRootNodeWithoutDeprecation($treeBuilder, 'helis_settings_manager', 'array');
         $rootNode
             ->children()
                 ->arrayNode('enqueue_extension')
@@ -68,7 +67,6 @@ class Configuration implements ConfigurationInterface
                 ->append($this->getSettingsNode())
                 ->append($this->getListenersNode())
             ->end();
-        // @formatter:on
 
         return $treeBuilder;
     }
@@ -78,10 +76,8 @@ class Configuration implements ConfigurationInterface
      */
     private function getSettingsNode(): NodeDefinition
     {
-        $treeBuilder = new TreeBuilder('settings');
-        $node = $treeBuilder->getRootNode();
-
-        // @formatter:off
+        $treeBuilder = new TreeBuilder('settings', 'array');
+        $node = $this->getRootNodeWithoutDeprecation($treeBuilder, 'settings', 'array');
         $node
         ->arrayPrototype()
             ->children()
@@ -148,7 +144,6 @@ class Configuration implements ConfigurationInterface
                 ->end()
             ->end()
         ->end();
-        // @formatter:on
 
         return $node;
     }
@@ -158,18 +153,30 @@ class Configuration implements ConfigurationInterface
      */
     private function getListenersNode(): NodeDefinition
     {
-        $treeBuilder = new TreeBuilder('listeners');
-        $node = $treeBuilder->getRootNode();
-
-        // @formatter:off
+        $treeBuilder = new TreeBuilder('listeners', 'array');
+        $node = $this->getRootNodeWithoutDeprecation($treeBuilder, 'listeners', 'array');
         $node
             ->addDefaultsIfNotSet()
             ->children()
                 ->arrayNode('controller')->canBeEnabled()->end()
                 ->arrayNode('command')->canBeEnabled()->end()
             ->end();
-        // @formatter:on
 
         return $node;
+    }
+
+    /**
+     * @internal
+     *
+     * @param TreeBuilder $builder
+     * @param string|null $name
+     * @param string      $type
+     *
+     * @return ArrayNodeDefinition|NodeDefinition
+     */
+    public function getRootNodeWithoutDeprecation(TreeBuilder $builder, string $name, string $type = 'array')
+    {
+        // BC layer for symfony/config 4.1 and older
+        return \method_exists($builder, 'getRootNode') ? $builder->getRootNode() : $builder->root($name, $type);
     }
 }

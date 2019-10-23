@@ -1,5 +1,5 @@
 {
-    "bootstrap": "vendor/autoload.php",
-    "path": "benchmarks",
-    "time_unit": "milliseconds"
+  "bootstrap": "vendor/autoload.php",
+  "path": "benchmarks",
+  "time_unit": "milliseconds"
 }

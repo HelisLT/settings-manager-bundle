@@ -11,31 +11,30 @@
                 <br>
                 <h1 class="display-4">{{ 'edit.title' | trans }}</h1>
                 {{ form_start(form) }}
-                {{ form_errors(form) }}
+                    {{ form_errors(form) }}
 
-                {{ form_row(form.name) }}
-                <div class="row">
-                    <div class="col-lg-6 col-md-6 col-sm-12">
-                        {{ form_row(form.domain) }}
+                    {{ form_row(form.name) }}
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-12">
+                            {{ form_row(form.domain) }}
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-12">
+                            {{ form_row(form.type) }}
+                        </div>
                     </div>
-                    <div class="col-lg-6 col-md-6 col-sm-12">
-                        {{ form_row(form.type) }}
+                    {{ form_row(form.description) }}
+
+                    <div>
+                        <span id="data-status"></span>
                     </div>
-                </div>
-                {{ form_row(form.description) }}
 
-                <div>
-                    <span id="data-status"></span>
-                </div>
+                    {{ form_row(form.data) }}
 
-                {{ form_row(form.data) }}
-
-                <div class="form-group">
-                    <button type="submit" class="btn btn-success" id="submit-button">Save</button>
-                    <a href="{{ path('settings_index', {domainName: domainName}) }}"
-                       class="btn btn-outline-danger">Back</a>
-                </div>
-                {{ form_rest(form) }}
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-success" id="submit-button">Save</button>
+                        <a href="{{ path('settings_index', {domainName: domainName}) }}" class="btn btn-outline-danger">Back</a>
+                    </div>
+                    {{ form_rest(form) }}
                 {{ form_end(form) }}
             </div>
         </div>
@@ -47,7 +46,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/3.10.0/js-yaml.min.js"></script>
     <script>
         (function () {
-            var settingType = '{{ settingType }}';
+            var settingType = '{{ settingType}}';
 
             if (settingType === 'yaml') {
                 var $textarea = $('#setting_form_data');
@@ -78,12 +77,13 @@
                 });
 
                 //validation
-                $textarea.on('keyup', function (event) {
+                $textarea.on('keyup', function(event) {
                     try {
                         jsyaml.safeLoad($textarea.val());
                         $statusSpan.html('Syntax is correct.');
                         $submitButton.removeAttr('disabled');
-                    } catch (err) {
+                    }
+                    catch (err) {
                         $statusSpan.html(err.message);
                         $submitButton.attr('disabled', 'disabled');
                     }

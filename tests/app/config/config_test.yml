@@ -19,11 +19,17 @@ security:
         main:
             pattern: ^/
             anonymous: ~
+            logout_on_user_change: true
 
 liip_functional_test:
     command_verbosity: normal
+
+liip_test_fixtures:
     cache_db:
-        sqlite: liip_functional_test.services_database_backup.sqlite
+        sqlite: liip_test_fixtures.services_database_backup.sqlite
+
+twig:
+    strict_variables: "%kernel.debug%"
 
 doctrine:
     dbal:
@@ -63,47 +69,47 @@ helis_settings_manager:
     settings_files:
         - '%kernel.root_dir%/config/extra_settings.yml'
     settings:
-        -   name: foo
-            description: 'foo desc'
-            domain:
-                name: default
-                enabled: true # just to make sure default domain is enabled
-            type: bool
-            data: false
-            tags:
-                - 'super_switch'
+        - name: foo
+          description: 'foo desc'
+          domain:
+              name: default
+              enabled: true # just to make sure default domain is enabled
+          type: bool
+          data: false
+          tags:
+              - 'super_switch'
 
-        -   name: baz
-            description: 'baz desc'
-            domain: default
-            type: bool
-            data: true
-            tags:
-                - 'experimental'
-                - 'poo'
+        - name: baz
+          description: 'baz desc'
+          domain: default
+          type: bool
+          data: true
+          tags:
+              - 'experimental'
+              - 'poo'
 
-        -   name: tuna
-            description: 'tuna desc'
-            domain: default
-            type: string
-            data: fish
+        - name: tuna
+          description: 'tuna desc'
+          domain: default
+          type: string
+          data: fish
 
-        -   name: wth_yaml
-            description: 'ohohoho'
-            domain: default
-            type: yaml
-            data:
-                amazing: ['foo', 'foo', 'foo', 'yee']
-                cool:
-                    yes: [yes, no]
-                damn: 5
+        - name: wth_yaml
+          description: 'ohohoho'
+          domain: default
+          type: yaml
+          data:
+              amazing: ['foo', 'foo', 'foo', 'yee']
+              cool:
+                  yes: [yes, no]
+              damn: 5
 
-        -   name: choice
-            description: 'choice example'
-            domain: default
-            type: choice
-            choices: ['choice1', 'choice2']
-            data: 'choice1'
+        - name: choice
+          description: 'choice example'
+          domain: default
+          type: choice
+          choices: ['choice1', 'choice2']
+          data: 'choice1'
 
 services:
     _defaults:

@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace Helis\SettingsManagerBundle\Tests\Unit\Settings;
 
-use Helis\SettingsManagerBundle\Settings\SettingsAwareServiceFactory;
-use Helis\SettingsManagerBundle\Settings\SettingsRouter;
 use PHPUnit\Framework\MockObject\MockObject;
+use Helis\SettingsManagerBundle\Settings\SettingsAwareServiceFactory;
 use PHPUnit\Framework\TestCase;
-use stdClass;
+use Helis\SettingsManagerBundle\Settings\SettingsRouter;
 
 class SettingsAwareServiceFactoryTest extends TestCase
 {
@@ -17,11 +16,24 @@ class SettingsAwareServiceFactoryTest extends TestCase
      */
     private $settingsRouter;
 
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp()
+    {
+        parent::setUp();
+
+        $this->settingsRouter = $this
+            ->getMockBuilder(SettingsRouter::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+    }
+
     public function testGet()
     {
         $factory = new SettingsAwareServiceFactory($this->settingsRouter);
         $object = $this
-            ->getMockBuilder(stdClass::class)
+            ->getMockBuilder(\stdClass::class)
             ->setMethods(['setEnabled', 'setGGCount'])
             ->getMock();
 
@@ -36,18 +48,5 @@ class SettingsAwareServiceFactoryTest extends TestCase
             ->willReturnOnConsecutiveCalls(false, 69);
 
         $factory->get(['zomg_active' => 'setEnabled', 'gg_count' => 'setGGCount'], $object);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
-    {
-        parent::setUp();
-
-        $this->settingsRouter = $this
-            ->getMockBuilder(SettingsRouter::class)
-            ->disableOriginalConstructor()
-            ->getMock();
     }
 }

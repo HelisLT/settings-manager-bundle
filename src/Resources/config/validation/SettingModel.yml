@@ -1,14 +1,14 @@
 Helis\SettingsManagerBundle\Model\SettingModel:
     constraints:
-        -   Helis\SettingsManagerBundle\Validator\Constraints\SettingType: { groups: [Default] }
-        -   Helis\SettingsManagerBundle\Validator\Constraints\UniqueSetting: { groups: [Duplication] }
+        - Helis\SettingsManagerBundle\Validator\Constraints\SettingType: { groups: [Default] }
+        - Helis\SettingsManagerBundle\Validator\Constraints\UniqueSetting: { groups: [Duplication] }
     getters:
         data:
-            -   NotNull: { message: 'Setting value cannot be null', groups: [Default] }
+            - NotNull: { message: 'Setting value cannot be null', groups: [Default] }
     properties:
         name:
-            -   NotBlank: { message: 'Setting name should not be blank', groups: [Default] }
+            - NotBlank: { message: 'Setting name should not be blank', groups: [Default] }
         domain:
-            -   NotNull: { message: 'Setting should have a domain', groups: [Default] }
+            - NotNull: { message: 'Setting should have a domain', groups: [Default] }
         type:
-            -   NotNull: { message: 'Setting should have a type', groups: [Default] }
+            - NotNull: { message: 'Setting should have a type', groups: [Default] }

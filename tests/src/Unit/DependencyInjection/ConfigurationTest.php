@@ -12,6 +12,13 @@ class ConfigurationTest extends TestCase
 {
     private $processor;
 
+    protected function setUp()
+    {
+        parent::setUp();
+
+        $this->processor = new Processor();
+    }
+
     public function configurationProcessDataProvider(): array
     {
         return [
@@ -109,7 +116,7 @@ class ConfigurationTest extends TestCase
                                 'value' => false,
                             ],
                             'tags' => [],
-                            'choices' => [],
+                            'choices' => []
                         ],
                         [
                             'name' => 'cammel',
@@ -123,7 +130,7 @@ class ConfigurationTest extends TestCase
                                 'value' => false,
                             ],
                             'tags' => [],
-                            'choices' => [],
+                            'choices' => []
                         ],
                         [
                             'name' => 'fix',
@@ -144,7 +151,7 @@ class ConfigurationTest extends TestCase
                                     'name' => 'bar',
                                 ],
                             ],
-                            'choices' => [],
+                            'choices' => []
                         ],
                     ],
                     'profiler' => ['enabled' => false],
@@ -165,12 +172,5 @@ class ConfigurationTest extends TestCase
             $expected,
             $this->processor->processConfiguration(new Configuration(), $configToProcess)
         );
-    }
-
-    protected function setUp()
-    {
-        parent::setUp();
-
-        $this->processor = new Processor();
     }
 }

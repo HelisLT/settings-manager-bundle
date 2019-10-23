@@ -7,22 +7,22 @@ namespace Helis\SettingsManagerBundle\Settings;
 use Helis\SettingsManagerBundle\Event\GetSettingEvent;
 use Helis\SettingsManagerBundle\Model\DomainModel;
 use Helis\SettingsManagerBundle\Model\SettingModel;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Helis\SettingsManagerBundle\SettingsManagerEvents;
 
 class SettingsRouter
 {
     private $settingsManager;
     private $settingsStore;
-    private $eventDispatcher;
+    private $eventManager;
 
     public function __construct(
         SettingsManager $settingsManager,
         SettingsStore $settingsStore,
-        EventDispatcherInterface $eventDispatcher
+        EventManagerInterface $eventManager
     ) {
         $this->settingsManager = $settingsManager;
         $this->settingsStore = $settingsStore;
-        $this->eventDispatcher = $eventDispatcher;
+        $this->eventManager = $eventManager;
     }
 
     /**
@@ -131,7 +131,7 @@ class SettingsRouter
         }
 
         if ($setting instanceof SettingModel) {
-            $this->eventDispatcher->dispatch(new GetSettingEvent($setting));
+            $this->eventManager->dispatch(SettingsManagerEvents::GET_SETTING, new GetSettingEvent($setting));
         }
 
         return $setting;

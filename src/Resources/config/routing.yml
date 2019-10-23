@@ -6,31 +6,31 @@ settings_domain_index:
     path: /domains
     methods: [GET]
     defaults:
-        _controller: HelisSettingsManagerBundle:Domain:index
+        _controller: Helis\SettingsManagerBundle\Controller\DomainController::indexAction
 
 settings_domain_quick_edit:
     path: /domains/{domainName}/{providerName}
     methods: [PUT]
     defaults:
-        _controller: HelisSettingsManagerBundle:Domain:quickEdit
+        _controller: Helis\SettingsManagerBundle\Controller\DomainController::quickEditAction
 
 settings_domain_edit:
     path: /domains/{domainName}/{providerName}
     methods: [GET, POST]
     defaults:
-        _controller: HelisSettingsManagerBundle:Domain:edit
+        _controller: Helis\SettingsManagerBundle\Controller\DomainController::editAction
 
 settings_domain_copy:
     path: /domains/{domainName}/copy/{providerName}
     methods: [POST]
     defaults:
-        _controller: HelisSettingsManagerBundle:Domain:copy
+        _controller: Helis\SettingsManagerBundle\Controller\DomainController::copyAction
 
 settings_domain_delete:
     path: /domains/{domainName}/{providerName}
     methods: [DELETE]
     defaults:
-        _controller: HelisSettingsManagerBundle:Domain:delete
+        _controller: Helis\SettingsManagerBundle\Controller\DomainController::deleteAction
         providerName: ~
 
 #####################
@@ -41,14 +41,14 @@ settings_index:
     path: /{domainName}
     methods: [GET]
     defaults:
-        _controller: HelisSettingsManagerBundle:Settings:index
+        _controller: Helis\SettingsManagerBundle\Controller\SettingsController::indexAction
         domainName: default
 
 settings_quick_edit:
     path: /{domainName}/{settingName}
     methods: [PUT]
     defaults:
-        _controller: HelisSettingsManagerBundle:Settings:quickEdit
+        _controller: Helis\SettingsManagerBundle\Controller\SettingsController::quickEditAction
     options:
         expose: true
 
@@ -56,18 +56,18 @@ settings_edit:
     path: /{domainName}/{settingName}
     methods: [GET, POST]
     defaults:
-        _controller: HelisSettingsManagerBundle:Settings:edit
+        _controller: Helis\SettingsManagerBundle\Controller\SettingsController::editAction
 
 settings_delete:
     path: /{domainName}/{settingName}
     methods: [DELETE]
     defaults:
-        _controller: HelisSettingsManagerBundle:Settings:delete
+        _controller: Helis\SettingsManagerBundle\Controller\SettingsController::deleteAction
 
 settings_duplicate:
     path: /{domainName}/{settingName}/duplicate/{toDomainName}
     methods: [POST]
     defaults:
-        _controller: HelisSettingsManagerBundle:Settings:duplicate
+        _controller: Helis\SettingsManagerBundle\Controller\SettingsController::duplicateAction
     options:
         expose: true

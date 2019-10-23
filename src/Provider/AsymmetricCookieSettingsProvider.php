@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Helis\SettingsManagerBundle\Provider;
 
-use ParagonIE\Paseto\Builder;
 use ParagonIE\Paseto\Keys\AsymmetricPublicKey;
 use ParagonIE\Paseto\Keys\AsymmetricSecretKey;
+use Symfony\Component\Serializer\SerializerInterface;
+use ParagonIE\Paseto\Builder;
 use ParagonIE\Paseto\Parser;
 use ParagonIE\Paseto\Protocol\Version2;
 use ParagonIE\Paseto\ProtocolCollection;
-use Symfony\Component\Serializer\SerializerInterface;
 
 class AsymmetricCookieSettingsProvider extends AbstractCookieSettingsProvider
 {

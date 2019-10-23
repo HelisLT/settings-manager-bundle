@@ -7,9 +7,12 @@ use App\Entity\Setting;
 use App\Entity\Tag;
 use Helis\SettingsManagerBundle\Provider\DoctrineOrmSettingsProvider;
 use Helis\SettingsManagerBundle\Provider\SettingsProviderInterface;
+use Liip\TestFixturesBundle\Test\FixturesTrait;
 
 class DoctrineOrmSettingsProviderTest extends AbstractSettingsProviderTest
 {
+    use FixturesTrait;
+
     protected function setUp()
     {
         $this->loadFixtures([]);

@@ -32,6 +32,22 @@ class AwsSsmSettingsProviderTest extends TestCase
      */
     private $serializer;
 
+    protected function setUp()
+    {
+        $this->awsSsmClientMock = $this->createPartialMock(SsmClient::class, ['getParameters', 'putParameter']);
+        $this->serializer = new Serializer(
+            [
+                new ArrayDenormalizer(),
+                new SettingModelNormalizer(),
+                new DomainModelNormalizer(),
+                new TagModelNormalizer(),
+            ],
+            [
+                new JsonEncoder(),
+            ]
+        );
+    }
+
     public function testGetSettingsWithNoParameters(): void
     {
         $settingsProvider = $this->createSettingsProvider([]);
@@ -64,7 +80,7 @@ class AwsSsmSettingsProviderTest extends TestCase
             [
                 'get' => [
                     [
-                        'Name' => 'Parameter A Name',
+                        'Name'  => 'Parameter A Name',
                         'Value' => 'a_value',
                     ],
                 ],
@@ -98,20 +114,20 @@ class AwsSsmSettingsProviderTest extends TestCase
                 'get' => [
                     // Not json encoded, bc compatiblity
                     [
-                        'Name' => 'Parameter A Name',
+                        'Name'  => 'Parameter A Name',
                         'Value' => 'a_value',
                     ],
                     [
-                        'Name' => 'Parameter B Name',
+                        'Name'  => 'Parameter B Name',
                         'Value' => 'b_value',
                     ],
                     // Serialized values
                     [
-                        'Name' => 'Parameter C Name',
+                        'Name'  => 'Parameter C Name',
                         'Value' => '"c_value"',
                     ],
                     [
-                        'Name' => 'Parameter D Name',
+                        'Name'  => 'Parameter D Name',
                         'Value' => '["parameter_d_1","parameter_d_2","parameter_d_3"]',
                     ],
                 ],
@@ -185,10 +201,10 @@ class AwsSsmSettingsProviderTest extends TestCase
             ->method('putParameter')
             ->with(
                 [
-                    'Name' => 'Parameter A Name',
+                    'Name'      => 'Parameter A Name',
                     'Overwrite' => true,
-                    'Type' => 'String',
-                    'Value' => '"a_value"',
+                    'Type'      => 'String',
+                    'Value'     => '"a_value"',
                 ]
             );
 
@@ -211,22 +227,6 @@ class AwsSsmSettingsProviderTest extends TestCase
             ->method('putParameter');
 
         $settingsProvider->save($setting);
-    }
-
-    protected function setUp()
-    {
-        $this->awsSsmClientMock = $this->createPartialMock(SsmClient::class, ['getParameters', 'putParameter']);
-        $this->serializer = new Serializer(
-            [
-                new ArrayDenormalizer(),
-                new SettingModelNormalizer(),
-                new DomainModelNormalizer(),
-                new TagModelNormalizer(),
-            ],
-            [
-                new JsonEncoder(),
-            ]
-        );
     }
 
     private function createSettingsProvider(array $parameterNames): AwsSsmSettingsProvider

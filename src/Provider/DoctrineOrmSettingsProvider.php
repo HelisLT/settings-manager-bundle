@@ -10,7 +10,6 @@ use Helis\SettingsManagerBundle\Model\DomainModel;
 use Helis\SettingsManagerBundle\Model\SettingModel;
 use Helis\SettingsManagerBundle\Model\TagModel;
 use Helis\SettingsManagerBundle\Provider\Traits\WritableProviderTrait;
-use UnexpectedValueException;
 
 class DoctrineOrmSettingsProvider implements SettingsProviderInterface
 {
@@ -28,8 +27,8 @@ class DoctrineOrmSettingsProvider implements SettingsProviderInterface
         $this->entityManager = $entityManager;
 
         if (!is_subclass_of($settingsEntityClass, SettingModel::class)) {
-            throw new UnexpectedValueException(
-                $settingsEntityClass . ' is not part of the model ' . SettingModel::class
+            throw new \UnexpectedValueException(
+                $settingsEntityClass.' is not part of the model '.SettingModel::class
             );
         }
 
@@ -37,8 +36,8 @@ class DoctrineOrmSettingsProvider implements SettingsProviderInterface
 
         if ($tagEntityClass !== null) {
             if (!is_subclass_of($tagEntityClass, TagModel::class)) {
-                throw new UnexpectedValueException(
-                    $tagEntityClass . ' is not part of the model ' . TagModel::class
+                throw new \UnexpectedValueException(
+                    $tagEntityClass.' is not part of the model '.TagModel::class
                 );
             }
 

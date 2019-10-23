@@ -2,52 +2,56 @@ language: php
 
 sudo: false
 
-dist: trusty
+dist: xenial
 
 cache:
-    directories:
-        - $HOME/.composer/cache
+  directories:
+    - $HOME/.composer/cache
 
 services:
-    - redis-server
+  - redis-server
 
 php:
-    - 7.2
-    - 7.3
+  - 7.1
+  - 7.2
+  - 7.3
 
 env:
-    - SYMFONY_VERSION=4.3.*@dev
-
-addons:
-    apt:
-        sources:
-            -   sourceline: 'ppa:ondrej/php'
-        packages:
-            - libsodium-dev
+  - SYMFONY_VERSION=3.4.*@dev
+  - SYMFONY_VERSION=4.1.*@dev
+  - SYMFONY_VERSION=4.2.*@dev
+  - SYMFONY_VERSION=4.3.*@dev
 
 before_install:
-    - pecl info redis
-    - echo "extension = redis.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
-    - php -m
-    - if [ "$SYMFONY_VERSION" != "" ]; then composer require "symfony/symfony:${SYMFONY_VERSION}" --no-update; fi;
+  - |
+    sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 6B05F25D762E3157
+    sudo add-apt-repository -y ppa:ondrej/php
+    sudo apt update
+    sudo apt install -y librabbitmq-dev libsodium-dev
+
+  - if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.1" ]]; then pecl install libsodium; fi
+  - pecl info redis
+  - echo "extension = redis.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+  - php -m
+  - if [ "$SYMFONY_VERSION" != "" ]; then composer require "symfony/symfony:${SYMFONY_VERSION}" --no-update; fi;
 
 install: composer update $COMPOSER_FLAGS
 
 script: ./vendor/bin/phpunit -c . -v
 
 jobs:
-    include:
-        -   stage: Code Quality
-            php: 7.2
-            env: CODING_STANDARDS
-            script: composer phpcs
+  include:
+    - stage: Code Quality
+      php: 7.2
+      env: CODING_STANDARDS
+      script: composer phpcs
 
-        -   stage: Code Quality
-            php: 7.2
-            env: STATIC_ANALYSIS
-            script: composer phpstan
+    - stage: Code Quality
+      php: 7.2
+      env: STATIC_ANALYSIS
+      script: composer phpstan
 
-        -   stage: Code Quality
-            php: 7.2
-            env: BENCHMARK
-            script: ./vendor/bin/phpbench run --progress=travis
+    - stage: Code Quality
+      php: 7.2
+      env: BENCHMARK
+      script: ./vendor/bin/phpbench run --progress=travis

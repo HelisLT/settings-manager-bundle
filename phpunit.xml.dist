@@ -6,9 +6,10 @@
          bootstrap="vendor/autoload.php"
 >
     <php>
+        <env name="SYMFONY_DEPRECATIONS_HELPER" value="max[direct]=0"/>
         <env name="REDIS_HOST" value="127.0.0.1"/>
         <env name="REDIS_PORT" value="6379"/>
-        <server name="KERNEL_CLASS" value="AppKernel"/>
+        <server name="KERNEL_CLASS" value="AppKernel" />
     </php>
 
     <testsuites>
@@ -16,4 +17,8 @@
             <directory>./tests/</directory>
         </testsuite>
     </testsuites>
+
+    <listeners>
+        <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener"/>
+    </listeners>
 </phpunit>

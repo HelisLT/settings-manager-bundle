@@ -1,7 +1,7 @@
 switchable_print:
     path: /print/{value}
     defaults:
-        _controller: AppBundle:Switchable:print
+        _controller: App\Controller\SwitchableController::printAction
 
 helis_settings_manager:
     resource: "@HelisSettingsManagerBundle/Resources/config/routing.yml"

@@ -7,7 +7,6 @@ namespace Helis\SettingsManagerBundle\Settings;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
-use Throwable;
 
 class SettingsAwareServiceFactory implements LoggerAwareInterface
 {
@@ -25,7 +24,7 @@ class SettingsAwareServiceFactory implements LoggerAwareInterface
         foreach ($callMap as $settingName => $setter) {
             try {
                 $setting = $this->settingsRouter->get($settingName, null);
-            } catch (Throwable $e) {
+            } catch (\Throwable $e) {
                 $this->logger && $this->logger->error('Failed to get setting', [
                     'exception' => $e,
                     'sSettingName' => $settingName,
@@ -47,7 +46,7 @@ class SettingsAwareServiceFactory implements LoggerAwareInterface
             if (method_exists($object, $setter)) {
                 $object->{$setter}($setting);
             } else {
-                throw new LogicException('Undefined method ' . get_class($object) . "::{$setter}().");
+                throw new LogicException('Undefined method '.get_class($object)."::{$setter}().");
             }
         }
 

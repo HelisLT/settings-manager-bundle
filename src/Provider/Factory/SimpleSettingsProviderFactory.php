@@ -26,7 +26,7 @@ class SimpleSettingsProviderFactory implements ProviderFactoryInterface
     public function get(): SettingsProviderInterface
     {
         /** @var SettingModel[] $settings */
-        $settings = $this->serializer->denormalize($this->normalizedData, SettingModel::class . '[]');
+        $settings = $this->serializer->denormalize($this->normalizedData, SettingModel::class.'[]');
 
         if ($this->readOnly) {
             return new ReadableSimpleSettingsProvider($settings);

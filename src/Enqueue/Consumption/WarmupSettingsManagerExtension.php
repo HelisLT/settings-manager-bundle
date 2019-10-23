@@ -11,8 +11,7 @@ use Helis\SettingsManagerBundle\Settings\Traits\SettingsRouterAwareTrait;
 
 class WarmupSettingsManagerExtension implements ExtensionInterface
 {
-    use EmptyExtensionTrait;
-    use SettingsRouterAwareTrait;
+    use EmptyExtensionTrait, SettingsRouterAwareTrait;
 
     private $currentIteration;
     private $divider;

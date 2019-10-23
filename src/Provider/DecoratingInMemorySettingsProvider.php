@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Helis\SettingsManagerBundle\Provider;
 
 use Helis\SettingsManagerBundle\Provider\Traits\ReadOnlyProviderTrait;
-use InvalidArgumentException;
 
 class DecoratingInMemorySettingsProvider implements SettingsProviderInterface
 {
@@ -17,7 +16,7 @@ class DecoratingInMemorySettingsProvider implements SettingsProviderInterface
     public function __construct(SettingsProviderInterface $settingsProvider)
     {
         if (!$settingsProvider->isReadOnly()) {
-            throw new InvalidArgumentException('DecoratingInMemorySettingsProvider can only decorate read only provider');
+            throw new \InvalidArgumentException('DecoratingInMemorySettingsProvider can only decorate read only provider');
         }
 
         $this->settingsProvider = $settingsProvider;

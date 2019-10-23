@@ -6,15 +6,22 @@ namespace Helis\SettingsManagerBundle\Tests\Functional\Subscriber;
 
 use App\DataFixtures\ORM\LoadSwitchableCommandData;
 use Liip\FunctionalTestBundle\Test\WebTestCase;
+use Liip\TestFixturesBundle\Test\FixturesTrait;
 
 class SwitchableCommandSubscriberTest extends WebTestCase
 {
+    use FixturesTrait;
+
     public function testSkippedCommand()
     {
+        $this->markTestSkipped('CommandTester do not dispatch events.');
+
         $this->loadFixtures([]);
 
         $output = $this->runCommand('switchable:print', ['value' => 'batman']);
-        $this->assertEquals("Command is disabled\n", $output);
+
+        $this->assertEquals(0, $output->getStatusCode());
+        $this->assertContains("Command is disabled\n", $output->getDisplay());
     }
 
     public function testRunCommand()
@@ -22,6 +29,8 @@ class SwitchableCommandSubscriberTest extends WebTestCase
         $this->loadFixtures([LoadSwitchableCommandData::class]);
 
         $output = $this->runCommand('switchable:print', ['value' => 'batman']);
-        $this->assertEquals('batman', $output, 'Enabled command output does not match');
+
+        $this->assertEquals(0, $output->getStatusCode());
+        $this->assertContains('batman', $output->getDisplay(), 'Enabled command output does not match');
     }
 }

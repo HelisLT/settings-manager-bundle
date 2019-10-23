@@ -19,14 +19,13 @@ class LazyReadableSimpleSettingsProviderTest extends AbstractReadableSettingsPro
         foreach ($serializer->normalize($this->getSettingFixtures()) as $setting) {
             $domainName = $setting['domain']['name'];
             $settingName = $setting['name'];
-            $settingKey = $domainName . '_' . $settingName;
+            $settingKey = $domainName.'_'.$settingName;
 
             $normDomains[$domainName] = $setting['domain'];
             $normSettings[$settingKey] = $setting;
             $settingsKeyMap[$settingName][] = $domainsKeyMap[$domainName][] = $settingKey;
         }
 
-        return new LazyReadableSimpleSettingsProvider($serializer, $normDomains, $normSettings, $settingsKeyMap,
-            $domainsKeyMap);
+        return new LazyReadableSimpleSettingsProvider($serializer, $normDomains, $normSettings, $settingsKeyMap, $domainsKeyMap);
     }
 }
