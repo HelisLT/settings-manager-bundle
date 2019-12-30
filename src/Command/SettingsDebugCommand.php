@@ -128,14 +128,18 @@ EOF
             $setting = array_shift($setting);
 
             $tableHeaders = ['Option', 'Value'];
-            $tableRows[] = ['Name', $setting->getName()];
-            $tableRows[] = ['Description', $setting->getDescription() ?? '-'];
-            $tableRows[] = ['Domain', $setting->getDomain()->getName()];
-            $tableRows[] = ['Provider Name', $setting->getProviderName() ?? 'config'];
-            $tableRows[] = ['Type', $setting->getType()->getValue()];
-            $tableRows[] = ['Tags', $this->implodeTags($setting)];
-            $tableRows[] = ['Choices', $this->dataToScalar($setting->getChoices())];
-            $tableRows[] = ['Data', $this->dataToScalar($setting->getData())];
+            $tableRows = [];
+
+            if ($setting !== null) {
+                $tableRows[] = ['Name', $setting->getName()];
+                $tableRows[] = ['Description', $setting->getDescription() ?? '-'];
+                $tableRows[] = ['Domain', $setting->getDomain()->getName()];
+                $tableRows[] = ['Provider Name', $setting->getProviderName() ?? 'config'];
+                $tableRows[] = ['Type', $setting->getType()->getValue()];
+                $tableRows[] = ['Tags', $this->implodeTags($setting)];
+                $tableRows[] = ['Choices', $this->dataToScalar($setting->getChoices())];
+                $tableRows[] = ['Data', $this->dataToScalar($setting->getData())];
+            }
 
             $io->table($tableHeaders, $tableRows);
         }
