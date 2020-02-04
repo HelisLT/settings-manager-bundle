@@ -60,6 +60,7 @@
         "predis/predis": "^1.1",
         "symfony/asset": "^3.4|^4.2.12|^4.3",
         "symfony/framework-bundle": "^3.4|^4.2.12|^4.3",
+        "symfony/monolog-bridge": "^3.4|^4.2.12|^4.3",
         "symfony/monolog-bundle": "^3.1",
         "symfony/phpunit-bridge": "^3.4|^4.2.12|^4.3",
         "symfony/security-bundle": "^3.4|^4.2.12|^4.3",
