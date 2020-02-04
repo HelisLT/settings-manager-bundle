@@ -18,8 +18,6 @@ interface SettingsProviderInterface
     /**
      * In almost every case settings manager can avoid calling this provider by readonly flag.
      * When settings manager is requested to do an update this flag is ignored on source provider.
-     *
-     * @return bool
      */
     public function isReadOnly(): bool;
 
@@ -47,8 +45,6 @@ interface SettingsProviderInterface
      * Settings manager can still try to call this method even if it's read only.
      * In case make sure it throws ReadOnlyProviderException.
      *
-     * @param SettingModel $settingModel
-     *
      * @return bool Status of save process
      *
      * @throws ReadOnlyProviderException When provider is read only
@@ -57,17 +53,11 @@ interface SettingsProviderInterface
 
     /**
      * Removes setting from provider.
-     *
-     * @param SettingModel $settingModel
-     *
-     * @return bool
      */
     public function delete(SettingModel $settingModel): bool;
 
     /**
      * Collects all domain models.
-     *
-     * @param bool $onlyEnabled
      *
      * @return DomainModel[]
      */
@@ -75,19 +65,11 @@ interface SettingsProviderInterface
 
     /**
      * Updates domain model in provider.
-     *
-     * @param DomainModel $domainModel
-     *
-     * @return bool
      */
     public function updateDomain(DomainModel $domainModel): bool;
 
     /**
      * Removes domain and all settings associated with it.
-     *
-     * @param string $domainName
-     *
-     * @return bool
      */
     public function deleteDomain(string $domainName): bool;
 }

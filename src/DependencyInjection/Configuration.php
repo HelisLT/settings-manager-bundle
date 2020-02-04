@@ -71,9 +71,6 @@ class Configuration implements ConfigurationInterface
         return $treeBuilder;
     }
 
-    /**
-     * @return NodeDefinition
-     */
     private function getSettingsNode(): NodeDefinition
     {
         $treeBuilder = new TreeBuilder('settings', 'array');
@@ -148,9 +145,6 @@ class Configuration implements ConfigurationInterface
         return $node;
     }
 
-    /**
-     * @return NodeDefinition
-     */
     private function getListenersNode(): NodeDefinition
     {
         $treeBuilder = new TreeBuilder('listeners', 'array');
@@ -168,9 +162,7 @@ class Configuration implements ConfigurationInterface
     /**
      * @internal
      *
-     * @param TreeBuilder $builder
      * @param string|null $name
-     * @param string      $type
      *
      * @return ArrayNodeDefinition|NodeDefinition
      */

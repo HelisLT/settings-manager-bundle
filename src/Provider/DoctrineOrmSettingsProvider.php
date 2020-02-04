@@ -28,18 +28,14 @@ class DoctrineOrmSettingsProvider implements SettingsProviderInterface
         $this->entityManager = $entityManager;
 
         if (!is_subclass_of($settingsEntityClass, SettingModel::class)) {
-            throw new \UnexpectedValueException(
-                $settingsEntityClass.' is not part of the model '.SettingModel::class
-            );
+            throw new \UnexpectedValueException($settingsEntityClass.' is not part of the model '.SettingModel::class);
         }
 
         $this->settingsEntityClass = $settingsEntityClass;
 
         if ($tagEntityClass !== null) {
             if (!is_subclass_of($tagEntityClass, TagModel::class)) {
-                throw new \UnexpectedValueException(
-                    $tagEntityClass.' is not part of the model '.TagModel::class
-                );
+                throw new \UnexpectedValueException($tagEntityClass.' is not part of the model '.TagModel::class);
             }
 
             $this->tagEntityClass = $tagEntityClass;

@@ -28,10 +28,7 @@ class SettingsRouter
     /**
      * Retrieves setting data with string typehint.
      *
-     * @param string $settingName
      * @param string $defaultValue
-     *
-     * @return string
      */
     public function getString(string $settingName, $defaultValue = ''): string
     {
@@ -41,10 +38,7 @@ class SettingsRouter
     /**
      * Retrieves setting data with bool typehint.
      *
-     * @param string $settingName
-     * @param bool   $defaultValue
-     *
-     * @return bool
+     * @param bool $defaultValue
      */
     public function getBool(string $settingName, $defaultValue = false): bool
     {
@@ -54,10 +48,7 @@ class SettingsRouter
     /**
      * Retrieves setting data with int typehint.
      *
-     * @param string $settingName
-     * @param int    $defaultValue
-     *
-     * @return int
+     * @param int $defaultValue
      */
     public function getInt(string $settingName, $defaultValue = 0): int
     {
@@ -67,10 +58,7 @@ class SettingsRouter
     /**
      * Retrieves setting with float typehint.
      *
-     * @param string $settingName
-     * @param float  $defaultValue
-     *
-     * @return float
+     * @param float $defaultValue
      */
     public function getFloat(string $settingName, $defaultValue = .0): float
     {
@@ -80,10 +68,7 @@ class SettingsRouter
     /**
      * Retrieves setting data with array typehint.
      *
-     * @param string $settingName
-     * @param array  $defaultValue
-     *
-     * @return array
+     * @param array $defaultValue
      */
     public function getArray(string $settingName, $defaultValue = []): array
     {
@@ -93,8 +78,7 @@ class SettingsRouter
     /**
      * Returns data from setting.
      *
-     * @param string $settingName
-     * @param mixed  $defaultValue
+     * @param mixed $defaultValue
      *
      * @return mixed
      */
@@ -107,8 +91,6 @@ class SettingsRouter
 
     /**
      * Returns setting model.
-     *
-     * @param string $settingName
      *
      * @return SettingModel
      */
@@ -139,8 +121,6 @@ class SettingsRouter
 
     /**
      * Check if settings store is warmed up.
-     *
-     * @return bool
      */
     public function isWarm(): bool
     {
@@ -162,8 +142,6 @@ class SettingsRouter
 
     /**
      * Warm up domains from providers.
-     *
-     * @param bool $force
      */
     private function warmupDomains(bool $force = false): void
     {
@@ -179,8 +157,6 @@ class SettingsRouter
 
     /**
      * Warmup settings from providers.
-     *
-     * @param array $settingNames
      */
     private function warmupSettings(array $settingNames): void
     {

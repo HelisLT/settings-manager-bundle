@@ -76,8 +76,6 @@ class SettingModel
 
     /**
      * @param TagModel[]|Collection $tags
-     *
-     * @return SettingModel
      */
     public function setTags(Collection $tags): SettingModel
     {
@@ -163,19 +161,11 @@ class SettingModel
         return $this;
     }
 
-    /**
-     * @return array
-     */
     public function getChoices(): array
     {
         return $this->choices;
     }
 
-    /**
-     * @param array $choices
-     *
-     * @return SettingModel
-     */
     public function setChoices(array $choices): SettingModel
     {
         $this->choices = $choices;

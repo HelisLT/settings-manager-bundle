@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Helis\SettingsManagerBundle\Menu;
 
-use Knp\Menu\FactoryInterface;
-use Knp\Menu\ItemInterface;
 use Helis\SettingsManagerBundle\Event\ConfigureMenuEvent;
 use Helis\SettingsManagerBundle\SettingsManagerEvents;
+use Knp\Menu\FactoryInterface;
+use Knp\Menu\ItemInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class MenuBuilder

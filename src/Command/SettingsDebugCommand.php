@@ -28,8 +28,6 @@ class SettingsDebugCommand extends Command
 
     /**
      * SettingsDebugCommand constructor.
-     *
-     * @param SettingsManager $settingsManager
      */
     public function __construct(SettingsManager $settingsManager)
     {
