@@ -5,7 +5,7 @@ services:
         autoconfigure: true
 
     _instanceof:
-        \Twig_Extension:
+        Twig\Extension\AbstractExtension:
             tags:
                 - { name: twig.extension }
 

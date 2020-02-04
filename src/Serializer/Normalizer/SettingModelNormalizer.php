@@ -17,7 +17,8 @@ use Symfony\Component\Serializer\SerializerAwareTrait;
 
 class SettingModelNormalizer implements NormalizerInterface, DenormalizerInterface, SerializerAwareInterface
 {
-    use SerializerAwareTrait, ObjectToPopulateTrait;
+    use SerializerAwareTrait;
+    use ObjectToPopulateTrait;
 
     /**
      * {@inheritdoc}

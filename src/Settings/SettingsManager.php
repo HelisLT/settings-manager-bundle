@@ -30,7 +30,6 @@ class SettingsManager implements LoggerAwareInterface
 
     /**
      * @param SettingsProviderInterface[] $providers
-     * @param EventManagerInterface       $eventManager
      */
     public function __construct(array $providers, EventManagerInterface $eventManager)
     {
@@ -47,9 +46,6 @@ class SettingsManager implements LoggerAwareInterface
     }
 
     /**
-     * @param string|null $providerName
-     * @param bool        $onlyEnabled
-     *
      * @return DomainModel[]
      */
     public function getDomains(string $providerName = null, bool $onlyEnabled = false): array
@@ -146,7 +142,6 @@ class SettingsManager implements LoggerAwareInterface
 
     /**
      * @param string[] $domainNames
-     * @param string   $tagName
      *
      * @return SettingModel[]
      */
@@ -177,10 +172,6 @@ class SettingsManager implements LoggerAwareInterface
 
     /**
      * Tries to update an existing provider or saves to a new provider.
-     *
-     * @param SettingModel $settingModel
-     *
-     * @return bool
      */
     public function save(SettingModel $settingModel): bool
     {
@@ -247,21 +238,12 @@ class SettingsManager implements LoggerAwareInterface
 
     /**
      * @deprecated use save()
-     *
-     * @param SettingModel $settingModel
-     *
-     * @return bool
      */
     public function update(SettingModel $settingModel): bool
     {
         return $this->save($settingModel);
     }
 
-    /**
-     * @param SettingModel $settingModel
-     *
-     * @return bool
-     */
     public function delete(SettingModel $settingModel): bool
     {
         $changed = false;
@@ -290,9 +272,6 @@ class SettingsManager implements LoggerAwareInterface
 
     /**
      * Saves settings from domain to specific provider. Mostly used for setting population.
-     *
-     * @param string $domainName
-     * @param string $providerName
      */
     public function copyDomainToProvider(string $domainName, string $providerName): void
     {
@@ -309,10 +288,6 @@ class SettingsManager implements LoggerAwareInterface
         ]);
     }
 
-    /**
-     * @param DomainModel $domainModel
-     * @param string|null $providerName
-     */
     public function updateDomain(DomainModel $domainModel, string $providerName = null): void
     {
         if ($providerName !== null) {
@@ -334,10 +309,6 @@ class SettingsManager implements LoggerAwareInterface
         ]);
     }
 
-    /**
-     * @param string      $domainName
-     * @param string|null $providerName
-     */
     public function deleteDomain(string $domainName, string $providerName = null): void
     {
         if ($providerName !== null) {

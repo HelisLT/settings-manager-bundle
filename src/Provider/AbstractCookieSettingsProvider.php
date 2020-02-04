@@ -10,6 +10,9 @@ use Helis\SettingsManagerBundle\Provider\Traits\WritableProviderTrait;
 use ParagonIE\Paseto\Builder;
 use ParagonIE\Paseto\Exception\PasetoException;
 use ParagonIE\Paseto\Parser;
+use ParagonIE\Paseto\Rules\IssuedBy;
+use ParagonIE\Paseto\Rules\NotExpired;
+use ParagonIE\Paseto\Rules\Subject;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -18,13 +21,11 @@ use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Serializer\SerializerInterface;
-use ParagonIE\Paseto\Rules\IssuedBy;
-use ParagonIE\Paseto\Rules\NotExpired;
-use ParagonIE\Paseto\Rules\Subject;
 
 abstract class AbstractCookieSettingsProvider extends SimpleSettingsProvider implements EventSubscriberInterface, LoggerAwareInterface
 {
-    use LoggerAwareTrait, WritableProviderTrait;
+    use LoggerAwareTrait;
+    use WritableProviderTrait;
 
     private $serializer;
     private $publicKeyMaterial;

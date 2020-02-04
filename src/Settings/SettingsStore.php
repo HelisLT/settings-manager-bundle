@@ -57,8 +57,6 @@ class SettingsStore extends ArrayCollection
     }
 
     /**
-     * @param string $providerName
-     *
      * @return SettingModel[]
      */
     public function getByProvider(string $providerName): array
@@ -68,8 +66,6 @@ class SettingsStore extends ArrayCollection
 
     /**
      * Checks if settings store is not empty.
-     *
-     * @return bool
      */
     public function isWarm(): bool
     {

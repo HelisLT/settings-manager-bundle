@@ -18,7 +18,6 @@ php:
 
 env:
   - SYMFONY_VERSION=3.4.*@dev
-  - SYMFONY_VERSION=4.1.*@dev
   - SYMFONY_VERSION=4.2.*@dev
   - SYMFONY_VERSION=4.3.*@dev
 
@@ -42,16 +41,16 @@ script: ./vendor/bin/phpunit -c . -v
 jobs:
   include:
     - stage: Code Quality
-      php: 7.2
+      php: 7.3
       env: CODING_STANDARDS
       script: composer phpcs
 
     - stage: Code Quality
-      php: 7.2
+      php: 7.3
       env: STATIC_ANALYSIS
       script: composer phpstan
 
     - stage: Code Quality
-      php: 7.2
+      php: 7.3
       env: BENCHMARK
       script: ./vendor/bin/phpbench run --progress=travis
