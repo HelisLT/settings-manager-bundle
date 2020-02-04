@@ -49,8 +49,7 @@ class DoctrineOrmSettingsProvider implements SettingsProviderInterface
             ->select('s')
             ->from($this->settingsEntityClass, 's')
             ->where($qb->expr()->in('s.domain.name', ':domainNames'))
-            ->setParameter('domainNames', $domainNames)
-            ->setMaxResults(300);
+            ->setParameter('domainNames', $domainNames);
 
         $out = [];
         foreach ($qb->getQuery()->iterate() as $row) {
