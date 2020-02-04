@@ -8,6 +8,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Helis\SettingsManagerBundle\Settings\SettingsRouter;
 use Helis\SettingsManagerBundle\Twig\SettingsExtension;
 use PHPUnit\Framework\TestCase;
+use Twig\TwigFunction;
 
 class SettingsExtensionTest extends TestCase
 {
@@ -35,9 +36,9 @@ class SettingsExtensionTest extends TestCase
         $functions = $extension->getFunctions();
 
         $this->assertCount(1, $functions);
-        /** @var \Twig_SimpleFunction $function */
+        /** @var TwigFunction $function */
         $function = array_shift($functions);
-        $this->assertInstanceOf(\Twig_SimpleFunction::class, $function);
+        $this->assertInstanceOf(TwigFunction::class, $function);
         $this->assertEquals('setting_get', $function->getName());
         $this->assertEquals('getSetting', $function->getCallable()[1]);
     }

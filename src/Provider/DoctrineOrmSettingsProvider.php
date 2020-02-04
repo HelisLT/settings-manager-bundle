@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Helis\SettingsManagerBundle\Provider;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManagerInterface;
 use Helis\SettingsManagerBundle\Model\DomainModel;
 use Helis\SettingsManagerBundle\Model\SettingModel;
@@ -55,7 +56,12 @@ class DoctrineOrmSettingsProvider implements SettingsProviderInterface
             ->setParameter('domainNames', $domainNames)
             ->setMaxResults(300);
 
-        return $qb->getQuery()->getResult();
+        $out = [];
+        foreach ($qb->getQuery()->iterate() as $row) {
+            $out[] = reset($row);
+        }
+
+        return $out;
     }
 
     public function getSettingsByName(array $domainNames, array $settingNames): array
@@ -72,7 +78,12 @@ class DoctrineOrmSettingsProvider implements SettingsProviderInterface
             ->setParameter('settingNames', $settingNames)
             ->setMaxResults(300);
 
-        return $qb->getQuery()->getResult();
+        $out = [];
+        foreach ($qb->getQuery()->iterate() as $row) {
+            $out[] = reset($row);
+        }
+
+        return $out;
     }
 
     public function getDomains(bool $onlyEnabled = false): array
@@ -96,18 +107,18 @@ class DoctrineOrmSettingsProvider implements SettingsProviderInterface
                 ->setParameter('default_name', DomainModel::DEFAULT_NAME);
         }
 
-        return array_map(
-            function ($row) {
-                $model = new DomainModel();
-                $model->setName($row['name']);
-                $model->setPriority($row['priority']);
-                $model->setEnabled($row['enabled']);
-                $model->setReadOnly($row['readOnly']);
+        $out = [];
+        foreach ($qb->getQuery()->iterate(null, AbstractQuery::HYDRATE_ARRAY) as $row) {
+            $row = reset($row);
+            $model = new DomainModel();
+            $model->setName($row['name']);
+            $model->setPriority($row['priority']);
+            $model->setEnabled($row['enabled']);
+            $model->setReadOnly($row['readOnly']);
+            $out[] = $model;
+        }
 
-                return $model;
-            },
-            $qb->getQuery()->getArrayResult()
-        );
+        return $out;
     }
 
     public function save(SettingModel $settingModel): bool
