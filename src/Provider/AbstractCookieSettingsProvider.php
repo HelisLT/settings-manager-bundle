@@ -24,7 +24,8 @@ use ParagonIE\Paseto\Rules\Subject;
 
 abstract class AbstractCookieSettingsProvider extends SimpleSettingsProvider implements EventSubscriberInterface, LoggerAwareInterface
 {
-    use LoggerAwareTrait, WritableProviderTrait;
+    use LoggerAwareTrait;
+    use WritableProviderTrait;
 
     private $serializer;
     private $publicKeyMaterial;
