@@ -70,8 +70,7 @@ class DoctrineOrmSettingsProvider implements SettingsProviderInterface
                 $qb->expr()->in('s.domain.name', ':domainNames')
             ))
             ->setParameter('domainNames', $domainNames)
-            ->setParameter('settingNames', $settingNames)
-            ->setMaxResults(300);
+            ->setParameter('settingNames', $settingNames);
 
         $out = [];
         foreach ($qb->getQuery()->iterate() as $row) {
@@ -89,8 +88,7 @@ class DoctrineOrmSettingsProvider implements SettingsProviderInterface
             ->addSelect('s.domain.priority AS priority')
             ->addSelect('s.domain.enabled AS enabled')
             ->addSelect('s.domain.readOnly AS readOnly')
-            ->from($this->settingsEntityClass, 's')
-            ->setMaxResults(100);
+            ->from($this->settingsEntityClass, 's');
 
         if ($onlyEnabled) {
             $qb
