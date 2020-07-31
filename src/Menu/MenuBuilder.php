@@ -32,8 +32,8 @@ class MenuBuilder
             ->setExtra('translation_domain', 'HelisSettingsManager');
 
         $this->eventDispatcher->dispatch(
-            SettingsManagerEvents::CONFIGURE_MENU,
-            new ConfigureMenuEvent($this->factory, $menu)
+            new ConfigureMenuEvent($this->factory, $menu),
+            SettingsManagerEvents::CONFIGURE_MENU
         );
 
         return $menu;
