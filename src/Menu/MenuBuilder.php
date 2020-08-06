@@ -6,19 +6,19 @@ namespace Helis\SettingsManagerBundle\Menu;
 
 use Helis\SettingsManagerBundle\Event\ConfigureMenuEvent;
 use Helis\SettingsManagerBundle\SettingsManagerEvents;
+use Helis\SettingsManagerBundle\Settings\EventManager;
 use Knp\Menu\FactoryInterface;
 use Knp\Menu\ItemInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class MenuBuilder
 {
     private $factory;
-    private $eventDispatcher;
+    private $eventManager;
 
-    public function __construct(FactoryInterface $factory, EventDispatcherInterface $eventDispatcher)
+    public function __construct(FactoryInterface $factory, EventManager $eventManager)
     {
         $this->factory = $factory;
-        $this->eventDispatcher = $eventDispatcher;
+        $this->eventManager = $eventManager;
     }
 
     public function createTopMenu(array $options): ItemInterface
@@ -31,7 +31,7 @@ class MenuBuilder
             ->addChild('navbar.domain_list', ['route' => 'settings_domain_index'])
             ->setExtra('translation_domain', 'HelisSettingsManager');
 
-        $this->eventDispatcher->dispatch(
+        $this->eventManager->dispatchConfigureMenu(
             SettingsManagerEvents::CONFIGURE_MENU,
             new ConfigureMenuEvent($this->factory, $menu)
         );

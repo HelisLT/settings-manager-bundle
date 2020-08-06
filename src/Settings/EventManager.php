@@ -29,4 +29,15 @@ class EventManager implements EventManagerInterface
             $this->eventDispatcher->dispatch($eventName.'.'.strtolower($event->getSetting()->getName()), $event);
         }
     }
+    
+    public function dispatchConfigureMenu(string $eventName, ConfigureMenuEvent $event): void
+    {
+        if ($this->eventDispatcher instanceof ContractsEventDispatcherInterface) {
+            // sf >= 4.3
+            $this->eventDispatcher->dispatch($event, $eventName);
+        } else {
+            // sf < 4.2 legacy
+            $this->eventDispatcher->dispatch($eventName, $event);
+        }
+    }
 }
