@@ -159,7 +159,7 @@ class DoctrineOrmSettingsProvider implements SettingsProviderInterface
         $success = ((int)$qb->getQuery()->getSingleScalarResult()) > 0;
 
         if ($success) {
-            $this->entityManager->clear($this->settingsEntityClass);
+            $this->entityManager->clear();
         }
 
         return $success;
@@ -180,7 +180,7 @@ class DoctrineOrmSettingsProvider implements SettingsProviderInterface
         $success = ((int)$qb->getQuery()->getSingleScalarResult()) > 0;
 
         if ($success) {
-            $this->entityManager->clear($this->settingsEntityClass);
+            $this->entityManager->clear();
         }
 
         return $success;
@@ -197,7 +197,7 @@ class DoctrineOrmSettingsProvider implements SettingsProviderInterface
         $success = ((int)$qb->getQuery()->getSingleScalarResult()) > 0;
 
         if ($success) {
-            $this->entityManager->clear($this->settingsEntityClass);
+            $this->entityManager->clear();
         }
 
         return $success;
