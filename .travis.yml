@@ -12,14 +12,13 @@ services:
   - redis-server
 
 php:
-  - 7.1
   - 7.2
   - 7.3
 
 env:
   - SYMFONY_VERSION=3.4.*@dev
-  - SYMFONY_VERSION=4.2.*@dev
   - SYMFONY_VERSION=4.3.*@dev
+  - SYMFONY_VERSION=4.4.*@dev
 
 before_install:
   - |
