@@ -145,3 +145,8 @@ services:
     test.settings_manager.serializer:
         alias: 'settings_manager.serializer'
         public: true
+
+    App\ImportantService:
+        public: true
+        tags:
+            - { name: settings_manager.setting_aware, setting: baz, method: setEnabled }
