@@ -150,3 +150,8 @@ services:
         public: true
         tags:
             - { name: settings_manager.setting_aware, setting: baz, method: setEnabled }
+
+    App\FinalImportantService:
+        public: true
+        tags:
+            - { name: settings_manager.setting_aware, setting: baz, method: setEnabled }
