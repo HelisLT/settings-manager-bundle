@@ -14,9 +14,9 @@ class SwitchableControllerSubscriberTest extends WebTestCase
 
     public function testControllerDisabled()
     {
+        $client = $this->makeClient();
         $this->loadFixtures([]);
 
-        $client = $this->makeClient();
         $client->request('GET', '/print/batman');
 
         $this->assertStatusCode(404, $client);
@@ -24,9 +24,9 @@ class SwitchableControllerSubscriberTest extends WebTestCase
 
     public function testControllerEnabled()
     {
+        $client = $this->makeClient();
         $this->loadFixtures([LoadSwitchableControllerData::class]);
 
-        $client = $this->makeClient();
         $client->request('GET', '/print/batman');
 
         $this->assertStatusCode(200, $client);
