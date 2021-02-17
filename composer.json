@@ -65,10 +65,12 @@
         "symfony/security-bundle": "^3.4|^4.3",
         "symfony/stopwatch": "^3.4|^4.3",
         "symfony/twig-bundle": "^3.4|^4.3",
-        "symfony/web-profiler-bundle": "^3.4|^4.3"
+        "symfony/web-profiler-bundle": "^3.4|^4.3",
+        "symfony/lock": "^3.4|^4.3"
     },
     "suggest": {
         "symfony/cache": "Required by some settings providers",
+        "symfony/lock": "Required by some settings providers",
         "symfony/monolog-bundle": "Allows more advanced logging",
         "doctrine/orm": "Allows to use orm setting provider",
         "acelaya/doctrine-enum-type": "Required if using doctrine orm, for persisting enum's",
