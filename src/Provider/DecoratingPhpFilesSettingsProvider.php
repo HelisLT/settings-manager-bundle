@@ -8,7 +8,7 @@ use Helis\SettingsManagerBundle\Model\DomainModel;
 use Helis\SettingsManagerBundle\Model\SettingModel;
 use Symfony\Component\Cache\Adapter\PhpFilesAdapter;
 use Symfony\Component\Cache\CacheItem;
-use Symfony\Component\Lock\LockFactory;
+use Symfony\Component\Lock\Factory;
 use Symfony\Component\Lock\Store\FlockStore;
 
 class DecoratingPhpFilesSettingsProvider implements ModificationAwareSettingsProviderInterface
@@ -21,7 +21,7 @@ class DecoratingPhpFilesSettingsProvider implements ModificationAwareSettingsPro
     /** @var PhpFilesAdapter */
     private $cache;
 
-    /** @var LockFactory */
+    /** @var Factory */
     private $lockFactory;
 
     /** @var int */
@@ -34,7 +34,7 @@ class DecoratingPhpFilesSettingsProvider implements ModificationAwareSettingsPro
         $this->decoratingProvider = $decoratingProvider;
         $this->checkValidityInterval = $checkValidityInterval;
 
-        $this->lockFactory = new LockFactory(new FlockStore());
+        $this->lockFactory = new Factory(new FlockStore());
         $this->cache = new PhpFilesAdapter('settings_cache');
     }
 
