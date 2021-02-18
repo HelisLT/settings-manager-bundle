@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Helis\SettingsManagerBundle\Settings;
 
+use Helis\SettingsManagerBundle\Event\ConfigureMenuEvent;
 use Helis\SettingsManagerBundle\Event\SettingEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface as ContractsEventDispatcherInterface;
