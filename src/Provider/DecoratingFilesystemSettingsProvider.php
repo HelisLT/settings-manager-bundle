@@ -6,13 +6,14 @@ namespace Helis\SettingsManagerBundle\Provider;
 
 use Helis\SettingsManagerBundle\Model\DomainModel;
 use Helis\SettingsManagerBundle\Model\SettingModel;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\PhpFilesAdapter;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Lock\Factory;
 use Symfony\Component\Lock\Store\FlockStore;
 use Symfony\Component\Serializer\SerializerInterface;
 
-class DecoratingPhpFilesSettingsProvider implements ModificationAwareSettingsProviderInterface
+class DecoratingFilesystemSettingsProvider implements ModificationAwareSettingsProviderInterface
 {
     public const MODIFICATION_TIME_KEY = 'settings_modification_time';
 
@@ -34,14 +35,16 @@ class DecoratingPhpFilesSettingsProvider implements ModificationAwareSettingsPro
     public function __construct(
         ModificationAwareSettingsProviderInterface $decoratingProvider,
         SerializerInterface $serializer,
-        int $checkValidityInterval = 30
+        string $nameSpace = 'settings_cache',
+        int $checkValidityInterval = 30,
+        bool $useOPcache = true
     ) {
         $this->decoratingProvider = $decoratingProvider;
         $this->serializer = $serializer;
         $this->checkValidityInterval = $checkValidityInterval;
 
         $this->lockFactory = new Factory(new FlockStore());
-        $this->cache = new PhpFilesAdapter('settings_cache');
+        $this->cache = $useOPcache ? new PhpFilesAdapter($nameSpace) : new FilesystemAdapter($nameSpace);
     }
 
     /**
@@ -103,6 +106,9 @@ class DecoratingPhpFilesSettingsProvider implements ModificationAwareSettingsPro
         return $settings;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function getDomains(bool $onlyEnabled = false): array
     {
         $key = $this->getDomainKey($onlyEnabled);

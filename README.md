@@ -166,7 +166,7 @@ And additional decorating providers:
 
  - [Phpredis](#phpredis-decorating-settings-provider)
  - [Predis](#predis-decorating-settings-provider)
- - [PHP Files Cache](#php-files-decorating-provider)
+ - [Filesystem Cache](#filesystem-decorating-provider)
 
 ### Simple settings provider
 
@@ -378,9 +378,9 @@ Required libraries:
 
  > `composer require predis/predis`
 
-### PHP files decorating provider
+### Filesystem decorating provider
 
-`Helis\SettingsManagerBundle\Provider\DecoratingPhpFilesSettingsProvider`
+`Helis\SettingsManagerBundle\Provider\DecoratingFilesystemSettingsProvider`
 
 This provider is used to cache other settings providers that implements `ModificationAwareSettingsProviderInterface`. At the moment supports [phpredis decorating settings provider](#phpredis-decorating-settings-provider) and [predis decorating settings provider](#predis-decorating-settings-provider). It uses Symfony [PHP Files Cache Adapter](https://symfony.com/doc/current/components/cache/adapters/php_files_adapter.html). Single change in decorating provider causes whole cache to be invalidated.
 
@@ -388,10 +388,12 @@ Required libraries and extensions:
 
 - [symfony/cache](https://symfony.com/doc/current/components/cache.html)
 - [symfony/lock](https://symfony.com/doc/current/components/lock.html)
-- [OPcache](https://pecl.php.net/package/ZendOpcache)
+- [OPcache](https://pecl.php.net/package/ZendOpcache) (recommended, `$useOPcache: false` can be used to omit it)
 
 > `composer require symfony/cache`
+> 
 > `composer require symfony/lock`
+>
 > `pecl install zendopcache-7.0.4`
 
 Configuration example:
@@ -402,6 +404,7 @@ settings_manager.decorating_provider.cache:
     decorates: 'Helis\SettingsManagerBundle\Provider\DecoratingRedisSettingsProvider'
     arguments:
         $decoratingProvider: '@settings_manager.decorating_provider.cache.inner'
+        $serializer: '@settings_manager.serializer'
 ```
 
 ## Configuration reference

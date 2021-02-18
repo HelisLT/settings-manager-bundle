@@ -5,12 +5,12 @@ namespace Helis\SettingsManagerBundle\Tests\Functional\Provider;
 
 use App\Entity\Setting;
 use App\Entity\Tag;
-use Helis\SettingsManagerBundle\Provider\DecoratingPhpFilesSettingsProvider;
+use Helis\SettingsManagerBundle\Provider\DecoratingFilesystemSettingsProvider;
 use Helis\SettingsManagerBundle\Provider\DecoratingRedisSettingsProvider;
 use Helis\SettingsManagerBundle\Provider\DoctrineOrmSettingsProvider;
 use Helis\SettingsManagerBundle\Provider\SettingsProviderInterface;
 
-class DecoratingPhpFilesSettingsProviderTest extends DecoratingPredisSettingsProviderTest
+class DecoratingFilesystemSettingsProviderTest extends DecoratingPredisSettingsProviderTest
 {
     protected function createProvider(): SettingsProviderInterface
     {
@@ -30,7 +30,7 @@ class DecoratingPhpFilesSettingsProviderTest extends DecoratingPredisSettingsPro
 
         $container = $this->getContainer();
 
-        return new DecoratingPhpFilesSettingsProvider(
+        return new DecoratingFilesystemSettingsProvider(
             new DecoratingRedisSettingsProvider(
                 new DoctrineOrmSettingsProvider(
                     $container->get('doctrine.orm.default_entity_manager'),
@@ -41,7 +41,9 @@ class DecoratingPhpFilesSettingsProviderTest extends DecoratingPredisSettingsPro
                 $container->get('test.settings_manager.serializer')
             ),
             $container->get('test.settings_manager.serializer'),
-            0
+            'settings_cache',
+            0,
+            false
         );
     }
 }
