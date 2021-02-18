@@ -30,7 +30,7 @@ class EventManager implements EventManagerInterface
             $this->eventDispatcher->dispatch($eventName.'.'.strtolower($event->getSetting()->getName()), $event);
         }
     }
-    
+
     public function dispatchConfigureMenu(string $eventName, ConfigureMenuEvent $event): void
     {
         if ($this->eventDispatcher instanceof ContractsEventDispatcherInterface) {

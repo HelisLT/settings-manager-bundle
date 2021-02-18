@@ -15,6 +15,8 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 class AwsSsmSettingsProvider extends SimpleSettingsProvider
 {
+    use ReadOnlyProviderTrait;
+
     private const TYPE_MAP = [
         'double' => Type::FLOAT,
         'boolean' => Type::BOOL,
@@ -23,8 +25,6 @@ class AwsSsmSettingsProvider extends SimpleSettingsProvider
         'string' => Type::STRING,
         'choice' => Type::CHOICE,
     ];
-
-    use ReadOnlyProviderTrait;
 
     private $ssmClient;
     private $denormalizer;

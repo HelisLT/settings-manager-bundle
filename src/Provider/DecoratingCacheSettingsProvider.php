@@ -92,7 +92,6 @@ class DecoratingCacheSettingsProvider implements ModificationAwareSettingsProvid
     }
 
     /**
-     * @param string $domainName
      * @return string[]
      */
     private function getSettingNames(string $domainName): array
