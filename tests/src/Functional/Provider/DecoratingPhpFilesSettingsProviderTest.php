@@ -40,6 +40,7 @@ class DecoratingPhpFilesSettingsProviderTest extends DecoratingPredisSettingsPro
                 $this->redis,
                 $container->get('test.settings_manager.serializer')
             ),
+            $container->get('test.settings_manager.serializer'),
             0
         );
     }
