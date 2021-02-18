@@ -7,18 +7,14 @@ namespace Helis\SettingsManagerBundle\Provider;
 use Helis\SettingsManagerBundle\Model\DomainModel;
 use Helis\SettingsManagerBundle\Model\SettingModel;
 use Helis\SettingsManagerBundle\Settings\Traits\DomainNameExtractTrait;
-use Symfony\Component\Cache\Adapter\FilesystemAdapter;
-use Symfony\Component\Cache\Adapter\PhpFilesAdapter;
+use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Lock\Factory;
-use Symfony\Component\Lock\Store\FlockStore;
 use Symfony\Component\Serializer\SerializerInterface;
 
-class DecoratingFilesystemSettingsProvider implements ModificationAwareSettingsProviderInterface
+class DecoratingCacheSettingsProvider implements ModificationAwareSettingsProviderInterface
 {
     use DomainNameExtractTrait;
-
-    public const MODIFICATION_TIME_KEY = 'settings_modification_time';
 
     /** @var SettingsProviderInterface */
     private $decoratingProvider;
@@ -26,7 +22,7 @@ class DecoratingFilesystemSettingsProvider implements ModificationAwareSettingsP
     /** @var SerializerInterface */
     protected $serializer;
 
-    /** @var PhpFilesAdapter */
+    /** @var AdapterInterface */
     private $cache;
 
     /** @var Factory */
@@ -35,19 +31,21 @@ class DecoratingFilesystemSettingsProvider implements ModificationAwareSettingsP
     /** @var int */
     private $checkValidityInterval;
 
+    /** @var string */
+    private $modificationTimeKey = 'settings_modification_time';
+
     public function __construct(
         ModificationAwareSettingsProviderInterface $decoratingProvider,
         SerializerInterface $serializer,
-        string $nameSpace = 'settings_cache',
-        int $checkValidityInterval = 30,
-        bool $useOPcache = true
+        AdapterInterface $cache,
+        Factory $lockFactory,
+        int $checkValidityInterval = 30
     ) {
         $this->decoratingProvider = $decoratingProvider;
         $this->serializer = $serializer;
+        $this->lockFactory = $lockFactory;
+        $this->cache = $cache;
         $this->checkValidityInterval = $checkValidityInterval;
-
-        $this->lockFactory = new Factory(new FlockStore());
-        $this->cache = $useOPcache ? new PhpFilesAdapter($nameSpace) : new FilesystemAdapter($nameSpace);
     }
 
     /**
@@ -245,11 +243,15 @@ class DecoratingFilesystemSettingsProvider implements ModificationAwareSettingsP
         }
     }
 
+    public function setModificationTimeKey(string $modificationTimeKey): void
+    {
+        $this->modificationTimeKey = $modificationTimeKey;
+    }
+
     private function setModificationTime(bool $commit = false): int
     {
         $time = (int)round(microtime(true) * 10000);
-        /** @var CacheItem $cachedValue */
-        $cachedValue = $this->cache->getItem(self::MODIFICATION_TIME_KEY);
+        $cachedValue = $this->cache->getItem($this->modificationTimeKey);
         $cachedValue->set($time);
         $this->cache->saveDeferred($cachedValue);
 
@@ -262,8 +264,7 @@ class DecoratingFilesystemSettingsProvider implements ModificationAwareSettingsP
 
     public function getModificationTime(): int
     {
-        /** @var CacheItem $cachedValue */
-        $cachedValue = $this->cache->getItem(self::MODIFICATION_TIME_KEY);
+        $cachedValue = $this->cache->getItem($this->modificationTimeKey);
         if ($cachedValue->isHit()) {
             return $cachedValue->get();
         }

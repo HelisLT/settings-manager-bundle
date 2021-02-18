@@ -10,7 +10,7 @@ Provides a nice way to define variables and inject them into application parts.
 [![Latest Stable Version](https://poser.pugx.org/helis/settings-manager-bundle/v/stable)](https://packagist.org/packages/helis/settings-manager-bundle)
 [![License](https://poser.pugx.org/helis/settings-manager-bundle/license)](https://packagist.org/packages/helis/settings-manager-bundle)
 
-## Jump to
+## Jump tohttps://symfony.com/doc/current/components/cache.html#available-cache-adapters
 
  - [Quick start](#quick-start)
  - [Usage](#usage)
@@ -166,7 +166,7 @@ And additional decorating providers:
 
  - [Phpredis](#phpredis-decorating-settings-provider)
  - [Predis](#predis-decorating-settings-provider)
- - [Filesystem Cache](#filesystem-decorating-provider)
+ - [Cache](#cache-decorating-provider)
 
 ### Simple settings provider
 
@@ -378,33 +378,33 @@ Required libraries:
 
  > `composer require predis/predis`
 
-### Filesystem decorating provider
+### Cache decorating provider
 
-`Helis\SettingsManagerBundle\Provider\DecoratingFilesystemSettingsProvider`
+`Helis\SettingsManagerBundle\Provider\DecoratingCacheSettingsProvider`
 
 This provider is used to cache other settings providers that implements `ModificationAwareSettingsProviderInterface`. At the moment supports [phpredis decorating settings provider](#phpredis-decorating-settings-provider) and [predis decorating settings provider](#predis-decorating-settings-provider). It uses Symfony [PHP Files Cache Adapter](https://symfony.com/doc/current/components/cache/adapters/php_files_adapter.html). Single change in decorating provider causes whole cache to be invalidated.
+Supports [symfony cache component adapters](https://symfony.com/doc/current/components/cache.html#available-cache-adapters)
 
 Required libraries and extensions:
 
 - [symfony/cache](https://symfony.com/doc/current/components/cache.html)
 - [symfony/lock](https://symfony.com/doc/current/components/lock.html)
-- [OPcache](https://pecl.php.net/package/ZendOpcache) (recommended, `$useOPcache: false` can be used to omit it)
 
 > `composer require symfony/cache`
 > 
 > `composer require symfony/lock`
->
-> `pecl install zendopcache-7.0.4`
 
 Configuration example:
 
 ```yaml
 settings_manager.decorating_provider.cache:
-    class: 'Helis\SettingsManagerBundle\Provider\DecoratingPhpFilesSettingsProvider'
+    class: 'Helis\SettingsManagerBundle\Provider\DecoratingCacheSettingsProvider'
     decorates: 'Helis\SettingsManagerBundle\Provider\DecoratingRedisSettingsProvider'
     arguments:
         $decoratingProvider: '@settings_manager.decorating_provider.cache.inner'
         $serializer: '@settings_manager.serializer'
+        $cache: '@cache.settings'
+        $lockFactory: '@symfony_flock_factory'
 ```
 
 ## Configuration reference

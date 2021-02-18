@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Helis\SettingsManagerBundle\Provider\Traits;
 
 use Predis\Client;
@@ -28,7 +30,7 @@ trait RedisModificationTrait
 
     public function getModificationTime(): int
     {
-        $time = $this->redis->get($this->modificationTimeKey);
+        $time = (int) $this->redis->get($this->modificationTimeKey);
 
         if (empty($time)) {
             $time = $this->setModificationTime();

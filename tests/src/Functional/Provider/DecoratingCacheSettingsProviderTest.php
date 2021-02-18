@@ -5,12 +5,15 @@ namespace Helis\SettingsManagerBundle\Tests\Functional\Provider;
 
 use App\Entity\Setting;
 use App\Entity\Tag;
-use Helis\SettingsManagerBundle\Provider\DecoratingFilesystemSettingsProvider;
+use Helis\SettingsManagerBundle\Provider\DecoratingCacheSettingsProvider;
 use Helis\SettingsManagerBundle\Provider\DecoratingRedisSettingsProvider;
 use Helis\SettingsManagerBundle\Provider\DoctrineOrmSettingsProvider;
 use Helis\SettingsManagerBundle\Provider\SettingsProviderInterface;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
+use Symfony\Component\Lock\Factory;
+use Symfony\Component\Lock\Store\FlockStore;
 
-class DecoratingFilesystemSettingsProviderTest extends DecoratingPredisSettingsProviderTest
+class DecoratingCacheSettingsProviderTest extends DecoratingPredisSettingsProviderTest
 {
     protected function createProvider(): SettingsProviderInterface
     {
@@ -30,7 +33,10 @@ class DecoratingFilesystemSettingsProviderTest extends DecoratingPredisSettingsP
 
         $container = $this->getContainer();
 
-        return new DecoratingFilesystemSettingsProvider(
+        $namespace = 'settings_cache';
+        $cacheDir = $container->getParameter('kernel.cache_dir') . DIRECTORY_SEPARATOR . 'pools';
+
+        return new DecoratingCacheSettingsProvider(
             new DecoratingRedisSettingsProvider(
                 new DoctrineOrmSettingsProvider(
                     $container->get('doctrine.orm.default_entity_manager'),
@@ -41,9 +47,9 @@ class DecoratingFilesystemSettingsProviderTest extends DecoratingPredisSettingsP
                 $container->get('test.settings_manager.serializer')
             ),
             $container->get('test.settings_manager.serializer'),
-            'test_settings_cache',
-            0,
-            false
+            new FilesystemAdapter($namespace, 0, $cacheDir),
+            new Factory(new FlockStore()),
+            0
         );
     }
 }
