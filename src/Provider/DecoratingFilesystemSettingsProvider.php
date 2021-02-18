@@ -115,16 +115,34 @@ class DecoratingFilesystemSettingsProvider implements ModificationAwareSettingsP
         $cacheItem = $this->getCached($key);
 
         if ($cacheItem->isHit()) {
-            return $cacheItem->get();
+            return $this->deserializeArray($cacheItem->get());
         }
 
         $domains = $this->decoratingProvider->getDomains($onlyEnabled);
 
         if (!empty($domains)) {
-            $this->storeCached($cacheItem, $domains);
+            $this->storeCached($cacheItem, $this->serializeArray($domains));
         }
 
         return $domains;
+    }
+
+    private function serializeArray(array $elements): array
+    {
+        foreach ($elements as &$element) {
+            $element = $this->serializer->serialize($element, 'json');
+        }
+
+        return $elements;
+    }
+
+    private function deserializeArray(array $elements): array
+    {
+        foreach ($elements as &$element) {
+            $element = $this->serializer->deserialize($element, DomainModel::class, 'json');
+        }
+
+        return $elements;
     }
 
     public function isReadOnly(): bool
