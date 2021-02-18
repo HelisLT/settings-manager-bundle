@@ -16,6 +16,8 @@ class DecoratingCacheSettingsProvider implements ModificationAwareSettingsProvid
 {
     use DomainNameExtractTrait;
 
+    private const LOCK_RETRY_INTERVAL_MS = 50000; // microseconds
+
     /** @var SettingsProviderInterface */
     private $decoratingProvider;
 
@@ -208,7 +210,7 @@ class DecoratingCacheSettingsProvider implements ModificationAwareSettingsProvid
             $lock = $this->lockFactory->createLock(__FUNCTION__);
 
             if (!$lock->acquire()) {
-                usleep(50000);
+                usleep(self::LOCK_RETRY_INTERVAL_MS);
                 $this->clearIfNeeded();
             }
 
@@ -232,13 +234,34 @@ class DecoratingCacheSettingsProvider implements ModificationAwareSettingsProvid
             }
 
             if (null === $settingNames) {
-                $this->warmupDomainSettings($domainName);
+                $lock = $this->lockFactory->createLock(__FUNCTION__ . $domainName);
+                if (!$lock->acquire()) {
+                    usleep(self::LOCK_RETRY_INTERVAL_MS);
+                    $this->warmup($domainNames, $settingNames);
+                }
+
+                try {
+                    $this->warmupDomainSettings($domainName);
+                } finally {
+                    $lock->release();
+                }
             } else {
                 foreach ($settingNames as $settingName) {
                     if ($this->isSettingWarm($domainName, $settingName)) {
                         continue;
                     }
-                    $this->warmupSingleSetting($domainName, $settingName);
+
+                    $lock = $this->lockFactory->createLock(__FUNCTION__ . $domainName . $settingName);
+                    if (!$lock->acquire()) {
+                        usleep(self::LOCK_RETRY_INTERVAL_MS);
+                        $this->warmup($domainNames, $settingNames);
+                    }
+
+                    try {
+                        $this->warmupSingleSetting($domainName, $settingName);
+                    } finally {
+                        $lock->release();
+                    }
                 }
             }
         }
