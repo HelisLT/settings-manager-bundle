@@ -41,7 +41,7 @@ class DecoratingFilesystemSettingsProviderTest extends DecoratingPredisSettingsP
                 $container->get('test.settings_manager.serializer')
             ),
             $container->get('test.settings_manager.serializer'),
-            'settings_cache',
+            'test_settings_cache',
             0,
             false
         );

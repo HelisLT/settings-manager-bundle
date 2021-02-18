@@ -6,6 +6,7 @@ namespace Helis\SettingsManagerBundle\Provider;
 
 use Helis\SettingsManagerBundle\Model\DomainModel;
 use Helis\SettingsManagerBundle\Model\SettingModel;
+use Helis\SettingsManagerBundle\Settings\Traits\DomainNameExtractTrait;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\PhpFilesAdapter;
 use Symfony\Component\Cache\CacheItem;
@@ -15,6 +16,8 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 class DecoratingFilesystemSettingsProvider implements ModificationAwareSettingsProviderInterface
 {
+    use DomainNameExtractTrait;
+
     public const MODIFICATION_TIME_KEY = 'settings_modification_time';
 
     /** @var SettingsProviderInterface */
@@ -52,17 +55,40 @@ class DecoratingFilesystemSettingsProvider implements ModificationAwareSettingsP
      */
     public function getSettings(array $domainNames): array
     {
-        $this->clearCacheIfNeeded();
+        $this->clearAndWarmupIfNeeded();
         $settings = [];
 
         foreach ($domainNames as $domainName) {
             foreach ($this->getSettingNames($domainName) as $settingName) {
                 $key = $this->getSettingKey($domainName, $settingName);
                 $item = $this->getCached($key);
-                $settings[] = $this->serializer->deserialize($item->get(), SettingModel::class, 'json');
+                if ($item->isHit()) {
+                    $settings[] = $this->serializer->deserialize($item->get(), SettingModel::class, 'json');
+                }
             }
         }
         $this->cache->commit();
+
+        return $settings;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getSettingsByName(array $domainNames, array $settingNames): array
+    {
+        $this->clearAndWarmupIfNeeded();
+        $settings = [];
+
+        foreach ($domainNames as $domainName) {
+            foreach ($settingNames as $settingName) {
+                $key = $this->getSettingKey($domainName, $settingName);
+                $item = $this->getCached($key);
+                if ($item->isHit()) {
+                    $settings[] = $this->serializer->deserialize($item->get(), SettingModel::class, 'json');
+                }
+            }
+        }
 
         return $settings;
     }
@@ -73,37 +99,7 @@ class DecoratingFilesystemSettingsProvider implements ModificationAwareSettingsP
      */
     private function getSettingNames(string $domainName): array
     {
-        $key = $this->getSettingNamesKey($domainName);
-        $cacheItem = $this->getCached($key);
-
-        if (!$cacheItem->isHit()) {
-            $settingNames = [];
-            foreach ($this->decoratingProvider->getSettings([$domainName]) as $setting) {
-                $settingNames[] = $setting->getName();
-                $settingKey = $this->getSettingKey($domainName, $setting->getName());
-                $serializedSetting = $this->serializer->serialize($setting, 'json');
-                $this->storeCached($this->getCached($settingKey), $serializedSetting, false);
-            }
-            $this->storeCached($cacheItem, $settingNames, false);
-        }
-
-        return $cacheItem->get();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getSettingsByName(array $domainNames, array $settingNames): array
-    {
-        $settings = [];
-
-        foreach ($this->getSettings($domainNames) as $setting) {
-            if (in_array($setting->getName(), $settingNames, true)) {
-                $settings[] = $setting;
-            }
-        }
-
-        return $settings;
+        return $this->getCached($this->getSettingNamesKey($domainName))->get() ?? [];
     }
 
     /**
@@ -111,6 +107,7 @@ class DecoratingFilesystemSettingsProvider implements ModificationAwareSettingsP
      */
     public function getDomains(bool $onlyEnabled = false): array
     {
+        $this->clearAndWarmupIfNeeded();
         $key = $this->getDomainKey($onlyEnabled);
         $cacheItem = $this->getCached($key);
 
@@ -200,7 +197,7 @@ class DecoratingFilesystemSettingsProvider implements ModificationAwareSettingsP
         return sprintf('domain%s', $onlyEnabled ? '_oe' : '');
     }
 
-    private function clearCacheIfNeeded(): void
+    private function clearAndWarmupIfNeeded(): void
     {
         /** @var CacheItem $lastCheck */
         $lastCheck = $this->cache->getItem('last_modification_time_check');
@@ -214,12 +211,13 @@ class DecoratingFilesystemSettingsProvider implements ModificationAwareSettingsP
 
             if (!$lock->acquire()) {
                 usleep(50000);
-                $this->clearCacheIfNeeded();
+                $this->clearAndWarmupIfNeeded();
             }
 
             try {
                 $this->cache->clear();
                 $this->setModificationTime();
+                $this->warmup();
             } finally {
                 $lock->release();
             }
@@ -227,6 +225,24 @@ class DecoratingFilesystemSettingsProvider implements ModificationAwareSettingsP
 
         $lastCheck->set($time);
         $this->cache->save($lastCheck);
+    }
+
+    private function warmup(): void
+    {
+        foreach ($this->extractDomainNames($this->getDomains()) as $domainName) {
+            $key = $this->getSettingNamesKey($domainName);
+            $cacheItem = $this->getCached($key);
+            $settingNames = [];
+
+            foreach ($this->decoratingProvider->getSettings([$domainName]) as $setting) {
+                $settingNames[] = $setting->getName();
+                $settingKey = $this->getSettingKey($domainName, $setting->getName());
+                $serializedSetting = $this->serializer->serialize($setting, 'json');
+                $this->storeCached($this->getCached($settingKey), $serializedSetting, false);
+            }
+
+            $this->storeCached($cacheItem, $settingNames, false);
+        }
     }
 
     private function setModificationTime(bool $commit = false): int
@@ -252,6 +268,6 @@ class DecoratingFilesystemSettingsProvider implements ModificationAwareSettingsP
             return $cachedValue->get();
         }
 
-        return $this->setModificationTime();
+        return 0;
     }
 }
