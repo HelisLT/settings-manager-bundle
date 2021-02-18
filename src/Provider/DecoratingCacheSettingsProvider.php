@@ -234,7 +234,7 @@ class DecoratingCacheSettingsProvider implements ModificationAwareSettingsProvid
             }
 
             if (null === $settingNames) {
-                $lock = $this->lockFactory->createLock(__FUNCTION__ . $domainName);
+                $lock = $this->lockFactory->createLock(__FUNCTION__.$domainName);
                 if (!$lock->acquire()) {
                     usleep(self::LOCK_RETRY_INTERVAL_MS);
                     $this->warmup($domainNames, $settingNames);
@@ -251,7 +251,7 @@ class DecoratingCacheSettingsProvider implements ModificationAwareSettingsProvid
                         continue;
                     }
 
-                    $lock = $this->lockFactory->createLock(__FUNCTION__ . $domainName . $settingName);
+                    $lock = $this->lockFactory->createLock(__FUNCTION__.$domainName.$settingName);
                     if (!$lock->acquire()) {
                         usleep(self::LOCK_RETRY_INTERVAL_MS);
                         $this->warmup($domainNames, $settingNames);
