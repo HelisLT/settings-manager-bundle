@@ -275,6 +275,7 @@ class DecoratingCacheSettingsProvider implements ModificationAwareSettingsProvid
 
         if (empty($settings)) {
             $this->storeCached($this->getCached($settingKey), null, false);
+
             return;
         }
 
