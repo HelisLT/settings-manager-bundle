@@ -212,6 +212,8 @@ class DecoratingCacheSettingsProvider implements ModificationAwareSettingsProvid
             if (!$lock->acquire()) {
                 usleep(self::LOCK_RETRY_INTERVAL_MS);
                 $this->clearIfNeeded();
+
+                return;
             }
 
             try {
@@ -238,6 +240,8 @@ class DecoratingCacheSettingsProvider implements ModificationAwareSettingsProvid
                 if (!$lock->acquire()) {
                     usleep(self::LOCK_RETRY_INTERVAL_MS);
                     $this->warmup($domainNames, $settingNames);
+
+                    return;
                 }
 
                 try {
@@ -255,6 +259,8 @@ class DecoratingCacheSettingsProvider implements ModificationAwareSettingsProvid
                     if (!$lock->acquire()) {
                         usleep(self::LOCK_RETRY_INTERVAL_MS);
                         $this->warmup($domainNames, $settingNames);
+
+                        return;
                     }
 
                     try {
