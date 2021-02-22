@@ -10,7 +10,7 @@ Provides a nice way to define variables and inject them into application parts.
 [![Latest Stable Version](https://poser.pugx.org/helis/settings-manager-bundle/v/stable)](https://packagist.org/packages/helis/settings-manager-bundle)
 [![License](https://poser.pugx.org/helis/settings-manager-bundle/license)](https://packagist.org/packages/helis/settings-manager-bundle)
 
-## Jump tohttps://symfony.com/doc/current/components/cache.html#available-cache-adapters
+## Jump to
 
  - [Quick start](#quick-start)
  - [Usage](#usage)
