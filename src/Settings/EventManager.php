@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Helis\SettingsManagerBundle\Settings;
 
+use Helis\SettingsManagerBundle\Event\ConfigureMenuEvent;
 use Helis\SettingsManagerBundle\Event\SettingEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface as ContractsEventDispatcherInterface;
@@ -29,7 +30,7 @@ class EventManager implements EventManagerInterface
             $this->eventDispatcher->dispatch($eventName.'.'.strtolower($event->getSetting()->getName()), $event);
         }
     }
-    
+
     public function dispatchConfigureMenu(string $eventName, ConfigureMenuEvent $event): void
     {
         if ($this->eventDispatcher instanceof ContractsEventDispatcherInterface) {

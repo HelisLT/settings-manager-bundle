@@ -6,13 +6,15 @@ namespace Helis\SettingsManagerBundle\Provider;
 
 use Helis\SettingsManagerBundle\Model\DomainModel;
 use Helis\SettingsManagerBundle\Model\SettingModel;
+use Helis\SettingsManagerBundle\Provider\Traits\RedisModificationTrait;
 use Helis\SettingsManagerBundle\Settings\Traits\DomainNameExtractTrait;
 use Redis;
 use Symfony\Component\Serializer\SerializerInterface;
 
-class DecoratingRedisSettingsProvider implements SettingsProviderInterface
+class DecoratingRedisSettingsProvider implements ModificationAwareSettingsProviderInterface
 {
     use DomainNameExtractTrait;
+    use RedisModificationTrait;
 
     private const DOMAIN_KEY = 'domain';
     private const HASHMAP_KEY = 'hashmap';
@@ -121,6 +123,8 @@ class DecoratingRedisSettingsProvider implements SettingsProviderInterface
         );
         $pipe->exec();
 
+        $this->setModificationTime();
+
         return $output;
     }
 
@@ -138,6 +142,8 @@ class DecoratingRedisSettingsProvider implements SettingsProviderInterface
             $pipe->hDel($this->getDomainKey(false), $domainName);
         }
         $pipe->exec();
+
+        $this->setModificationTime();
 
         return $output;
     }
@@ -163,6 +169,7 @@ class DecoratingRedisSettingsProvider implements SettingsProviderInterface
                 $dictionary[$domain->getName()] = $this->serializer->serialize($domain, 'json');
             }
             $this->redis->hMSet($key, $dictionary);
+            $this->setModificationTime();
         }
 
         return $domains;
@@ -181,6 +188,7 @@ class DecoratingRedisSettingsProvider implements SettingsProviderInterface
             $pipe->hDel($this->getDomainKey(true), $domainModel->getName());
         }
         $pipe->exec();
+        $this->setModificationTime();
         $this->buildHashmap(true, $domainModel->getName());
 
         return $output;
@@ -195,6 +203,7 @@ class DecoratingRedisSettingsProvider implements SettingsProviderInterface
         $pipe->hDel($this->getDomainKey(true), $domainName);
         $pipe->hDel($this->getDomainKey(false), $domainName);
         $pipe->exec();
+        $this->setModificationTime();
 
         return $output;
     }
@@ -244,9 +253,11 @@ class DecoratingRedisSettingsProvider implements SettingsProviderInterface
                 $pipe->setex($key, $this->ttl, 1);
             }
             $pipe->exec();
+            $this->setModificationTime();
         } else {
             if ($isBuilt === false || (int)$isBuilt === 0) {
                 $this->redis->setex($key, $this->ttl, 1);
+                $this->setModificationTime();
             }
         }
     }

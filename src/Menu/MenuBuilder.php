@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Helis\SettingsManagerBundle\Menu;
 
 use Helis\SettingsManagerBundle\Event\ConfigureMenuEvent;
-use Helis\SettingsManagerBundle\SettingsManagerEvents;
 use Helis\SettingsManagerBundle\Settings\EventManager;
+use Helis\SettingsManagerBundle\SettingsManagerEvents;
 use Knp\Menu\FactoryInterface;
 use Knp\Menu\ItemInterface;
 

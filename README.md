@@ -10,7 +10,7 @@ Provides a nice way to define variables and inject them into application parts.
 [![Latest Stable Version](https://poser.pugx.org/helis/settings-manager-bundle/v/stable)](https://packagist.org/packages/helis/settings-manager-bundle)
 [![License](https://poser.pugx.org/helis/settings-manager-bundle/license)](https://packagist.org/packages/helis/settings-manager-bundle)
 
-## Jump to
+## Jump tohttps://symfony.com/doc/current/components/cache.html#available-cache-adapters
 
  - [Quick start](#quick-start)
  - [Usage](#usage)
@@ -162,10 +162,11 @@ Settings providers:
  - [Cookie](#cookie-settings-provider)
  - [AWS SSM](#aws-ssm-settings-provider)
 
-And additional 2 decorating providers:
+And additional decorating providers:
 
  - [Phpredis](#phpredis-decorating-settings-provider)
  - [Predis](#predis-decorating-settings-provider)
+ - [Cache](#cache-decorating-provider)
 
 ### Simple settings provider
 
@@ -376,6 +377,35 @@ Required libraries:
  - [predis/predis](https://github.com/nrk/predis)
 
  > `composer require predis/predis`
+
+### Cache decorating provider
+
+`Helis\SettingsManagerBundle\Provider\DecoratingCacheSettingsProvider`
+
+This provider is used to cache other settings providers that implements `ModificationAwareSettingsProviderInterface`. At the moment supports [phpredis decorating settings provider](#phpredis-decorating-settings-provider) and [predis decorating settings provider](#predis-decorating-settings-provider). It uses Symfony [PHP Files Cache Adapter](https://symfony.com/doc/current/components/cache/adapters/php_files_adapter.html). Single change in decorating provider causes whole cache to be invalidated.
+Supports [symfony cache component adapters](https://symfony.com/doc/current/components/cache.html#available-cache-adapters)
+
+Required libraries and extensions:
+
+- [symfony/cache](https://symfony.com/doc/current/components/cache.html)
+- [symfony/lock](https://symfony.com/doc/current/components/lock.html)
+
+> `composer require symfony/cache`
+> 
+> `composer require symfony/lock`
+
+Configuration example:
+
+```yaml
+settings_manager.decorating_provider.cache:
+    class: 'Helis\SettingsManagerBundle\Provider\DecoratingCacheSettingsProvider'
+    decorates: 'Helis\SettingsManagerBundle\Provider\DecoratingRedisSettingsProvider'
+    arguments:
+        $decoratingProvider: '@settings_manager.decorating_provider.cache.inner'
+        $serializer: '@settings_manager.serializer'
+        $cache: '@cache.settings'
+        $lockFactory: '@symfony_flock_factory'
+```
 
 ## Configuration reference
 

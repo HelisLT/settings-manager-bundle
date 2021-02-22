@@ -6,14 +6,16 @@ namespace Helis\SettingsManagerBundle\Provider;
 
 use Helis\SettingsManagerBundle\Model\DomainModel;
 use Helis\SettingsManagerBundle\Model\SettingModel;
+use Helis\SettingsManagerBundle\Provider\Traits\RedisModificationTrait;
 use Helis\SettingsManagerBundle\Settings\Traits\DomainNameExtractTrait;
 use Predis\Client;
 use Predis\Pipeline\Pipeline;
 use Symfony\Component\Serializer\SerializerInterface;
 
-class DecoratingPredisSettingsProvider implements SettingsProviderInterface
+class DecoratingPredisSettingsProvider implements ModificationAwareSettingsProviderInterface
 {
     use DomainNameExtractTrait;
+    use RedisModificationTrait;
 
     private const DOMAIN_KEY = 'domain';
     private const HASHMAP_KEY = 'hashmap';
@@ -124,6 +126,7 @@ class DecoratingPredisSettingsProvider implements SettingsProviderInterface
                 $serializedSetting
             );
         });
+        $this->setModificationTime();
 
         return $output;
     }
@@ -141,6 +144,7 @@ class DecoratingPredisSettingsProvider implements SettingsProviderInterface
                 $pipe->hdel($this->getDomainKey(false), [$domainName]);
             }
         });
+        $this->setModificationTime();
 
         return $output;
     }
@@ -166,6 +170,7 @@ class DecoratingPredisSettingsProvider implements SettingsProviderInterface
                 $dictionary[$domain->getName()] = $this->serializer->serialize($domain, 'json');
             }
             $this->redis->hmset($key, $dictionary);
+            $this->setModificationTime();
         }
 
         return $domains;
@@ -185,6 +190,7 @@ class DecoratingPredisSettingsProvider implements SettingsProviderInterface
                 $pipe->hdel($this->getDomainKey(true), [$domainModel->getName()]);
             }
         });
+        $this->setModificationTime();
         $this->buildHashmap(true, $domainModel->getName());
 
         return $output;
@@ -199,6 +205,7 @@ class DecoratingPredisSettingsProvider implements SettingsProviderInterface
             $pipe->hdel($this->getDomainKey(true), [$domainName]);
             $pipe->hdel($this->getDomainKey(false), [$domainName]);
         });
+        $this->setModificationTime();
 
         return $output;
     }
@@ -248,9 +255,11 @@ class DecoratingPredisSettingsProvider implements SettingsProviderInterface
                     $pipe->setex($key, $this->ttl, 1);
                 }
             });
+            $this->setModificationTime();
         } else {
             if ($isBuilt === null || (int)$isBuilt === 0) {
                 $this->redis->setex($key, $this->ttl, 1);
+                $this->setModificationTime();
             }
         }
     }
