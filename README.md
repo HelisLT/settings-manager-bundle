@@ -167,6 +167,7 @@ And additional decorating providers:
  - [Phpredis](#phpredis-decorating-settings-provider)
  - [Predis](#predis-decorating-settings-provider)
  - [Cache](#cache-decorating-provider)
+ - [Api](#api-decorating-settings-provider)
 
 ### Simple settings provider
 
@@ -382,7 +383,7 @@ Required libraries:
 
 `Helis\SettingsManagerBundle\Provider\DecoratingCacheSettingsProvider`
 
-This provider is used to cache other settings providers that implements `ModificationAwareSettingsProviderInterface`. At the moment supports [phpredis decorating settings provider](#phpredis-decorating-settings-provider) and [predis decorating settings provider](#predis-decorating-settings-provider). It uses Symfony [PHP Files Cache Adapter](https://symfony.com/doc/current/components/cache/adapters/php_files_adapter.html). Single change in decorating provider causes whole cache to be invalidated.
+This provider is used to cache other settings providers that implements `ModificationAwareSettingsProviderInterface`. At the moment supports [phpredis decorating settings provider](#phpredis-decorating-settings-provider), [predis decorating settings provider](#predis-decorating-settings-provider) and [api decorating settings provider](#api-decorating-settings-provider). It uses Symfony [PHP Files Cache Adapter](https://symfony.com/doc/current/components/cache/adapters/php_files_adapter.html). Single change in decorating provider causes whole cache to be invalidated.
 Supports [symfony cache component adapters](https://symfony.com/doc/current/components/cache.html#available-cache-adapters)
 
 Required libraries and extensions:
@@ -405,6 +406,22 @@ settings_manager.decorating_provider.cache:
         $serializer: '@settings_manager.serializer'
         $cache: '@cache.settings'
         $lockFactory: '@symfony_flock_factory'
+```
+
+### API decorating settings provider
+
+`Helis\SettingsManagerBundle\Provider\DecoratingApiSettingsProvider`
+
+This provider is used to cache other settings providers like [DoctrineORM](#doctrineorm-settings-provider) or [AWS SSM](#aws-ssm-settings-provider). It uses any API client that implements `Helis\SettingsManagerBundle\Provider\ApiSettingsProviderClientInterface`.
+
+Configuration example:
+
+```yaml
+Helis\SettingsManagerBundle\Provider\DecoratingApiSettingsProvider:
+    decorates: 'Helis\SettingsManagerBundle\Provider\DoctrineOrmSettingsProvider'
+    arguments:
+        $decoratingProvider: '@Helis\SettingsManagerBundle\Provider\DecoratingApiSettingsProvider.inner'
+        $apiClient: '@app.settings_api_client' # you need to register your own client in container
 ```
 
 ## Configuration reference
