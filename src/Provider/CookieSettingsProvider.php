@@ -11,7 +11,7 @@ use ParagonIE\Paseto\Protocol\Version2;
 use ParagonIE\Paseto\ProtocolCollection;
 use Symfony\Component\Serializer\SerializerInterface;
 
-class CookieSettingsProvider extends AbstractCookieSettingsProvider
+class CookieSettingsProvider extends AbstractPasetoCookieSettingsProvider
 {
     protected $symmetricKeyMaterial;
 
@@ -22,7 +22,7 @@ class CookieSettingsProvider extends AbstractCookieSettingsProvider
     ) {
         $this->symmetricKeyMaterial = $symmetricKeyMaterial;
 
-        parent::__construct($serializer, $cookieName, 86400, 'settings_manager', 'settings', '/');
+        parent::__construct($serializer, $cookieName);
     }
 
     protected function getTokenParser(): Parser

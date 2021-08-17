@@ -319,6 +319,34 @@ Helis\SettingsManagerBundle\Provider\AsymmetricCookieSettingsProvider:
         - { name: kernel.event_subscriber }
 ```
 
+### JWT Cookie settings provider
+
+`Helis\SettingsManagerBundle\Provider\JwtCookieSettingsProvider`
+
+This is a provider, which only enables existing settings by using a cookie. Cookies are encoded with asymmetric private
+and public keys, so that they could not be randomly enabled by users.
+
+Required libraries:
+
+ - [lcobucci/jwt](https://github.com/lcobucci/jwt)
+
+ > `composer require lcobucci/jwt`
+
+ `JWT` is used to encrypt cookies.
+
+ Configuration example:
+
+```yaml
+Helis\SettingsManagerBundle\Provider\JwtCookieSettingsProvider:
+    arguments:
+        $serializer: '@settings_manager.serializer'
+        $publicKeyPath: '%kernel.project_dir%/config/keys/settings_cookie_public.key'
+        $privateKeyPath: '%kernel.project_dir%/config/keys/settings_cookie_private.key'
+    tags:
+        - { name: settings_manager.provider, provider: jwt_cookie, priority: 50 }
+        - { name: kernel.event_subscriber }
+```
+
 ### AWS SSM settings provider
 
 `Helis\SettingsManagerBundle\Provider\AwsSsmSettingsProvider`

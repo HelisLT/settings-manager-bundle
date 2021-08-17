@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Helis\SettingsManagerBundle\Tests\Unit\Provider;
 
-use Helis\SettingsManagerBundle\Provider\AbstractCookieSettingsProvider;
+use Helis\SettingsManagerBundle\Provider\AbstractBaseCookieSettingsProvider;
 use Helis\SettingsManagerBundle\Provider\AsymmetricCookieSettingsProvider;
 use ParagonIE\Paseto\Protocol\Version2;
 
@@ -12,7 +12,7 @@ class AsymmetricCookieSettingsProviderTest extends AbstractCookieSettingsProvide
 {
     private static $asymmetricKey = null;
 
-    protected function createProvider(): AbstractCookieSettingsProvider
+    protected function createProvider(): AbstractBaseCookieSettingsProvider
     {
         //make separate encoding and decoding tests reuse same key pair
         if (null === self::$asymmetricKey) {

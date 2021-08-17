@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Helis\SettingsManagerBundle\Tests\Unit\Provider;
 
-use Helis\SettingsManagerBundle\Provider\AbstractCookieSettingsProvider;
+use Helis\SettingsManagerBundle\Provider\AbstractBaseCookieSettingsProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,7 +17,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 abstract class AbstractCookieSettingsProviderTest extends TestCase
 {
     /**
-     * @var AbstractCookieSettingsProvider
+     * @var AbstractBaseCookieSettingsProvider
      */
     protected $provider;
     protected $serializer;
@@ -30,7 +30,7 @@ abstract class AbstractCookieSettingsProviderTest extends TestCase
         $this->provider = $this->createProvider();
     }
 
-    abstract protected function createProvider(): AbstractCookieSettingsProvider;
+    abstract protected function createProvider(): AbstractBaseCookieSettingsProvider;
 
     public function testOnKernelResponseNothingChanged()
     {
