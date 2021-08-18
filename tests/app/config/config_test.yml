@@ -135,7 +135,7 @@ services:
         tags:
             - { name: settings_manager.provider, provider: orm, priority: 20 }
 
-    Helis\SettingsManagerBundle\Provider\CookieSettingsProvider:
+    Helis\SettingsManagerBundle\Provider\PasetoCookieSettingsProvider:
         arguments:
             $serializer: '@settings_manager.serializer'
         tags:

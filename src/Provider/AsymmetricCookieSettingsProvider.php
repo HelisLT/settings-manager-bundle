@@ -12,6 +12,9 @@ use ParagonIE\Paseto\Protocol\Version2;
 use ParagonIE\Paseto\ProtocolCollection;
 use Symfony\Component\Serializer\SerializerInterface;
 
+/**
+ * @deprecated Please use AsymmetricPasetoCookieSettingsProvider instead
+ */
 class AsymmetricCookieSettingsProvider extends AbstractPasetoCookieSettingsProvider
 {
     protected $publicKeyMaterial;

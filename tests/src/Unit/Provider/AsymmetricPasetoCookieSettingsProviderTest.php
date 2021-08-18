@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Helis\SettingsManagerBundle\Tests\Unit\Provider;
 
 use Helis\SettingsManagerBundle\Provider\AbstractBaseCookieSettingsProvider;
-use Helis\SettingsManagerBundle\Provider\AsymmetricCookieSettingsProvider;
+use Helis\SettingsManagerBundle\Provider\AsymmetricPasetoCookieSettingsProvider;
 use ParagonIE\Paseto\Protocol\Version2;
 
-class AsymmetricCookieSettingsProviderTest extends AbstractCookieSettingsProviderTest
+class AsymmetricPasetoCookieSettingsProviderTest extends AbstractCookieSettingsProviderTest
 {
     private static $asymmetricKey = null;
 
@@ -19,7 +19,7 @@ class AsymmetricCookieSettingsProviderTest extends AbstractCookieSettingsProvide
             self::$asymmetricKey = Version2::generateAsymmetricSecretKey();
         }
 
-        return new AsymmetricCookieSettingsProvider(
+        return new AsymmetricPasetoCookieSettingsProvider(
             $this->serializer,
             self::$asymmetricKey->raw(),
             self::$asymmetricKey->getPublicKey()->raw(),
