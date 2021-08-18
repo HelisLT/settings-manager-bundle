@@ -50,12 +50,14 @@ abstract class AbstractBaseCookieSettingsProvider extends SimpleSettingsProvider
     }
 
     /**
-     * @param string $rawToken
      * @return SettingModel[]
      */
-    abstract protected function parseSettings(string $rawToken): array;
+    abstract protected function parseToken(string $rawToken): array;
 
-    abstract protected function buildToken(): string;
+    /**
+     * @param SettingModel[] $settings
+     */
+    abstract protected function buildToken(array $settings): string;
 
     public function onKernelRequest(GetResponseEvent $event): void
     {
@@ -65,7 +67,7 @@ abstract class AbstractBaseCookieSettingsProvider extends SimpleSettingsProvider
             return;
         }
 
-        $this->settings = $this->parseSettings($rawToken);
+        $this->settings = $this->parseToken($rawToken);
     }
 
     public function onKernelResponse(FilterResponseEvent $event): void
@@ -89,7 +91,7 @@ abstract class AbstractBaseCookieSettingsProvider extends SimpleSettingsProvider
             return;
         }
 
-        $token = $this->buildToken();
+        $token = $this->buildToken($this->settings);
 
         if (empty($token)) {
             $this->logger && $this->logger->error(

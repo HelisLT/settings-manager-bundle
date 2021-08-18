@@ -23,7 +23,7 @@ abstract class AbstractCookieSettingsProvider extends AbstractBaseCookieSettings
 
     abstract protected function getTokenBuilder(): Builder;
 
-    protected function parseSettings(string $rawToken): array
+    protected function parseToken(string $rawToken): array
     {
         $parser = $this->getTokenParser();
         $parser
@@ -55,7 +55,7 @@ abstract class AbstractCookieSettingsProvider extends AbstractBaseCookieSettings
         }
     }
 
-    protected function buildToken(): string
+    protected function buildToken(array $settings): string
     {
         $now = new \DateTime();
 
@@ -67,7 +67,7 @@ abstract class AbstractCookieSettingsProvider extends AbstractBaseCookieSettings
             ->setSubject($this->subject)
             ->setExpiration($now->add(new \DateInterval('PT'.$this->ttl.'S')))
             ->setClaims([
-                'dt' => $this->serializer->serialize($this->settings, 'json'),
+                'dt' => $this->serializer->serialize($settings, 'json'),
             ]);
 
         $this->footer !== null && $token->setFooter($this->footer);

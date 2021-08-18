@@ -35,7 +35,7 @@ class JwtCookieSettingsProvider extends AbstractBaseCookieSettingsProvider
         parent::__construct($serializer, $cookieName);
     }
 
-    protected function parseSettings(string $rawToken): array
+    protected function parseToken(string $rawToken): array
     {
         $validator = new Validator();
         $constraints = [
@@ -75,7 +75,7 @@ class JwtCookieSettingsProvider extends AbstractBaseCookieSettingsProvider
         }
     }
 
-    protected function buildToken(): string
+    protected function buildToken(array $settings): string
     {
         if (null === $this->privateKeyPath) {
             return '';
@@ -90,7 +90,7 @@ class JwtCookieSettingsProvider extends AbstractBaseCookieSettingsProvider
             ->issuedBy($this->issuer)
             ->relatedTo($this->subject)
             ->expiresAt($expiresAt)
-            ->withClaim('dt', $this->serializer->serialize($this->settings, 'json'))
+            ->withClaim('dt', $this->serializer->serialize($settings, 'json'))
             ->getToken(new Sha256(), LocalFileReference::file($this->privateKeyPath));
 
         return (string)$token;
