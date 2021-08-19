@@ -102,7 +102,7 @@ EOF
 
             if ($tag = $input->getOption('tag')) {
                 // Display settings filtered by tags
-                foreach (array_reverse($this->settingsManager->getEnabledSettingsByTag(
+                foreach (array_reverse($this->settingsManager->getSettingsByTag(
                     $domains,
                     $tag
                 )) as $settingModel) {

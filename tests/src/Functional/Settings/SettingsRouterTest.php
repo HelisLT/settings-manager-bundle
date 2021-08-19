@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Helis\SettingsManagerBundle\Tests\Functional\Settings;
 
+use Helis\SettingsManagerBundle\Settings\SettingsStore;
 use Liip\FunctionalTestBundle\Test\WebTestCase;
 use Helis\SettingsManagerBundle\Model\Type;
 use Helis\SettingsManagerBundle\Settings\SettingsManager;
@@ -90,6 +91,77 @@ class SettingsRouterTest extends WebTestCase
         foreach ($expectedTags as $expectedTag) {
             $this->assertTrue($setting->hasTag($expectedTag), 'Missing tag');
         }
+    }
+
+    public function getSettingsByTagDataProvider(): array
+    {
+        return [
+            ['experimental', 1, ['baz']],
+            ['poo', 1, ['baz']],
+            ['super_switch', 1, ['foo']],
+            ['non-existing', 0, []],
+        ];
+    }
+
+    /**
+     * @param string[] $expectedSettingKeys
+     *
+     * @dataProvider getSettingsByTagDataProvider
+     */
+    public function testGetSettingsByTag(
+        string $tagName,
+        int $expectedSettingCount,
+        array $expectedSettingKeys
+    ): void {
+        $this->loadFixtures([LoadSettingsData::class]);
+        $settings = $this->settingsRouter->getSettingsByTag($tagName);
+        $this->assertCount($expectedSettingCount, $settings);
+        $this->assertEquals($expectedSettingKeys, array_keys($settings));
+
+        foreach ($settings as $setting) {
+            $this->assertTrue($setting->hasTag($tagName));
+        }
+    }
+
+    public function warmUpClearDataProvider(): array
+    {
+        return [
+            ['fixture', 'bazinga'],
+        ];
+    }
+
+    /**
+     * @dataProvider warmUpClearDataProvider
+     */
+    public function testWarmUpClear(string $tagName, string $settingName): void {
+        $this->loadFixtures([LoadSettingsData::class]);
+        $settingsStore = $this->getContainer()->get(SettingsStore::class);
+        $settings = $this->settingsRouter->getSettingsByTag($tagName);
+
+        $this->assertArrayHasKey($settingName, $settings);
+        $this->assertEquals($settingName, $settings[$settingName]->getName());
+
+        // Called getSettingsByTag, store is warm
+        $this->assertTrue($this->settingsRouter->isWarm());
+        $this->assertTrue($settingsStore->hasSettingsByTag($tagName));
+        // No $settingNamesToWarmup, so this only clears store
+        $this->settingsRouter->warmup();
+        $this->assertFalse($this->settingsRouter->isWarm());
+        $this->assertFalse($settingsStore->hasSettingsByTag($tagName));
+
+        // Called getSetting, store is warm
+        $this->assertNotNull($this->settingsRouter->getSetting($settingName));
+        $this->assertTrue($this->settingsRouter->isWarm());
+        // There are $settingNamesToWarmup
+        $this->settingsRouter->warmup();
+        $this->assertTrue($this->settingsRouter->isWarm());
+
+        // Called getSetting, store is warm
+        $this->assertNotNull($this->settingsRouter->getSetting($settingName));
+        $this->assertTrue($this->settingsRouter->isWarm());
+        // Clearing store
+        $settingsStore->clear();
+        $this->assertFalse($this->settingsRouter->isWarm());
     }
 
     public function testWarmupWithoutSave()

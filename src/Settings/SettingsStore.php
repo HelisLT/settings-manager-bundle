@@ -15,6 +15,11 @@ class SettingsStore extends ArrayCollection
     private $settingsByProvider;
 
     /**
+     * @var SettingModel[][]
+     */
+    private $settingsByTag;
+
+    /**
      * @var string[]
      */
     private $domainNames;
@@ -31,6 +36,7 @@ class SettingsStore extends ArrayCollection
         $this->settingsByProvider = [];
         $this->domainNames = [];
         $this->additionalDomainNames = [];
+        $this->settingsByTag = [];
     }
 
     /**
@@ -57,6 +63,39 @@ class SettingsStore extends ArrayCollection
     }
 
     /**
+     * @param SettingModel[] $settings
+     */
+    public function setSettingsByTag(string $tagName, array $settings): void
+    {
+        if (!isset($this->settingsByTag[$tagName])) {
+            $this->settingsByTag[$tagName] = [];
+        }
+
+        foreach ($settings as $setting) {
+            if ($setting !== null) {
+                if (!$setting->hasTag($tagName)) {
+                    throw new \LogicException('SettingModel does not have provided tag');
+                }
+
+                $this->settingsByTag[$tagName][$setting->getName()] = $setting;
+            }
+        }
+    }
+
+    public function hasSettingsByTag(string $tagName): bool
+    {
+        return isset($this->settingsByTag[$tagName]);
+    }
+
+    /**
+     * @return SettingModel[]
+     */
+    public function getSettingsByTag(string $tagName): array
+    {
+        return $this->settingsByTag[$tagName] ?? [];
+    }
+
+    /**
      * @return SettingModel[]
      */
     public function getByProvider(string $providerName): array
@@ -69,7 +108,7 @@ class SettingsStore extends ArrayCollection
      */
     public function isWarm(): bool
     {
-        return $this->count() > 0;
+        return $this->count() > 0 || !empty($this->settingsByTag);
     }
 
     public function getDomainNames(bool $includeAdditional = true): array
@@ -102,6 +141,7 @@ class SettingsStore extends ArrayCollection
     {
         $this->settingsByProvider = [];
         $this->domainNames = [];
+        $this->settingsByTag = [];
 
         parent::clear();
     }
