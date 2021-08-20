@@ -7,7 +7,7 @@ namespace Helis\SettingsManagerBundle\Benchmarks;
  * @BeforeMethods({"setUp"})
  * @AfterMethods({"tearDown"})
  */
-abstract class Benchmark
+abstract class AbstractBench
 {
     public function setUp(): void
     {

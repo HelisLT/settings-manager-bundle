@@ -1,5 +1,6 @@
 {
-  "bootstrap": "vendor/autoload.php",
-  "path": "benchmarks",
-  "time_unit": "milliseconds"
+  "$schema":"./vendor/phpbench/phpbench/phpbench.schema.json",
+  "runner.bootstrap": "vendor/autoload.php",
+  "runner.path": "benchmarks",
+  "runner.time_unit": "milliseconds"
 }

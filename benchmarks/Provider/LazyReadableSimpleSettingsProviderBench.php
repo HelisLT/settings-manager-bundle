@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Helis\SettingsManagerBundle\Benchmarks\Provider;
 
-use Helis\SettingsManagerBundle\Benchmarks\Benchmark;
+use Helis\SettingsManagerBundle\Benchmarks\AbstractBench;
 use Helis\SettingsManagerBundle\Provider\LazyReadableSimpleSettingsProvider;
 use Helis\SettingsManagerBundle\Serializer\Normalizer\DomainModelNormalizer;
 use Helis\SettingsManagerBundle\Serializer\Normalizer\SettingModelNormalizer;
@@ -12,7 +12,7 @@ use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Serializer;
 
-class LazyReadableSimpleSettingsProviderBench extends Benchmark
+class LazyReadableSimpleSettingsProviderBench extends AbstractBench
 {
     /**
      * @var LazyReadableSimpleSettingsProvider
@@ -115,7 +115,7 @@ class LazyReadableSimpleSettingsProviderBench extends Benchmark
      * @ParamProviders({"provideDomainNames"})
      * @Revs(1000)
      * @Iterations(5)
-     * @Assert(stat="mean", value="61")
+     * @Assert("mode(variant.time.avg) < 0.061 ms")
      */
     public function benchGetSettings(array $params): void
     {
@@ -126,7 +126,7 @@ class LazyReadableSimpleSettingsProviderBench extends Benchmark
      * @ParamProviders({"provideDomainNames", "provideSettingNames"})
      * @Revs(1000)
      * @Iterations(5)
-     * @Assert(stat="mean", value="71")
+     * @Assert("mode(variant.time.avg) < 0.071 ms")
      */
     public function benchGetSettingsByName(array $params): void
     {
@@ -136,7 +136,7 @@ class LazyReadableSimpleSettingsProviderBench extends Benchmark
     /**
      * @Revs(1000)
      * @Iterations(5)
-     * @Assert(stat="mean", value="11")
+     * @Assert("mode(variant.time.avg) < 0.011 ms")
      */
     public function benchGetDomains(): void
     {
@@ -146,7 +146,7 @@ class LazyReadableSimpleSettingsProviderBench extends Benchmark
     /**
      * @Revs(1000)
      * @Iterations(5)
-     * @Assert(stat="mean", value="11")
+     * @Assert("mode(variant.time.avg) < 0.011 ms")
      */
     public function benchGetEnabedDomains(): void
     {

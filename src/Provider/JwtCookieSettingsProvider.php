@@ -8,7 +8,6 @@ use Helis\SettingsManagerBundle\Model\SettingModel;
 use Lcobucci\Clock\FrozenClock;
 use Lcobucci\JWT\Builder;
 use Lcobucci\JWT\Parser;
-use Lcobucci\JWT\Signer\Key;
 use Lcobucci\JWT\Signer\Key\LocalFileReference;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
 use Lcobucci\JWT\Validation\Constraint\IssuedBy;
@@ -63,7 +62,7 @@ class JwtCookieSettingsProvider extends AbstractBaseCookieSettingsProvider
         }
 
         try {
-            return  $this
+            return $this
                 ->serializer
                 ->deserialize($token->claims()->get('dt'), SettingModel::class.'[]', 'json');
         } catch (\Throwable $e) {
