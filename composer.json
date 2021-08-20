@@ -52,6 +52,7 @@
         "knplabs/knp-menu-bundle": "^2.2",
         "liip/functional-test-bundle": "^4.0.0",
         "liip/test-fixtures-bundle": "^1.0.0",
+        "lcobucci/jwt": "^3.3.1",
         "paragonie/paseto": "^1.0",
         "phpbench/phpbench": "^0.15.0",
         "phpstan/phpstan": "^0.11.1",

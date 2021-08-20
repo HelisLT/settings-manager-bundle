@@ -159,7 +159,8 @@ Settings providers:
 
  - [Simple](#simple-settings-provider)
  - [DoctrineORM](#doctrineorm-settings-provider)
- - [Cookie](#cookie-settings-provider)
+ - [PasetoCookie](#paseto-cookie-settings-provider)
+ - [JwtCookie](#jwt-cookie-settings-provider)
  - [AWS SSM](#aws-ssm-settings-provider)
 
 And additional decorating providers:
@@ -268,9 +269,9 @@ Helis\SettingsManagerBundle\Provider\DoctrineOrmSettingsProvider:
         - { name: settings_manager.provider, provider: orm, priority: 20 }
 ```
 
-### Cookie settings provider
+### Paseto cookie settings provider
 
-`Helis\SettingsManagerBundle\Provider\CookieSettingsProvider`
+`Helis\SettingsManagerBundle\Provider\PasetoCookieSettingsProvider`
 
 This is a provider, which only enables existing settings by using a cookie. Cookies are encoded, so that they could not be randomly enabled by users.
 
@@ -285,7 +286,7 @@ Required libraries:
  Configuration example:
 
 ```yaml
-Helis\SettingsManagerBundle\Provider\CookieSettingsProvider:
+Helis\SettingsManagerBundle\Provider\PasetoCookieSettingsProvider:
     arguments:
         $serializer: '@settings_manager.serializer'
     tags:
@@ -293,9 +294,9 @@ Helis\SettingsManagerBundle\Provider\CookieSettingsProvider:
         - { name: kernel.event_subscriber }
 ```
 
-### Asymmetric Cookie settings provider
+### Asymmetric Paseto cookie settings provider
 
-`Helis\SettingsManagerBundle\Provider\AsymmetricCookieSettingsProvider`
+`Helis\SettingsManagerBundle\Provider\AsymmetricPasetoCookieSettingsProvider`
 
 This is a provider, which only enables existing settings by using a cookie. Cookies are encoded with asymmetric private
 and public keys, so that they could not be randomly enabled by users.
@@ -311,11 +312,39 @@ Required libraries:
  Configuration example:
 
 ```yaml
-Helis\SettingsManagerBundle\Provider\AsymmetricCookieSettingsProvider:
+Helis\SettingsManagerBundle\Provider\AsymmetricPasetoCookieSettingsProvider:
     arguments:
         $serializer: '@settings_manager.serializer'
     tags:
         - { name: settings_manager.provider, provider: asymmetric_cookie, priority: 40 }
+        - { name: kernel.event_subscriber }
+```
+
+### JWT Cookie settings provider
+
+`Helis\SettingsManagerBundle\Provider\JwtCookieSettingsProvider`
+
+This is a provider, which only enables existing settings by using a cookie. Cookies are encoded with asymmetric private
+and public keys, so that they could not be randomly enabled by users.
+
+Required libraries:
+
+ - [lcobucci/jwt](https://github.com/lcobucci/jwt)
+
+ > `composer require lcobucci/jwt`
+
+ `JWT` is used to encrypt cookies.
+
+ Configuration example:
+
+```yaml
+Helis\SettingsManagerBundle\Provider\JwtCookieSettingsProvider:
+    arguments:
+        $serializer: '@settings_manager.serializer'
+        $publicKeyPath: '%kernel.project_dir%/config/keys/settings_cookie_public.key'
+        $privateKeyPath: '%kernel.project_dir%/config/keys/settings_cookie_private.key'
+    tags:
+        - { name: settings_manager.provider, provider: jwt_cookie, priority: 50 }
         - { name: kernel.event_subscriber }
 ```
 
