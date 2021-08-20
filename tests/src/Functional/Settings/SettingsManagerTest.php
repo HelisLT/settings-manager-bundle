@@ -96,6 +96,58 @@ class SettingsManagerTest extends WebTestCase
         }
     }
 
+    public function getSettingsByTagDataProvider(): \Generator
+    {
+        yield [
+            [LoadSettingsData::DOMAIN_NAME_1],
+            'fixture',
+            2,
+            ['bazinga', 'foo']
+        ];
+
+        yield [
+            [LoadSettingsData::DOMAIN_NAME_1],
+            'experimental',
+            1,
+            ['baz']
+        ];
+
+        yield [[LoadSettingsData::DOMAIN_NAME_2], 'fixture', 1, ['tuna']];
+
+        yield [
+            [LoadSettingsData::DOMAIN_NAME_1, LoadSettingsData::DOMAIN_NAME_2],
+            'fixture',
+            3,
+            ['bazinga', 'foo', 'tuna']
+        ];
+
+        yield [[LoadSettingsData::DOMAIN_NAME_1, LoadSettingsData::DOMAIN_NAME_2], 'non-existing', 0, []];
+
+        yield [['non-existing'], 'fixture', 0, []];
+    }
+
+    /**
+     * @param string[] $domainNames
+     * @param string[] $expectedSettingKeys
+     *
+     * @dataProvider getSettingsByTagDataProvider
+     */
+    public function testGetSettingsByTag(
+        array $domainNames,
+        string $tagName,
+        int $expectedSettingCount,
+        array $expectedSettingKeys
+    ): void {
+        $this->loadFixtures([LoadSettingsData::class]);
+        $settings = $this->settingsManager->getSettingsByTag($domainNames, $tagName);
+        $this->assertCount($expectedSettingCount, $settings);
+        $this->assertEquals($expectedSettingKeys, array_keys($settings));
+
+        foreach ($settings as $setting) {
+            $this->assertTrue($setting->hasTag($tagName));
+        }
+    }
+
     public function testSave()
     {
         $this->loadFixtures([LoadSettingsData::class]);

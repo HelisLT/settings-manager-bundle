@@ -145,7 +145,7 @@ class SettingsManager implements LoggerAwareInterface
      *
      * @return SettingModel[]
      */
-    public function getEnabledSettingsByTag(array $domainNames, string $tagName): array
+    public function getSettingsByTag(array $domainNames, string $tagName): array
     {
         $settings = [[]];
 
@@ -168,6 +168,18 @@ class SettingsManager implements LoggerAwareInterface
         }
 
         return array_replace(...$settings);
+    }
+
+    /**
+     * @deprecated please use getSettingsByTag instead
+     *
+     * @param string[] $domainNames
+     *
+     * @return SettingModel[]
+     */
+    public function getEnabledSettingsByTag(array $domainNames, string $tagName): array
+    {
+        return $this->getSettingsByTag($domainNames, $tagName);
     }
 
     /**

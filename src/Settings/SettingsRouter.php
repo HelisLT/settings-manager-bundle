@@ -119,6 +119,16 @@ class SettingsRouter
         return $setting;
     }
 
+    public function getSettingsByTag(string $tagName): array
+    {
+        if (!$this->settingsStore->hasSettingsByTag($tagName)) {
+            $this->warmupDomains();
+            $this->warmupSettingsByTag($tagName);
+        }
+
+        return $this->settingsStore->getSettingsByTag($tagName);
+    }
+
     /**
      * Check if settings store is warmed up.
      */
@@ -132,7 +142,7 @@ class SettingsRouter
      */
     public function warmup(): void
     {
-        if ($this->settingsStore->count() > 0) {
+        if ($this->isWarm()) {
             $settingNamesToWarmup = array_keys(array_filter($this->settingsStore->toArray()));
             $this->settingsStore->clear();
             $this->warmupDomains(true);
@@ -163,6 +173,16 @@ class SettingsRouter
         if (!empty($this->settingsStore->getDomainNames())) {
             $this->settingsStore->setSettings(
                 $this->settingsManager->getSettingsByName($this->settingsStore->getDomainNames(), $settingNames)
+            );
+        }
+    }
+
+    private function warmupSettingsByTag(string $tagName): void
+    {
+        if (!empty($this->settingsStore->getDomainNames())) {
+            $this->settingsStore->setSettingsByTag(
+                $tagName,
+                $this->settingsManager->getSettingsByTag(array_values($this->settingsStore->getDomainNames()), $tagName)
             );
         }
     }
