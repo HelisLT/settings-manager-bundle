@@ -230,12 +230,18 @@ class DecoratingCacheSettingsProvider implements ModificationAwareSettingsProvid
 
     private function warmupByDomainNames(array $domainNames): void
     {
+        $missingDomainNames = [];
+
         foreach ($domainNames as $domainName) {
             if ($this->isDomainSettingsWarm($domainName)) {
                 continue;
             }
 
-            $lock = $this->lockFactory->createLock(__FUNCTION__.$domainName);
+            $missingDomainNames[] = $domainName;
+        }
+
+        if (count($missingDomainNames) > 0) {
+            $lock = $this->lockFactory->createLock(__FUNCTION__);
             if (!$lock->acquire()) {
                 usleep(self::LOCK_RETRY_INTERVAL_MS);
                 $this->warmupByDomainNames($domainNames);
@@ -244,7 +250,7 @@ class DecoratingCacheSettingsProvider implements ModificationAwareSettingsProvid
             }
 
             try {
-                $this->warmupDomainSettings($domainName);
+                $this->warmupDomainSettings($missingDomainNames);
             } finally {
                 $lock->release();
             }
@@ -277,8 +283,7 @@ class DecoratingCacheSettingsProvider implements ModificationAwareSettingsProvid
             $missingDomainNames = array_values($missingDomainNames);
             $missingSettingNames = array_values($missingSettingNames);
 
-            $lockKey = implode(',', array_merge($missingDomainNames, $missingSettingNames));
-            $lock = $this->lockFactory->createLock(__FUNCTION__.$lockKey);
+            $lock = $this->lockFactory->createLock(__FUNCTION__);
             if (!$lock->acquire()) {
                 usleep(self::LOCK_RETRY_INTERVAL_MS);
                 $this->warmupBySettingNames($domainNames, $settingNames);
@@ -326,20 +331,24 @@ class DecoratingCacheSettingsProvider implements ModificationAwareSettingsProvid
         }
     }
 
-    private function warmupDomainSettings(string $domainName): void
+    private function warmupDomainSettings(array $domainNames): void
     {
-        $key = $this->getSettingNamesKey($domainName);
-        $cacheItem = $this->getCached($key);
-        $domainSettings = [];
+        $mappedSettingNames = [];
 
-        foreach ($this->decoratingProvider->getSettings([$domainName]) as $setting) {
-            $domainSettings[] = $setting->getName();
-            $settingKey = $this->getSettingKey($domainName, $setting->getName());
+        foreach ($this->decoratingProvider->getSettings($domainNames) as $setting) {
+            $mappedSettingNames[$setting->getDomain()->getName()][] = $setting->getName();
+
+            $settingKey = $this->getSettingKey($setting->getDomain()->getName(), $setting->getName());
             $serializedSetting = $this->serializer->serialize($setting, 'json');
             $this->storeCached($this->getCached($settingKey), $serializedSetting, false);
         }
 
-        $this->storeCached($cacheItem, $domainSettings, false);
+        foreach ($mappedSettingNames as $domainName => $settingNames) {
+            $key = $this->getSettingNamesKey($domainName);
+            $cacheItem = $this->getCached($key);
+
+            $this->storeCached($cacheItem, $settingNames, false);
+        }
     }
 
     private function isDomainSettingsWarm(string $domainName): bool
