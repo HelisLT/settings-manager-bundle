@@ -6,7 +6,6 @@ namespace Helis\SettingsManagerBundle\Tests\Functional\Provider;
 use App\Entity\Setting;
 use App\Entity\Tag;
 use Helis\SettingsManagerBundle\Provider\DecoratingCacheSettingsProvider;
-use Helis\SettingsManagerBundle\Provider\DecoratingRedisSettingsProvider;
 use Helis\SettingsManagerBundle\Provider\DoctrineOrmSettingsProvider;
 use Helis\SettingsManagerBundle\Provider\SettingsProviderInterface;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
@@ -18,6 +17,8 @@ class DecoratingCacheSettingsProviderTest extends DecoratingPredisSettingsProvid
 {
     /** @var AdapterInterface */
     private $cache;
+
+    private $countingProvider;
 
     protected function setUp()
     {
@@ -51,16 +52,18 @@ class DecoratingCacheSettingsProviderTest extends DecoratingPredisSettingsProvid
 
         $container = $this->getContainer();
 
-        return new DecoratingCacheSettingsProvider(
-            new DecoratingRedisSettingsProvider(
-                new DoctrineOrmSettingsProvider(
-                    $container->get('doctrine.orm.default_entity_manager'),
-                    Setting::class,
-                    Tag::class
-                ),
-                $this->redis,
-                $container->get('test.settings_manager.serializer')
+        $this->countingProvider = new CountingCallsSettingsProvider(
+            new DoctrineOrmSettingsProvider(
+                $container->get('doctrine.orm.default_entity_manager'),
+                Setting::class,
+                Tag::class
             ),
+            $this->redis,
+            $container->get('test.settings_manager.serializer')
+        );
+
+        return new DecoratingCacheSettingsProvider(
+            $this->countingProvider,
             $container->get('test.settings_manager.serializer'),
             $this->cache,
             new Factory(new FlockStore()),
@@ -69,11 +72,40 @@ class DecoratingCacheSettingsProviderTest extends DecoratingPredisSettingsProvid
     }
 
     /**
+     * @dataProvider dataProviderTestGetSettings
+     */
+    public function testGetSettings(array $domainNames, array $expectedSettingsMap)
+    {
+        parent::testGetSettings($domainNames, $expectedSettingsMap);
+
+        $calls = $this->countingProvider->getCalls();
+
+        $this->assertEquals(['getSettings' => 1], $calls);
+
+        foreach ($expectedSettingsMap as $settingData) {
+            $settingNamesCacheKey = sprintf('setting_names[%s]', $settingData[1]);
+            $settingCacheKey = sprintf('setting[%s][%s]', $settingData[1], $settingData[0]);
+
+            $settingNamesCacheItem = $this->cache->getItem($settingNamesCacheKey);
+            $settingCacheItem = $this->cache->getItem($settingCacheKey);
+
+            $this->assertTrue($settingNamesCacheItem->isHit());
+            $this->assertTrue($settingCacheItem->isHit());
+            $this->assertNotNull($settingNamesCacheItem->get());
+            $this->assertNotNull($settingCacheItem->get());
+        }
+    }
+
+    /**
      * @dataProvider dataProviderTestGetSettingsByName
      */
     public function testGetSettingsByName(array $domainNames, array $settingNames, array $expectedSettingsMap)
     {
         parent::testGetSettingsByName($domainNames, $settingNames, $expectedSettingsMap);
+
+        $calls = $this->countingProvider->getCalls();
+
+        $this->assertEquals(['getSettingsByName' => 1], $calls);
 
         $expectedNonNullKeys = [];
 
