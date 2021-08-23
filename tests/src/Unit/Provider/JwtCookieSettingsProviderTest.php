@@ -75,6 +75,19 @@ class JwtCookieSettingsProviderTest extends AbstractCookieSettingsProviderTest
         $this->assertCount(0, $provider->getDomains());
     }
 
+    public function testPrivateKeyContent()
+    {
+        $previousProvider = $this->provider;
+        $this->provider = $this->createProviderWithKeys(
+            'file://' . __DIR__ . '/Fixtures/public.key',
+            file_get_contents(__DIR__ . '/Fixtures/private.key')
+        );
+
+        $this->testOnKernelResponse();
+
+        $this->provider = $previousProvider;
+    }
+
     private function createProviderWithKeys(string $publicKey, string $privateKey = null): JwtCookieSettingsProvider
     {
         return new JwtCookieSettingsProvider(
