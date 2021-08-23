@@ -8,7 +8,7 @@ use Helis\SettingsManagerBundle\Model\SettingModel;
 use Lcobucci\Clock\FrozenClock;
 use Lcobucci\JWT\Builder;
 use Lcobucci\JWT\Parser;
-use Lcobucci\JWT\Signer\Key\LocalFileReference;
+use Lcobucci\JWT\Signer\Key;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
 use Lcobucci\JWT\Validation\Constraint\IssuedBy;
 use Lcobucci\JWT\Validation\Constraint\RelatedTo;
@@ -19,17 +19,17 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 class JwtCookieSettingsProvider extends AbstractBaseCookieSettingsProvider
 {
-    private $publicKeyPath;
-    private $privateKeyPath;
+    private $publicKey;
+    private $privateKey;
 
     public function __construct(
         SerializerInterface $serializer,
-        string $publicKeyPath,
-        string $privateKeyPath = null,
+        string $publicKey,
+        string $privateKey = null,
         string $cookieName = 'stn'
     ) {
-        $this->publicKeyPath = $publicKeyPath;
-        $this->privateKeyPath = $privateKeyPath;
+        $this->publicKey = $publicKey;
+        $this->privateKey = $privateKey;
 
         parent::__construct($serializer, $cookieName);
     }
@@ -39,7 +39,7 @@ class JwtCookieSettingsProvider extends AbstractBaseCookieSettingsProvider
         $validator = new Validator();
         $constraints = [
             new ValidAt(new FrozenClock(new \DateTimeImmutable())),
-            new SignedWith(new Sha256(), LocalFileReference::file($this->publicKeyPath)),
+            new SignedWith(new Sha256(), new Key($this->publicKey)),
             new IssuedBy($this->issuer),
             new RelatedTo($this->subject),
         ];
@@ -76,7 +76,7 @@ class JwtCookieSettingsProvider extends AbstractBaseCookieSettingsProvider
 
     protected function buildToken(array $settings): string
     {
-        if (null === $this->privateKeyPath) {
+        if (null === $this->privateKey) {
             return '';
         }
 
@@ -90,7 +90,7 @@ class JwtCookieSettingsProvider extends AbstractBaseCookieSettingsProvider
             ->relatedTo($this->subject)
             ->expiresAt($expiresAt)
             ->withClaim('dt', $this->serializer->serialize($settings, 'json'))
-            ->getToken(new Sha256(), LocalFileReference::file($this->privateKeyPath));
+            ->getToken(new Sha256(), new Key($this->privateKey));
 
         return (string)$token;
     }
