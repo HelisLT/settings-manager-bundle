@@ -17,13 +17,16 @@ class JwtCookieSettingsProviderTest extends AbstractCookieSettingsProviderTest
 {
     protected function createProvider(): AbstractBaseCookieSettingsProvider
     {
-        return $this->createProviderWithKeys('public.key', 'private.key');
+        return $this->createProviderWithKeys(
+            'file://' . __DIR__ . '/Fixtures/public.key',
+            'file://' . __DIR__ . '/Fixtures/private.key'
+        );
     }
 
     public function testNoPrivateKey(): void
     {
         // No private key provided => no cookie will be set
-        $provider = $this->createProviderWithKeys('public.key');
+        $provider = $this->createProviderWithKeys('file://' . __DIR__ . '/Fixtures/public.key');
         $eventMock = $this->getMockBuilder(FilterResponseEvent::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -42,7 +45,7 @@ class JwtCookieSettingsProviderTest extends AbstractCookieSettingsProviderTest
     public function testInvalidPublicKey(): void
     {
         // Different public key => cookie invalid => no settings parsed
-        $provider = $this->createProviderWithKeys('public_1.key');
+        $provider = $this->createProviderWithKeys('invalid_key_content');
         $eventMock = $this
             ->getMockBuilder(GetResponseEvent::class)
             ->disableOriginalConstructor()
@@ -72,12 +75,12 @@ class JwtCookieSettingsProviderTest extends AbstractCookieSettingsProviderTest
         $this->assertCount(0, $provider->getDomains());
     }
 
-    private function createProviderWithKeys(string $publicKeyFile, string $privateKeyFile = null): JwtCookieSettingsProvider
+    private function createProviderWithKeys(string $publicKey, string $privateKey = null): JwtCookieSettingsProvider
     {
         return new JwtCookieSettingsProvider(
             $this->serializer,
-            __DIR__ . '/Fixtures/' . $publicKeyFile,
-            $privateKeyFile ? (__DIR__ . '/Fixtures/' . $privateKeyFile) : null,
+            $publicKey,
+            $privateKey ?? null,
             $this->cookieName
         );
     }
