@@ -32,6 +32,17 @@ class CountingCallsSettingsProvider extends DecoratingRedisSettingsProvider
         return parent::getSettingsByName($domainNames, $settingNames);
     }
 
+    public function getSettingsByTag(array $domainNames, string $tagName): array
+    {
+        if (!isset($this->calls[__FUNCTION__])) {
+            $this->calls[__FUNCTION__] = 0;
+        }
+
+        $this->calls[__FUNCTION__]++;
+
+        return parent::getSettingsByTag($domainNames, $tagName);
+    }
+
     public function getCalls(): array
     {
         return $this->calls;

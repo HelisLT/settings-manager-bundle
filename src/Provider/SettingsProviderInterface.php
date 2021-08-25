@@ -41,6 +41,16 @@ interface SettingsProviderInterface
     public function getSettingsByName(array $domainNames, array $settingNames): array;
 
     /**
+     * Returns settings by tag.
+     *
+     * @param string[] $domainNames Domains names to check
+     * @param string   $tagName     Tag name to filter by
+     *
+     * @return SettingModel[]
+     */
+    public function getSettingsByTag(array $domainNames, string $tagName): array;
+
+    /**
      * Saves setting model.
      * Settings manager can still try to call this method even if it's read only.
      * In case make sure it throws ReadOnlyProviderException.

@@ -43,6 +43,16 @@ class DecoratingInMemorySettingsProvider implements SettingsProviderInterface
         return $this->cacheMap[$cacheKey];
     }
 
+    public function getSettingsByTag(array $domainNames, string $tagName): array
+    {
+        $cacheKey = json_encode(['domainNames' => $domainNames, 'tagName' => $tagName]);
+        if (!isset($this->cacheMap[$cacheKey])) {
+            $this->cacheMap[$cacheKey] = $this->settingsProvider->getSettingsByTag($domainNames, $tagName);
+        }
+
+        return $this->cacheMap[$cacheKey];
+    }
+
     public function getDomains(bool $onlyEnabled = false): array
     {
         $cacheKey = $onlyEnabled ? 'domains_only_enabled' : 'domains';
