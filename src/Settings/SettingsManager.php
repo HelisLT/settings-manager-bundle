@@ -171,18 +171,6 @@ class SettingsManager implements LoggerAwareInterface
     }
 
     /**
-     * @deprecated please use getSettingsByTag instead
-     *
-     * @param string[] $domainNames
-     *
-     * @return SettingModel[]
-     */
-    public function getEnabledSettingsByTag(array $domainNames, string $tagName): array
-    {
-        return $this->getSettingsByTag($domainNames, $tagName);
-    }
-
-    /**
      * Tries to update an existing provider or saves to a new provider.
      */
     public function save(SettingModel $settingModel): bool
@@ -246,14 +234,6 @@ class SettingsManager implements LoggerAwareInterface
         }
 
         return false;
-    }
-
-    /**
-     * @deprecated use save()
-     */
-    public function update(SettingModel $settingModel): bool
-    {
-        return $this->save($settingModel);
     }
 
     public function delete(SettingModel $settingModel): bool
