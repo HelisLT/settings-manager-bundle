@@ -6,6 +6,11 @@ namespace Helis\SettingsManagerBundle\Provider\Traits;
 
 use Helis\SettingsManagerBundle\Model\SettingModel;
 
+/**
+ * TODO: implement provider specific filtering by tag name on each provider.
+ *       This trait was introduced as a temporary solution to nt enforce all
+ *       providers rewrite.
+ */
 trait TagFilteringTrait
 {
     /**
