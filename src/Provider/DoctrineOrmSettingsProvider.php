@@ -10,10 +10,12 @@ use Doctrine\ORM\EntityManagerInterface;
 use Helis\SettingsManagerBundle\Model\DomainModel;
 use Helis\SettingsManagerBundle\Model\SettingModel;
 use Helis\SettingsManagerBundle\Model\TagModel;
+use Helis\SettingsManagerBundle\Provider\Traits\TagFilteringTrait;
 use Helis\SettingsManagerBundle\Provider\Traits\WritableProviderTrait;
 
 class DoctrineOrmSettingsProvider implements SettingsProviderInterface
 {
+    use TagFilteringTrait;
     use WritableProviderTrait;
 
     protected $entityManager;
@@ -78,6 +80,11 @@ class DoctrineOrmSettingsProvider implements SettingsProviderInterface
         }
 
         return $out;
+    }
+
+    public function getSettingsByTag(array $domainNames, string $tagName): array
+    {
+        return $this->filterSettingsByTag($this->getSettings($domainNames), $tagName);
     }
 
     public function getDomains(bool $onlyEnabled = false): array

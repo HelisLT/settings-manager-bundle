@@ -6,11 +6,12 @@ namespace Helis\SettingsManagerBundle\Provider;
 
 use Helis\SettingsManagerBundle\Model\DomainModel;
 use Helis\SettingsManagerBundle\Model\SettingModel;
+use Helis\SettingsManagerBundle\Provider\Traits\TagFilteringTrait;
 use Helis\SettingsManagerBundle\Provider\Traits\WritableProviderTrait;
 
 class SimpleSettingsProvider implements SettingsProviderInterface
 {
-    use WritableProviderTrait;
+    use WritableProviderTrait, TagFilteringTrait;
 
     protected $settings;
 
@@ -48,6 +49,11 @@ class SimpleSettingsProvider implements SettingsProviderInterface
         }
 
         return $out;
+    }
+
+    public function getSettingsByTag(array $domainNames, string $tagName): array
+    {
+        return $this->filterSettingsByTag($this->getSettings($domainNames), $tagName);
     }
 
     public function getDomains(bool $onlyEnabled = false): array

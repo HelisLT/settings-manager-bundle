@@ -60,13 +60,8 @@ class DecoratingCacheSettingsProvider implements ModificationAwareSettingsProvid
         $settings = [];
 
         foreach ($domainNames as $domainName) {
-            foreach ($this->getSettingNames($domainName) as $settingName) {
-                $key = $this->getSettingKey($domainName, $settingName);
-                $item = $this->getCached($key);
-                if ($item->isHit() && null !== $item->get()) {
-                    $settings[] = $this->serializer->deserialize($item->get(), SettingModel::class, 'json');
-                }
-            }
+            $settingNames = $this->getSettingNamesByDomain($domainName);
+            $settings = array_merge($settings, $this->collectCachedSettings($domainName, $settingNames));
         }
         $this->cache->commit();
 
@@ -83,24 +78,24 @@ class DecoratingCacheSettingsProvider implements ModificationAwareSettingsProvid
         $settings = [];
 
         foreach ($domainNames as $domainName) {
-            foreach ($settingNames as $settingName) {
-                $key = $this->getSettingKey($domainName, $settingName);
-                $item = $this->getCached($key);
-                if ($item->isHit() && null !== $item->get()) {
-                    $settings[] = $this->serializer->deserialize($item->get(), SettingModel::class, 'json');
-                }
-            }
+            $settings = array_merge($settings, $this->collectCachedSettings($domainName, $settingNames));
         }
 
         return $settings;
     }
 
-    /**
-     * @return string[]
-     */
-    private function getSettingNames(string $domainName): array
+    public function getSettingsByTag(array $domainNames, string $tagName): array
     {
-        return $this->getCached($this->getSettingNamesKey($domainName))->get() ?? [];
+        $this->clearIfNeeded();
+        $this->warmupByTag($domainNames, $tagName);
+        $settings = [];
+
+        foreach ($domainNames as $domainName) {
+            $settingNames = $this->getSettingNamesByTag($domainName, $tagName);
+            $settings = array_merge($settings, $this->collectCachedSettings($domainName, $settingNames));
+        }
+
+        return $settings;
     }
 
     /**
@@ -123,24 +118,6 @@ class DecoratingCacheSettingsProvider implements ModificationAwareSettingsProvid
         }
 
         return $domains;
-    }
-
-    private function serializeArray(array $elements): array
-    {
-        foreach ($elements as &$element) {
-            $element = $this->serializer->serialize($element, 'json');
-        }
-
-        return $elements;
-    }
-
-    private function deserializeArray(array $elements): array
-    {
-        foreach ($elements as &$element) {
-            $element = $this->serializer->deserialize($element, DomainModel::class, 'json');
-        }
-
-        return $elements;
     }
 
     public function isReadOnly(): bool
@@ -168,34 +145,19 @@ class DecoratingCacheSettingsProvider implements ModificationAwareSettingsProvid
         return $this->decoratingProvider->deleteDomain($domainName);
     }
 
-    private function getCached(string $key): CacheItem
+    public function setModificationTimeKey(string $modificationTimeKey): void
     {
-        return $this->cache->getItem($key);
+        $this->modificationTimeKey = $modificationTimeKey;
     }
 
-    private function storeCached(CacheItem $cacheItem, $value, bool $commit = true): void
+    public function getModificationTime(): int
     {
-        $cacheItem->set($value);
-        $this->cache->saveDeferred($cacheItem);
-
-        if (true === $commit) {
-            $this->cache->commit();
+        $cachedValue = $this->cache->getItem($this->modificationTimeKey);
+        if ($cachedValue->isHit()) {
+            return $cachedValue->get();
         }
-    }
 
-    private function getSettingNamesKey(string $domainName): string
-    {
-        return sprintf('setting_names[%s]', $domainName);
-    }
-
-    private function getSettingKey(string $domainName, string $settingName): string
-    {
-        return sprintf('setting[%s][%s]', $domainName, $settingName);
-    }
-
-    private function getDomainKey(bool $onlyEnabled = false): string
-    {
-        return sprintf('domain%s', $onlyEnabled ? '_oe' : '');
+        return 0;
     }
 
     private function clearIfNeeded(): void
@@ -259,7 +221,7 @@ class DecoratingCacheSettingsProvider implements ModificationAwareSettingsProvid
         $this->cache->commit();
     }
 
-    private function warmupBySettingNames(array $domainNames, array $settingNames = null): void
+    private function warmupBySettingNames(array $domainNames, array $settingNames): void
     {
         $missingDomainNames = [];
         $missingSettingNames = [];
@@ -292,7 +254,7 @@ class DecoratingCacheSettingsProvider implements ModificationAwareSettingsProvid
             }
 
             try {
-                $this->warmupSettings($missingDomainNames, $missingSettingNames);
+                $this->warmupParticularSettings($missingDomainNames, $missingSettingNames);
             } finally {
                 $lock->release();
             }
@@ -301,7 +263,99 @@ class DecoratingCacheSettingsProvider implements ModificationAwareSettingsProvid
         $this->cache->commit();
     }
 
-    private function warmupSettings(array $domainNames, array $settingNames): void
+    private function warmupByTag(array $domainNames, string $tagName): void
+    {
+        $missingDomainNames = [];
+
+        foreach ($domainNames as $domainName) {
+            if ($this->isDomainSettingsWarm($domainName) || $this->isTagWarm($domainName, $tagName)) {
+                continue;
+            }
+
+            $missingDomainNames[] = $domainName;
+        }
+
+        if (count($missingDomainNames) > 0) {
+            $lock = $this->lockFactory->createLock(__FUNCTION__);
+            if (!$lock->acquire()) {
+                usleep(self::LOCK_RETRY_INTERVAL_MS);
+                $this->warmupByTag($domainNames, $tagName);
+
+                return;
+            }
+
+            try {
+                $this->warmupTaggedSettings($missingDomainNames, $tagName);
+            } finally {
+                $lock->release();
+            }
+        }
+
+        $this->cache->commit();
+    }
+
+    /**
+     * Warmup domain settings.
+     *
+     * As this method fetches all settings from given domains, it can build all three kinds of cache items:
+     *  - settings
+     *  - setting names by domain
+     *  - setting names by tag
+     *
+     * @param array $domainNames
+     */
+    private function warmupDomainSettings(array $domainNames): void
+    {
+        $mappedSettingNames = [];
+        $mappedTaggedSettingNames = [];
+
+        // build settings cache items
+        foreach ($this->decoratingProvider->getSettings($domainNames) as $setting) {
+            $domainName = $setting->getDomain()->getName();
+            $mappedSettingNames[$domainName][] = $setting->getName();
+
+            $settingKey = $this->getSettingKey($domainName, $setting->getName());
+            $serializedSetting = $this->serializer->serialize($setting, 'json');
+            $this->storeCached($this->getCached($settingKey), $serializedSetting, false);
+
+            foreach ($setting->getTags() as $tag) {
+                if (!isset($mappedTaggedSettingNames[$domainName])) {
+                    $mappedTaggedSettingNames[$domainName] = [];
+                }
+
+                $mappedTaggedSettingNames[$domainName][$tag->getName()][] = $setting->getName();
+            }
+        }
+
+        // build setting names by domain cache items
+        foreach ($mappedSettingNames as $domainName => $settingNames) {
+            $key = $this->getSettingNamesKey($domainName);
+            $cacheItem = $this->getCached($key);
+
+            $this->storeCached($cacheItem, $settingNames, false);
+        }
+
+        // build setting names by tag cache items
+        foreach ($mappedTaggedSettingNames as $domainName => $taggedSettingNames) {
+            foreach ($taggedSettingNames as $tagName => $settingNames) {
+                $key = $this->getTaggedSettingNamesKey($domainName, $tagName);
+                $cacheItem = $this->getCached($key);
+
+                $this->storeCached($cacheItem, $settingNames, false);
+            }
+        }
+    }
+
+    /**
+     * Warmup particular settings.
+     *
+     * As this method fetches only some particular settings from given domains,
+     * it can build only settings cache items.
+     *
+     * @param array $domainNames
+     * @param array $settingNames
+     */
+    private function warmupParticularSettings(array $domainNames, array $settingNames): void
     {
         $settings = $this->decoratingProvider->getSettingsByName($domainNames, $settingNames);
         $indexedSettings = [];
@@ -331,11 +385,24 @@ class DecoratingCacheSettingsProvider implements ModificationAwareSettingsProvid
         }
     }
 
-    private function warmupDomainSettings(array $domainNames): void
+    /**
+     * Warmup tagged settings.
+     *
+     * As this method fetches only tagged settings from given domains, it can build only these cache items:
+     *  - settings
+     *  - setting names by tag
+     *
+     * @param array  $domainNames
+     * @param string $tagName
+     */
+    private function warmupTaggedSettings(array $domainNames, string $tagName): void
     {
         $mappedSettingNames = [];
 
-        foreach ($this->decoratingProvider->getSettings($domainNames) as $setting) {
+        $settings = $this->decoratingProvider->getSettingsByTag($domainNames, $tagName);
+
+        // cache settings cache items
+        foreach ($settings as $setting) {
             $mappedSettingNames[$setting->getDomain()->getName()][] = $setting->getName();
 
             $settingKey = $this->getSettingKey($setting->getDomain()->getName(), $setting->getName());
@@ -343,8 +410,9 @@ class DecoratingCacheSettingsProvider implements ModificationAwareSettingsProvid
             $this->storeCached($this->getCached($settingKey), $serializedSetting, false);
         }
 
+        // build setting names by tag cache items
         foreach ($mappedSettingNames as $domainName => $settingNames) {
-            $key = $this->getSettingNamesKey($domainName);
+            $key = $this->getTaggedSettingNamesKey($domainName, $tagName);
             $cacheItem = $this->getCached($key);
 
             $this->storeCached($cacheItem, $settingNames, false);
@@ -361,9 +429,83 @@ class DecoratingCacheSettingsProvider implements ModificationAwareSettingsProvid
         return $this->getCached($this->getSettingKey($domainName, $settingName))->isHit();
     }
 
-    public function setModificationTimeKey(string $modificationTimeKey): void
+    private function isTagWarm(string $domainName, string $tagName): bool
     {
-        $this->modificationTimeKey = $modificationTimeKey;
+        return $this->getCached($this->getTaggedSettingNamesKey($domainName, $tagName))->isHit();
+    }
+
+    /**
+     * @param string $domainName
+     *
+     * @return string[]
+     */
+    private function getSettingNamesByDomain(string $domainName): array
+    {
+        return $this->getCached($this->getSettingNamesKey($domainName))->get() ?? [];
+    }
+
+    /**
+     * @param string $domainName
+     * @param string $tagName
+     *
+     * @return string[]
+     */
+    private function getSettingNamesByTag(string $domainName, string $tagName): array
+    {
+        return $this->getCached($this->getTaggedSettingNamesKey($domainName, $tagName))->get() ?? [];
+    }
+
+    private function serializeArray(array $elements): array
+    {
+        foreach ($elements as &$element) {
+            $element = $this->serializer->serialize($element, 'json');
+        }
+
+        return $elements;
+    }
+
+    private function deserializeArray(array $elements): array
+    {
+        foreach ($elements as &$element) {
+            $element = $this->serializer->deserialize($element, DomainModel::class, 'json');
+        }
+
+        return $elements;
+    }
+
+    private function getCached(string $key): CacheItem
+    {
+        return $this->cache->getItem($key);
+    }
+
+    private function storeCached(CacheItem $cacheItem, $value, bool $commit = true): void
+    {
+        $cacheItem->set($value);
+        $this->cache->saveDeferred($cacheItem);
+
+        if (true === $commit) {
+            $this->cache->commit();
+        }
+    }
+
+    private function getSettingNamesKey(string $domainName): string
+    {
+        return sprintf('setting_names[%s]', $domainName);
+    }
+
+    private function getSettingKey(string $domainName, string $settingName): string
+    {
+        return sprintf('setting[%s][%s]', $domainName, $settingName);
+    }
+
+    private function getTaggedSettingNamesKey(string $domainName, string $tagName): string
+    {
+        return sprintf('tagged_setting_names[%s][%s]', $domainName, $tagName);
+    }
+
+    private function getDomainKey(bool $onlyEnabled = false): string
+    {
+        return sprintf('domain%s', $onlyEnabled ? '_oe' : '');
     }
 
     private function setModificationTime(bool $commit = false): int
@@ -380,13 +522,18 @@ class DecoratingCacheSettingsProvider implements ModificationAwareSettingsProvid
         return $time;
     }
 
-    public function getModificationTime(): int
+    private function collectCachedSettings(string $domainName, array $settingNames): array
     {
-        $cachedValue = $this->cache->getItem($this->modificationTimeKey);
-        if ($cachedValue->isHit()) {
-            return $cachedValue->get();
+        $settings = [];
+
+        foreach ($settingNames as $settingName) {
+            $key = $this->getSettingKey($domainName, $settingName);
+            $item = $this->getCached($key);
+            if ($item->isHit() && null !== $item->get()) {
+                $settings[] = $this->serializer->deserialize($item->get(), SettingModel::class, 'json');
+            }
         }
 
-        return 0;
+        return $settings;
     }
 }

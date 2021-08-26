@@ -7,6 +7,7 @@ use App\Entity\Setting;
 use App\Entity\Tag;
 use Helis\SettingsManagerBundle\Model\DomainModel;
 use Helis\SettingsManagerBundle\Model\SettingModel;
+use Helis\SettingsManagerBundle\Model\TagModel;
 use Helis\SettingsManagerBundle\Model\Type;
 use Helis\SettingsManagerBundle\Provider\SettingsProviderInterface;
 use Liip\FunctionalTestBundle\Test\WebTestCase;
@@ -110,29 +111,29 @@ abstract class AbstractReadableSettingsProviderTest extends WebTestCase
             [
                 ['default'],
                 [
-                    ['bazinga', 'default', 'bool', false],
-                    ['foo', 'default', 'bool', true],
+                    ['bazinga', 'default', 'bool', false, ['fixture']],
+                    ['foo', 'default', 'bool', true, ['fixture']],
                 ],
             ],
             [
                 ['default', 'apples'],
                 [
-                    ['banana', 'apples', 'int', 10],
-                    ['bazinga', 'default', 'bool', false],
-                    ['bazinga', 'apples', 'bool', true],
-                    ['foo', 'default', 'bool', true],
-                    ['kiwi', 'apples', 'float', 1.2],
+                    ['banana', 'apples', 'int', 10, []],
+                    ['bazinga', 'default', 'bool', false, ['fixture']],
+                    ['bazinga', 'apples', 'bool', true, []],
+                    ['foo', 'default', 'bool', true, ['fixture']],
+                    ['kiwi', 'apples', 'float', 1.2, []],
                 ],
             ],
             [
                 ['default', 'apples', 'sea'],
                 [
-                    ['banana', 'apples', 'int', 10],
-                    ['bazinga', 'default', 'bool', false],
-                    ['bazinga', 'apples', 'bool', true],
-                    ['foo', 'default', 'bool', true],
-                    ['kiwi', 'apples', 'float', 1.2],
-                    ['tuna', 'sea', 'string', 'fishing'],
+                    ['banana', 'apples', 'int', 10, []],
+                    ['bazinga', 'default', 'bool', false, ['fixture']],
+                    ['bazinga', 'apples', 'bool', true, []],
+                    ['foo', 'default', 'bool', true, ['fixture']],
+                    ['kiwi', 'apples', 'float', 1.2, []],
+                    ['tuna', 'sea', 'string', 'fishing', ['fixture']],
                 ],
             ]
         ];
@@ -151,6 +152,9 @@ abstract class AbstractReadableSettingsProviderTest extends WebTestCase
                 $model->getDomain()->getName(),
                 $model->getType()->getValue(),
                 $model->getData(),
+                $model->getTags()->map(function (TagModel $tag) {
+                    return $tag->getName();
+                })->toArray(),
             ];
         }, $settings);
 
@@ -172,50 +176,50 @@ abstract class AbstractReadableSettingsProviderTest extends WebTestCase
                 ['default'],
                 ['bazinga'],
                 [
-                    ['bazinga', 'default', 'bool', false],
+                    ['bazinga', 'default', 'bool', false, ['fixture']],
                 ]
             ],
             [
                 ['default'],
                 ['bazinga', 'foo'],
                 [
-                    ['bazinga', 'default', 'bool', false],
-                    ['foo', 'default', 'bool', true],
+                    ['bazinga', 'default', 'bool', false, ['fixture']],
+                    ['foo', 'default', 'bool', true, ['fixture']],
                 ]
             ],
             [
                 ['default', 'apples'],
                 ['bazinga', 'foo'],
                 [
-                    ['bazinga', 'default', 'bool', false],
-                    ['bazinga', 'apples', 'bool', true],
-                    ['foo', 'default', 'bool', true],
+                    ['bazinga', 'default', 'bool', false, ['fixture']],
+                    ['bazinga', 'apples', 'bool', true, []],
+                    ['foo', 'default', 'bool', true, ['fixture']],
                 ]
             ],
             [
                 ['default', 'sea'],
                 ['foo', 'tuna'],
                 [
-                    ['foo', 'default', 'bool', true],
-                    ['tuna', 'sea', 'string', 'fishing'],
+                    ['foo', 'default', 'bool', true, ['fixture']],
+                    ['tuna', 'sea', 'string', 'fishing', ['fixture']],
                 ]
             ],
             [
                 ['default', 'sea', 'apples'],
                 ['foo', 'tuna', 'kiwi', 'persimon'],
                 [
-                    ['foo', 'default', 'bool', true],
-                    ['tuna', 'sea', 'string', 'fishing'],
-                    ['kiwi', 'apples', 'float', 1.2],
+                    ['foo', 'default', 'bool', true, ['fixture']],
+                    ['tuna', 'sea', 'string', 'fishing', ['fixture']],
+                    ['kiwi', 'apples', 'float', 1.2, []],
                 ]
             ],
             [
                 ['default', 'sea', 'apples', 'pear'],
                 ['foo', 'tuna', 'kiwi'],
                 [
-                    ['foo', 'default', 'bool', true],
-                    ['tuna', 'sea', 'string', 'fishing'],
-                    ['kiwi', 'apples', 'float', 1.2],
+                    ['foo', 'default', 'bool', true, ['fixture']],
+                    ['tuna', 'sea', 'string', 'fishing', ['fixture']],
+                    ['kiwi', 'apples', 'float', 1.2, []],
                 ]
             ],
         ];
@@ -227,6 +231,64 @@ abstract class AbstractReadableSettingsProviderTest extends WebTestCase
     public function testGetSettingsByName(array $domainNames, array $settingNames, array $expectedSettingsMap)
     {
         $settings = $this->provider->getSettingsByName($domainNames, $settingNames);
+
+        $map =  array_map(function (SettingModel $model) {
+            return [
+                $model->getName(),
+                $model->getDomain()->getName(),
+                $model->getType()->getValue(),
+                $model->getData(),
+                $model->getTags()->map(function (TagModel $tag) {
+                    return $tag->getName();
+                })->toArray(),
+            ];
+        }, $settings);
+
+        usort($map, function ($a, $b) {
+            return $a[0].$a[1] <=> $b[0].$b[1];
+        });
+
+        usort($expectedSettingsMap, function ($a, $b) {
+            return $a[0].$a[1] <=> $b[0].$b[1];
+        });
+
+        $this->assertEquals($map, $expectedSettingsMap);
+    }
+
+    public function dataProviderTestGetSettingsByTag(): array
+    {
+        return [
+            [
+                ['default'],
+                'non-existing-tag',
+                []
+            ],
+            [
+                ['default'],
+                'fixture',
+                [
+                    ['bazinga', 'default', 'bool', false],
+                    ['foo', 'default', 'bool', true],
+                ]
+            ],
+            [
+                ['default', 'sea', 'apples'],
+                'fixture',
+                [
+                    ['bazinga', 'default', 'bool', false],
+                    ['foo', 'default', 'bool', true],
+                    ['tuna', 'sea', 'string', 'fishing'],
+                ]
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider dataProviderTestGetSettingsByTag
+     */
+    public function testGetSettingsByTag(array $domainNames, string $tagName, array $expectedSettingsMap)
+    {
+        $settings = $this->provider->getSettingsByTag($domainNames, $tagName);
 
         $map =  array_map(function (SettingModel $model) {
             return [

@@ -7,6 +7,7 @@ namespace Helis\SettingsManagerBundle\Provider;
 use Helis\SettingsManagerBundle\Model\DomainModel;
 use Helis\SettingsManagerBundle\Model\SettingModel;
 use Helis\SettingsManagerBundle\Provider\Traits\RedisModificationTrait;
+use Helis\SettingsManagerBundle\Provider\Traits\TagFilteringTrait;
 use Helis\SettingsManagerBundle\Settings\Traits\DomainNameExtractTrait;
 use Redis;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -15,6 +16,7 @@ class DecoratingRedisSettingsProvider implements ModificationAwareSettingsProvid
 {
     use DomainNameExtractTrait;
     use RedisModificationTrait;
+    use TagFilteringTrait;
 
     private const DOMAIN_KEY = 'domain';
     private const HASHMAP_KEY = 'hashmap';
@@ -96,6 +98,11 @@ class DecoratingRedisSettingsProvider implements ModificationAwareSettingsProvid
         }
 
         return array_values(array_filter($out));
+    }
+
+    public function getSettingsByTag(array $domainNames, string $tagName): array
+    {
+        return $this->filterSettingsByTag($this->getSettings($domainNames), $tagName);
     }
 
     public function save(SettingModel $settingModel): bool

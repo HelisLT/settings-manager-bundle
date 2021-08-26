@@ -93,6 +93,14 @@ class DecoratingCacheSettingsProviderTest extends DecoratingPredisSettingsProvid
             $this->assertTrue($settingCacheItem->isHit());
             $this->assertNotNull($settingNamesCacheItem->get());
             $this->assertNotNull($settingCacheItem->get());
+
+            foreach ($settingData[4] as $tagName) {
+                $taggedSettingNamesCacheKey = sprintf('tagged_setting_names[%s][%s]', $settingData[1], $tagName);
+                $taggedSettingNamesCacheItem = $this->cache->getItem($taggedSettingNamesCacheKey);
+
+                $this->assertTrue($taggedSettingNamesCacheItem->isHit());
+                $this->assertNotNull($taggedSettingNamesCacheItem->get());
+            }
         }
     }
 
@@ -112,6 +120,20 @@ class DecoratingCacheSettingsProviderTest extends DecoratingPredisSettingsProvid
         foreach ($expectedSettingsMap as $settingData) {
             $cacheKey = sprintf('setting[%s][%s]', $settingData[1], $settingData[0]);
             $expectedNonNullKeys[$cacheKey] = true;
+
+            // setting names by domain are not cached
+            $settingNamesCacheKey = sprintf('setting_names[%s]', $settingData[1]);
+            $settingNamesCacheItem = $this->cache->getItem($settingNamesCacheKey);
+
+            $this->assertFalse($settingNamesCacheItem->isHit());
+
+            // setting name by tag are not cached
+            foreach ($settingData[4] as $tagName) {
+                $taggedSettingNamesCacheKey = sprintf('tagged_setting_names[%s][%s]', $settingData[1], $tagName);
+                $taggedSettingNamesCacheItem = $this->cache->getItem($taggedSettingNamesCacheKey);
+
+                $this->assertFalse($taggedSettingNamesCacheItem->isHit());
+            }
         }
 
         // check if all domainName, settingName pairs cached
@@ -128,6 +150,35 @@ class DecoratingCacheSettingsProviderTest extends DecoratingPredisSettingsProvid
                     $this->assertNull($cacheItem->get());
                 }
             }
+        }
+    }
+
+    /**
+     * @dataProvider dataProviderTestGetSettingsByTag
+     */
+    public function testGetSettingsByTag(array $domainNames, string $tagName, array $expectedSettingsMap)
+    {
+        parent::testGetSettingsByTag($domainNames, $tagName, $expectedSettingsMap);
+
+        $calls = $this->countingProvider->getCalls();
+
+        $this->assertEquals(1, $calls['getSettingsByTag']);
+
+        // check if cache keys built
+        foreach ($expectedSettingsMap as $settingData) {
+            $settingNamesCacheKey = sprintf('setting_names[%s]', $settingData[1]);
+            $settingCacheKey = sprintf('setting[%s][%s]', $settingData[1], $settingData[0]);
+            $taggedSettingNamesCacheKey = sprintf('tagged_setting_names[%s][%s]', $settingData[1], $tagName);
+
+            $settingNamesCacheItem = $this->cache->getItem($settingNamesCacheKey);
+            $settingCacheItem = $this->cache->getItem($settingCacheKey);
+            $taggedSettingNamesCacheItem = $this->cache->getItem($taggedSettingNamesCacheKey);
+
+            $this->assertFalse($settingNamesCacheItem->isHit());
+            $this->assertTrue($settingCacheItem->isHit());
+            $this->assertTrue($taggedSettingNamesCacheItem->isHit());
+            $this->assertNotNull($settingCacheItem->get());
+            $this->assertNotNull($taggedSettingNamesCacheItem->get());
         }
     }
 }

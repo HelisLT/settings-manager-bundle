@@ -83,9 +83,8 @@ class SettingsManager implements LoggerAwareInterface
                 if ($settingModel instanceof SettingModel) {
                     $settingModel->setProviderName($pName);
 
-                    if ((isset($providerSettings[$settingModel->getName()])
-                        && $providerSettings[$settingModel->getName()]->getDomain()->getPriority() < $settingModel->getDomain()->getPriority())
-                        || !isset($providerSettings[$settingModel->getName()])
+                    if (!isset($providerSettings[$settingModel->getName()])
+                        || $providerSettings[$settingModel->getName()]->getDomain()->getPriority() < $settingModel->getDomain()->getPriority()
                     ) {
                         $providerSettings[$settingModel->getName()] = $settingModel;
                     }
@@ -122,19 +121,7 @@ class SettingsManager implements LoggerAwareInterface
         $settings = [[]];
 
         foreach ($this->providers as $pName => $provider) {
-            $providerSettings = [];
-            foreach ($provider->getSettings($domainNames) as $settingModel) {
-                $settingModel->setProviderName($pName);
-
-                if ((isset($providerSettings[$settingModel->getName()])
-                        && $providerSettings[$settingModel->getName()]->getDomain()->getPriority() < $settingModel->getDomain()->getPriority())
-                    || !isset($providerSettings[$settingModel->getName()])
-                ) {
-                    $providerSettings[$settingModel->getName()] = $settingModel;
-                }
-            }
-
-            $settings[] = $providerSettings;
+            $settings[] = $this->collectSettings($provider->getSettings($domainNames), $pName);
         }
 
         return array_replace(...$settings);
@@ -142,6 +129,7 @@ class SettingsManager implements LoggerAwareInterface
 
     /**
      * @param string[] $domainNames
+     * @param string   $tagName
      *
      * @return SettingModel[]
      */
@@ -150,21 +138,7 @@ class SettingsManager implements LoggerAwareInterface
         $settings = [[]];
 
         foreach ($this->providers as $pName => $provider) {
-            $providerSettings = [];
-            foreach ($provider->getSettings($domainNames) as $settingModel) {
-                if ($settingModel->hasTag($tagName)) {
-                    $settingModel->setProviderName($pName);
-
-                    if ((isset($providerSettings[$settingModel->getName()])
-                            && $providerSettings[$settingModel->getName()]->getDomain()->getPriority() < $settingModel->getDomain()->getPriority())
-                        || !isset($providerSettings[$settingModel->getName()])
-                    ) {
-                        $providerSettings[$settingModel->getName()] = $settingModel;
-                    }
-                }
-            }
-
-            $settings[] = $providerSettings;
+            $settings[] = $this->collectSettings($provider->getSettingsByTag($domainNames, $tagName), $pName);
         }
 
         return array_replace(...$settings);
@@ -347,5 +321,28 @@ class SettingsManager implements LoggerAwareInterface
         }
 
         return $this->providers[$providerName];
+    }
+
+    /**
+     * @param SettingModel[] $settings
+     * @param string         $providerName
+     *
+     * @return SettingModel[]
+     */
+    private function collectSettings(array $settings, string $providerName): array
+    {
+        $result = [];
+
+        foreach ($settings as $settingModel) {
+            $settingModel->setProviderName($providerName);
+
+            if (!isset($result[$settingModel->getName()])
+                || $result[$settingModel->getName()]->getDomain()->getPriority() < $settingModel->getDomain()->getPriority()
+            ) {
+                $result[$settingModel->getName()] = $settingModel;
+            }
+        }
+
+        return $result;
     }
 }
