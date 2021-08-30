@@ -59,6 +59,8 @@ monolog:
 
 helis_settings_manager:
     enqueue_extension: true
+    settings_router:
+        treat_as_default_providers: ['config']
     profiler: true
     logger:
         enabled: true
