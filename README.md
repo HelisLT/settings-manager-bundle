@@ -463,7 +463,7 @@ This is a special provider supposed to be used in tests only. Useful, when there
 Configuration example:
 ```yaml
     settings_manager.provider.mock:
-        class: App\Provider\SettingsProviderMock
+        class: Helis\SettingsManagerBundle\Test\Provider\SettingsProviderMock
         tags:
             - { name: settings_manager.provider, provider: mock, priority: 9999 }
 ```
@@ -471,36 +471,26 @@ Configuration example:
 Mocking:
 
 ```php
-    /**
-     * {@inheritdoc}
-     */
+    ...
+
+    use SettingsIntegrationTrait;
+
     protected function setUp()
     {
         parent::setUp();
 
-        $this->settingsProviderMock = $this->getContainer()->get('settings_manager.provider.mock');
-
-        $this->settingsProviderMock->on(
-            "getSettingsByName",
-            [
-                (new SettingModel())
-                    ->setName('awesome_setting')
-                    ->setDomain((new DomainModel())->setName('some_domain'))
-            ],
-            ['any'],
-            ['awesome_setting']
+        SettingsProviderMock::addSetting(
+            (new SettingModel())
+                ->setName('awesome_setting')
+                ->setDomain(
+                    (new DomainModel())
+                        ->setName('some_domain')
+                        ->setEnabled(true)
+                )
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function tearDown()
-    {
-        parent::tearDown();
-
-        $this->settingsProviderMock->clear();
-    }
+    ...
 ```
 
 ## Configuration reference
