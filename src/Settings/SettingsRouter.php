@@ -243,7 +243,7 @@ class SettingsRouter
     {
         $settings = $this->doGetSettingsByTag($tagName);
 
-        if (count($settings) == 0) {
+        if (count($settings) === 0) {
             throw new TaggedSettingsNotFoundException($tagName);
         }
 

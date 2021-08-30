@@ -456,6 +456,53 @@ settings_manager.decorating_provider.cache:
         $lockFactory: '@symfony_flock_factory'
 ```
 
+### Settings provider mock
+
+This is a special provider supposed to be used in tests only. Useful, when there is a need to mock `mustGet...` calls.
+
+Configuration example:
+```yaml
+    settings_manager.provider.mock:
+        class: App\Provider\SettingsProviderMock
+        tags:
+            - { name: settings_manager.provider, provider: mock, priority: 9999 }
+```
+
+Mocking:
+
+```php
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp()
+    {
+        parent::setUp();
+
+        $this->settingsProviderMock = $this->getContainer()->get('settings_manager.provider.mock');
+
+        $this->settingsProviderMock->on(
+            "getSettingsByName",
+            [
+                (new SettingModel())
+                    ->setName('awesome_setting')
+                    ->setDomain((new DomainModel())->setName('some_domain'))
+            ],
+            ['any'],
+            ['awesome_setting']
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function tearDown()
+    {
+        parent::tearDown();
+
+        $this->settingsProviderMock->clear();
+    }
+```
+
 ## Configuration reference
 
 ```yaml
