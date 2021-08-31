@@ -70,7 +70,8 @@ class HelisSettingsManagerExtension extends Extension
             ->setPublic(true)
             ->setArgument(0, new Reference(SettingsManager::class))
             ->setArgument(1, new Reference(SettingsStore::class))
-            ->setArgument(2, new Reference(EventManagerInterface::class));
+            ->setArgument(2, new Reference(EventManagerInterface::class))
+            ->setArgument(3, $config['settings_router']['treat_as_default_providers']);
     }
 
     private function loadEnqueueExtension(array $config, ContainerBuilder $container): void

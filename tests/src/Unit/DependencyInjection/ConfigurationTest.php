@@ -33,6 +33,7 @@ class ConfigurationTest extends TestCase
                     'logger' => ['enabled' => false, 'service_id' => null],
                     'listeners' => ['controller' => ['enabled' => false], 'command' => ['enabled' => false]],
                     'enqueue_extension' => ['enabled' => false, 'divider' => 1, 'priority' => 100],
+                    'settings_router' => ['treat_as_default_providers' => []],
                 ],
             ],
             // case 1: settings files
@@ -58,6 +59,7 @@ class ConfigurationTest extends TestCase
                     'logger' => ['enabled' => false, 'service_id' => null],
                     'listeners' => ['controller' => ['enabled' => false], 'command' => ['enabled' => false]],
                     'enqueue_extension' => ['enabled' => false, 'divider' => 1, 'priority' => 100],
+                    'settings_router' => ['treat_as_default_providers' => []],
                 ],
             ],
             // case 3: settings files, settings
@@ -158,6 +160,7 @@ class ConfigurationTest extends TestCase
                     'logger' => ['enabled' => false, 'service_id' => null],
                     'listeners' => ['controller' => ['enabled' => false], 'command' => ['enabled' => false]],
                     'enqueue_extension' => ['enabled' => true, 'divider' => 1, 'priority' => 100],
+                    'settings_router' => ['treat_as_default_providers' => []],
                 ],
             ],
         ];

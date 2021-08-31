@@ -34,7 +34,10 @@ class SettingsAwarePass implements CompilerPassInterface
                 if (!isset($tag['method'])) {
                     throw new LogicException($serviceId.' tag '.$this->tag.' is missing method property');
                 }
-                $callMap[$tag['setting']] = $tag['method'];
+                $callMap[$tag['setting']] = [
+                    'setter' => $tag['method'],
+                    'must' => $tag['must'] ?? false,
+                ];
             }
 
             unset($initialTags[$this->tag]);

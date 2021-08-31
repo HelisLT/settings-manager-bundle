@@ -101,14 +101,34 @@ SettingsRouter is pretty straight-forward. It has one main method, called `$sett
 | `getFloat`  | `0.0`         | `float`              |
 | `getArray`  | `[]`          | `array`              |
 
+#### Throw exception on miss
+
+In some cases throwing exception if setting not found might be desired behaviour. For this purpose, `SettingsRouter` has `mustGet($settingName)` and `mustGet...($settingName)` for each aliased getter.
+
+| Method name     | Declared return type |
+|-----------------|----------------------|
+| `mustGetString` | `string`             |
+| `mustGetBool`   | `bool`               |
+| `mustGetInt`    | `int`                |
+| `mustGetFloat`  | `float`              |
+| `mustGetArray`  | `array`              |
+
 ### Service Tag
 
-If you dont want to inject `SettingsRouter` or wish for a cleaner service, service tags are here to help. First of all, the service must have a setter, which can be used to inject a setting value. For bool values, the bundle provides the `SwitchableTrait`, which adds `setEnabled` and `isEnabled` methods. Then add a tag on your service with attributes `setting` for setting name and `method` for method name. Example:
+If you don't want to inject `SettingsRouter` or wish for a cleaner service, service tags are here to help. First of all, the service must have a setter, which can be used to inject a setting value. For bool values, the bundle provides the `SwitchableTrait`, which adds `setEnabled` and `isEnabled` methods. Then add a tag on your service with attributes `setting` for setting name and `method` for method name. Example:
 
 ```yaml
 AppBundle\Service\AmazingService:
     tags:
         - { name: settings_manager.setting_aware, setting: foo, method: setEnabled }
+```
+
+or the `must` version 
+
+```yaml
+AppBundle\Service\AmazingService:
+    tags:
+        - { name: settings_manager.setting_aware, setting: foo, method: setEnabled, must: true }
 ```
 
 ## Models
@@ -436,6 +456,43 @@ settings_manager.decorating_provider.cache:
         $lockFactory: '@symfony_flock_factory'
 ```
 
+### Settings provider mock
+
+This is a special provider supposed to be used in tests only. Useful, when there is a need to mock `mustGet...` calls.
+
+Configuration example:
+```yaml
+    settings_manager.provider.mock:
+        class: Helis\SettingsManagerBundle\Test\Provider\SettingsProviderMock
+        tags:
+            - { name: settings_manager.provider, provider: mock, priority: 9999 }
+```
+
+Mocking:
+
+```php
+    ...
+
+    use SettingsIntegrationTrait;
+
+    protected function setUp()
+    {
+        parent::setUp();
+
+        SettingsProviderMock::addSetting(
+            (new SettingModel())
+                ->setName('awesome_setting')
+                ->setDomain(
+                    (new DomainModel())
+                        ->setName('some_domain')
+                        ->setEnabled(true)
+                )
+        );
+    }
+
+    ...
+```
+
 ## Configuration reference
 
 ```yaml
@@ -448,6 +505,8 @@ helis_settings_manager:
             type: bool
             data: false
             tags: [super_switch]
+    settings_router:
+        treat_as_default_providers: ['config']
     profiler:
         enabled: false
     logger:
