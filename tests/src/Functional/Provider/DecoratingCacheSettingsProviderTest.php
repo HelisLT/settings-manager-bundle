@@ -10,7 +10,7 @@ use Helis\SettingsManagerBundle\Provider\DoctrineOrmSettingsProvider;
 use Helis\SettingsManagerBundle\Provider\SettingsProviderInterface;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
-use Symfony\Component\Lock\Factory;
+use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\Store\FlockStore;
 
 class DecoratingCacheSettingsProviderTest extends DecoratingPredisSettingsProviderTest
@@ -66,7 +66,7 @@ class DecoratingCacheSettingsProviderTest extends DecoratingPredisSettingsProvid
             $this->countingProvider,
             $container->get('test.settings_manager.serializer'),
             $this->cache,
-            new Factory(new FlockStore()),
+            new LockFactory(new FlockStore()),
             0
         );
     }

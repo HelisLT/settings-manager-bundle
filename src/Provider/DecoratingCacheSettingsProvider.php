@@ -9,7 +9,8 @@ use Helis\SettingsManagerBundle\Model\SettingModel;
 use Helis\SettingsManagerBundle\Settings\Traits\DomainNameExtractTrait;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\CacheItem;
-use Symfony\Component\Lock\Factory;
+use Symfony\Component\Lock\LockFactory;
+use Symfony\Component\Lock\SharedLockInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
 class DecoratingCacheSettingsProvider implements ModificationAwareSettingsProviderInterface
@@ -17,6 +18,8 @@ class DecoratingCacheSettingsProvider implements ModificationAwareSettingsProvid
     use DomainNameExtractTrait;
 
     private const LOCK_RETRY_INTERVAL_MS = 50000; // microseconds
+    private const LOCK_RESOURCE = __CLASS__ . 'settings-cache';
+    private const LOCK_MAX_READER_FAILED_ACQUIRES = 2;
 
     /** @var SettingsProviderInterface */
     private $decoratingProvider;
@@ -27,7 +30,7 @@ class DecoratingCacheSettingsProvider implements ModificationAwareSettingsProvid
     /** @var AdapterInterface */
     private $cache;
 
-    /** @var Factory */
+    /** @var LockFactory */
     private $lockFactory;
 
     /** @var int */
@@ -40,7 +43,7 @@ class DecoratingCacheSettingsProvider implements ModificationAwareSettingsProvid
         ModificationAwareSettingsProviderInterface $decoratingProvider,
         SerializerInterface $serializer,
         AdapterInterface $cache,
-        Factory $lockFactory,
+        LockFactory $lockFactory,
         int $checkValidityInterval = 30
     ) {
         $this->decoratingProvider = $decoratingProvider;
@@ -55,17 +58,7 @@ class DecoratingCacheSettingsProvider implements ModificationAwareSettingsProvid
      */
     public function getSettings(array $domainNames): array
     {
-        $this->clearIfNeeded();
-        $this->warmupByDomainNames($domainNames);
-        $settings = [];
-
-        foreach ($domainNames as $domainName) {
-            $settingNames = $this->getSettingNamesByDomain($domainName);
-            $settings = array_merge($settings, $this->collectCachedSettings($domainName, $settingNames));
-        }
-        $this->cache->commit();
-
-        return $settings;
+        return $this->doGetSettings($domainNames, 0);
     }
 
     /**
@@ -73,29 +66,12 @@ class DecoratingCacheSettingsProvider implements ModificationAwareSettingsProvid
      */
     public function getSettingsByName(array $domainNames, array $settingNames): array
     {
-        $this->clearIfNeeded();
-        $this->warmupBySettingNames($domainNames, $settingNames);
-        $settings = [];
-
-        foreach ($domainNames as $domainName) {
-            $settings = array_merge($settings, $this->collectCachedSettings($domainName, $settingNames));
-        }
-
-        return $settings;
+        return $this->doGetSettingsByName($domainNames, $settingNames, 0);
     }
 
     public function getSettingsByTag(array $domainNames, string $tagName): array
     {
-        $this->clearIfNeeded();
-        $this->warmupByTag($domainNames, $tagName);
-        $settings = [];
-
-        foreach ($domainNames as $domainName) {
-            $settingNames = $this->getSettingNamesByTag($domainName, $tagName);
-            $settings = array_merge($settings, $this->collectCachedSettings($domainName, $settingNames));
-        }
-
-        return $settings;
+        return $this->doGetSettingsByTag($domainNames, $tagName, 0);
     }
 
     /**
@@ -103,21 +79,7 @@ class DecoratingCacheSettingsProvider implements ModificationAwareSettingsProvid
      */
     public function getDomains(bool $onlyEnabled = false): array
     {
-        $this->clearIfNeeded();
-        $key = $this->getDomainKey($onlyEnabled);
-        $cacheItem = $this->getCached($key);
-
-        if ($cacheItem->isHit()) {
-            return $this->deserializeArray(array_filter($cacheItem->get()));
-        }
-
-        $domains = $this->decoratingProvider->getDomains($onlyEnabled);
-
-        if (!empty($domains)) {
-            $this->storeCached($cacheItem, $this->serializeArray($domains));
-        }
-
-        return $domains;
+        return $this->doGetDomains($onlyEnabled, 0);
     }
 
     public function isReadOnly(): bool
@@ -160,7 +122,7 @@ class DecoratingCacheSettingsProvider implements ModificationAwareSettingsProvid
         return 0;
     }
 
-    private function clearIfNeeded(): void
+    private function clearIfNeeded(SharedLockInterface $lock): void
     {
         $lastCheck = $this->cache->getItem('last_modification_time_check');
         $time = time();
@@ -169,11 +131,10 @@ class DecoratingCacheSettingsProvider implements ModificationAwareSettingsProvid
         }
 
         if ($this->getModificationTime() < $this->decoratingProvider->getModificationTime()) {
-            $lock = $this->lockFactory->createLock(__FUNCTION__);
-
+            // protect cache clear with exclusive (write) lock
             if (!$lock->acquire()) {
                 usleep(self::LOCK_RETRY_INTERVAL_MS);
-                $this->clearIfNeeded();
+                $this->clearIfNeeded($lock);
 
                 return;
             }
@@ -188,6 +149,145 @@ class DecoratingCacheSettingsProvider implements ModificationAwareSettingsProvid
 
         $lastCheck->set($time);
         $this->cache->save($lastCheck);
+    }
+
+    private function doGetSettings(array $domainNames, int $depth): array
+    {
+        /** @var SharedLockInterface $lock */
+        $lock = $this->lockFactory->createLock(self::LOCK_RESOURCE);
+
+        $this->clearIfNeeded($lock);
+
+        if (!$lock->acquireRead()) {
+            $depth++;
+            if ($depth === self::LOCK_MAX_READER_FAILED_ACQUIRES) {
+                // fallback to decorating provider bypassing cache if lock acquire fails for certain time
+                return $this->decoratingProvider->getSettings($domainNames);
+            }
+
+            usleep(self::LOCK_RETRY_INTERVAL_MS);
+
+            return $this->doGetSettings($domainNames, $depth);
+        }
+
+        try {
+            $this->warmupByDomainNames($domainNames);
+            $settings = [];
+
+            foreach ($domainNames as $domainName) {
+                $settingNames = $this->getSettingNamesByDomain($domainName);
+                $settings = array_merge($settings, $this->collectCachedSettings($domainName, $settingNames));
+            }
+        } finally {
+            $lock->release();
+        }
+
+        return $settings;
+    }
+
+    private function doGetSettingsByName(array $domainNames, array $settingNames, int $depth): array
+    {
+        /** @var SharedLockInterface $lock */
+        $lock = $this->lockFactory->createLock(self::LOCK_RESOURCE);
+
+        $this->clearIfNeeded($lock);
+
+        if (!$lock->acquireRead()) {
+            $depth++;
+            if ($depth === self::LOCK_MAX_READER_FAILED_ACQUIRES) {
+                // fallback to decorating provider bypassing cache if lock acquire fails for certain time
+                return $this->decoratingProvider->getSettingsByName($domainNames, $settingNames);
+            }
+
+            usleep(self::LOCK_RETRY_INTERVAL_MS);
+
+            return $this->doGetSettingsByName($domainNames, $settingNames, $depth);
+        }
+
+        try {
+            $this->warmupBySettingNames($domainNames, $settingNames);
+            $settings = [];
+
+            foreach ($domainNames as $domainName) {
+                $settings = array_merge($settings, $this->collectCachedSettings($domainName, $settingNames));
+            }
+        } finally {
+            $lock->release();
+        }
+
+        return $settings;
+    }
+
+    private function doGetSettingsByTag(array $domainNames, string $tagName, int $depth): array
+    {
+        /** @var SharedLockInterface $lock */
+        $lock = $this->lockFactory->createLock(self::LOCK_RESOURCE);
+
+        $this->clearIfNeeded($lock);
+
+        if (!$lock->acquireRead()) {
+            $depth++;
+            if ($depth === self::LOCK_MAX_READER_FAILED_ACQUIRES) {
+                // fallback to decorating provider bypassing cache if lock acquire fails for certain time
+                return $this->decoratingProvider->getSettingsByTag($domainNames, $tagName);
+            }
+
+            usleep(self::LOCK_RETRY_INTERVAL_MS);
+
+            return $this->doGetSettingsByTag($domainNames, $tagName, $depth);
+        }
+
+        try {
+            $this->warmupByTag($domainNames, $tagName);
+            $settings = [];
+
+            foreach ($domainNames as $domainName) {
+                $settingNames = $this->getSettingNamesByTag($domainName, $tagName);
+                $settings = array_merge($settings, $this->collectCachedSettings($domainName, $settingNames));
+            }
+        } finally {
+            $lock->release();
+        }
+
+        return $settings;
+    }
+
+    private function doGetDomains(bool $onlyEnabled, int $depth): array
+    {
+        /** @var SharedLockInterface $lock */
+        $lock = $this->lockFactory->createLock(self::LOCK_RESOURCE);
+
+        $this->clearIfNeeded($lock);
+
+        if (!$lock->acquireRead()) {
+            $depth++;
+            if ($depth === self::LOCK_MAX_READER_FAILED_ACQUIRES) {
+                return $this->decoratingProvider->getDomains($onlyEnabled);
+            }
+
+            usleep(self::LOCK_RETRY_INTERVAL_MS);
+
+            return $this->doGetDomains($onlyEnabled, $depth);
+        }
+
+        try {
+            $key = $this->getDomainKey($onlyEnabled);
+            $cacheItem = $this->getCached($key);
+
+            if ($cacheItem->isHit()) {
+                $domains = $this->deserializeArray(array_filter($cacheItem->get()));
+            } else {
+                $domains = $this->decoratingProvider->getDomains($onlyEnabled);
+
+                if (!empty($domains)) {
+                    $this->storeCached($cacheItem, $this->serializeArray($domains));
+                }
+            }
+        } finally {
+            $lock->release();
+        }
+
+        return $domains;
     }
 
     private function warmupByDomainNames(array $domainNames): void
