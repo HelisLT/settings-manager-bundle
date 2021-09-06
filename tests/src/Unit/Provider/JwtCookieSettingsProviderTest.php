@@ -10,8 +10,8 @@ use Helis\SettingsManagerBundle\Provider\AbstractBaseCookieSettingsProvider;
 use Helis\SettingsManagerBundle\Provider\JwtCookieSettingsProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 
 class JwtCookieSettingsProviderTest extends AbstractCookieSettingsProviderTest
 {
@@ -27,7 +27,7 @@ class JwtCookieSettingsProviderTest extends AbstractCookieSettingsProviderTest
     {
         // No private key provided => no cookie will be set
         $provider = $this->createProviderWithKeys('file://' . __DIR__ . '/Fixtures/public.key');
-        $eventMock = $this->getMockBuilder(FilterResponseEvent::class)
+        $eventMock = $this->getMockBuilder(ResponseEvent::class)
             ->disableOriginalConstructor()
             ->getMock();
         $eventMock->expects($this->once())->method('isMasterRequest')->willReturn(true);
@@ -47,7 +47,7 @@ class JwtCookieSettingsProviderTest extends AbstractCookieSettingsProviderTest
         // Different public key => cookie invalid => no settings parsed
         $provider = $this->createProviderWithKeys('invalid_key_content');
         $eventMock = $this
-            ->getMockBuilder(GetResponseEvent::class)
+            ->getMockBuilder(RequestEvent::class)
             ->disableOriginalConstructor()
             ->getMock();
 

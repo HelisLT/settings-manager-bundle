@@ -8,8 +8,8 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Helis\SettingsManagerBundle\Model\DomainModel;
 use Helis\SettingsManagerBundle\Model\SettingModel;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -35,7 +35,7 @@ abstract class AbstractCookieSettingsProviderTest extends TestCase
     public function testOnKernelResponseNothingChanged()
     {
         $eventMock = $this
-            ->getMockBuilder(FilterResponseEvent::class)
+            ->getMockBuilder(ResponseEvent::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -48,7 +48,7 @@ abstract class AbstractCookieSettingsProviderTest extends TestCase
 
     public function testOnKernelResponse()
     {
-        $eventMock = $this->getMockBuilder(FilterResponseEvent::class)
+        $eventMock = $this->getMockBuilder(ResponseEvent::class)
             ->disableOriginalConstructor()
             ->getMock();
         $eventMock->expects($this->once())->method('isMasterRequest')->willReturn(true);
@@ -84,7 +84,7 @@ abstract class AbstractCookieSettingsProviderTest extends TestCase
     public function testOnKernelRequest(Cookie $cookie)
     {
         $eventMock = $this
-            ->getMockBuilder(GetResponseEvent::class)
+            ->getMockBuilder(RequestEvent::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -115,7 +115,7 @@ abstract class AbstractCookieSettingsProviderTest extends TestCase
     public function testOnKernelRequestWithoutCookie()
     {
         $eventMock = $this
-            ->getMockBuilder(GetResponseEvent::class)
+            ->getMockBuilder(RequestEvent::class)
             ->disableOriginalConstructor()
             ->getMock();
 

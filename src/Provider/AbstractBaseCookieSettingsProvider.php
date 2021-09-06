@@ -11,8 +11,8 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Cookie;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -59,7 +59,7 @@ abstract class AbstractBaseCookieSettingsProvider extends SimpleSettingsProvider
      */
     abstract protected function buildToken(array $settings): string;
 
-    public function onKernelRequest(GetResponseEvent $event): void
+    public function onKernelRequest(RequestEvent $event): void
     {
         if (!$event->isMasterRequest()
             || ($rawToken = $event->getRequest()->cookies->get($this->cookieName)) === null
@@ -70,7 +70,7 @@ abstract class AbstractBaseCookieSettingsProvider extends SimpleSettingsProvider
         $this->settings = $this->parseToken($rawToken);
     }
 
-    public function onKernelResponse(FilterResponseEvent $event): void
+    public function onKernelResponse(ResponseEvent $event): void
     {
         if (!$event->isMasterRequest() || $event->getResponse() === null || !$this->changed) {
             return;
