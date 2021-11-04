@@ -3,22 +3,19 @@ declare(strict_types=1);
 
 namespace Helis\SettingsManagerBundle\Tests\Functional\Settings;
 
+use App\AbstractWebTestCase;
 use Helis\SettingsManagerBundle\Model\SettingModel;
-use Liip\FunctionalTestBundle\Test\WebTestCase;
 use Helis\SettingsManagerBundle\Model\DomainModel;
 use Helis\SettingsManagerBundle\Provider\SettingsProviderInterface;
 use Helis\SettingsManagerBundle\Settings\SettingsManager;
 use App\DataFixtures\ORM\LoadSettingsData;
 use App\Entity\Setting;
-use Liip\TestFixturesBundle\Test\FixturesTrait;
 
 /**
  * @IgnoreAnnotation("dataProvider")
  */
-class SettingsManagerTest extends WebTestCase
+class SettingsManagerTest extends AbstractWebTestCase
 {
-    use FixturesTrait;
-
     /**
      * @var SettingsManager
      */
@@ -27,11 +24,11 @@ class SettingsManagerTest extends WebTestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
-        $this->settingsManager = $this->getContainer()->get(SettingsManager::class);
+        $this->settingsManager = $this->getDependencyInjectionContainer()->get(SettingsManager::class);
     }
 
     public function testGetProviders()
@@ -161,7 +158,7 @@ class SettingsManagerTest extends WebTestCase
         $this->assertTrue($this->settingsManager->save($setting));
 
         // assert from orm
-        $doctrine = $this->getContainer()->get('doctrine');
+        $doctrine = $this->getDependencyInjectionContainer()->get('doctrine');
         $settingEntity = $doctrine
             ->getRepository(Setting::class)
             ->findOneBy(['domain.name' => 'test_save', 'name' => 'baz']);
@@ -226,7 +223,7 @@ class SettingsManagerTest extends WebTestCase
         $this->settingsManager->updateDomain($domain);
         /** @var SettingModel $setting */
         $setting = $this
-            ->getContainer()
+            ->getDependencyInjectionContainer()
             ->get('doctrine')
             ->getRepository(Setting::class)
             ->findOneBy(['domain.name' => $domain->getName()]);

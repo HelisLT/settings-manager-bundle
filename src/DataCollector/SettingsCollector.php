@@ -20,7 +20,7 @@ class SettingsCollector implements DataCollectorInterface
         $this->data = [];
     }
 
-    public function collect(Request $request, Response $response, \Exception $exception = null)
+    public function collect(Request $request, Response $response, \Throwable $exception = null)
     {
         $this->data = $this->settingsStore->getValues();
     }

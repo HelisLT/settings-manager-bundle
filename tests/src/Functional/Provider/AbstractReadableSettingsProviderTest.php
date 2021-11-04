@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Helis\SettingsManagerBundle\Tests\Functional\Provider;
 
+use App\AbstractWebTestCase;
 use App\Entity\Setting;
 use App\Entity\Tag;
 use Helis\SettingsManagerBundle\Model\DomainModel;
@@ -10,16 +11,15 @@ use Helis\SettingsManagerBundle\Model\SettingModel;
 use Helis\SettingsManagerBundle\Model\TagModel;
 use Helis\SettingsManagerBundle\Model\Type;
 use Helis\SettingsManagerBundle\Provider\SettingsProviderInterface;
-use Liip\FunctionalTestBundle\Test\WebTestCase;
 
-abstract class AbstractReadableSettingsProviderTest extends WebTestCase
+abstract class AbstractReadableSettingsProviderTest extends AbstractWebTestCase
 {
     /**
      * @var SettingsProviderInterface
      */
     protected $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

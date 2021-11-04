@@ -32,9 +32,13 @@ class AwsSsmSettingsProviderTest extends TestCase
      */
     private $serializer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->awsSsmClientMock = $this->createPartialMock(SsmClient::class, ['getParameters', 'putParameter']);
+        $this->awsSsmClientMock = $this->getMockBuilder(SsmClient::class)
+            ->disableOriginalConstructor()
+            ->addMethods(['getParameters', 'putParameter'])
+            ->getMock();
+
         $this->serializer = new Serializer(
             [
                 new ArrayDenormalizer(),

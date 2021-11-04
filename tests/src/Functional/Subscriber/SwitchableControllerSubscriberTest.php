@@ -4,14 +4,11 @@ declare(strict_types=1);
 
 namespace Helis\SettingsManagerBundle\Tests\Functional\Subscriber;
 
+use App\AbstractWebTestCase;
 use App\DataFixtures\ORM\LoadSwitchableControllerData;
-use Liip\FunctionalTestBundle\Test\WebTestCase;
-use Liip\TestFixturesBundle\Test\FixturesTrait;
 
-class SwitchableControllerSubscriberTest extends WebTestCase
+class SwitchableControllerSubscriberTest extends AbstractWebTestCase
 {
-    use FixturesTrait;
-
     public function testControllerDisabled()
     {
         $client = $this->makeClient();

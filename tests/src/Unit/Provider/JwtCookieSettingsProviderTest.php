@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class JwtCookieSettingsProviderTest extends AbstractCookieSettingsProviderTest
 {
@@ -27,17 +28,12 @@ class JwtCookieSettingsProviderTest extends AbstractCookieSettingsProviderTest
     {
         // No private key provided => no cookie will be set
         $provider = $this->createProviderWithKeys('file://' . __DIR__ . '/Fixtures/public.key');
-        $eventMock = $this->getMockBuilder(ResponseEvent::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $eventMock->expects($this->once())->method('isMasterRequest')->willReturn(true);
-        $eventMock->expects($this->exactly(1))->method('getResponse')->willReturn($response = new Response());
-        $eventMock->expects($this->never())->method('getRequest');
+        $event = new ResponseEvent($this->createMock(HttpKernelInterface::class), new Request(), 1, $response = new Response());
 
         $settingStub = $this->createMock(SettingModel::class);
 
         $provider->save($settingStub);
-        $provider->onKernelResponse($eventMock);
+        $provider->onKernelResponse($event);
 
         $this->assertCount(0, $response->headers->getCookies());
     }

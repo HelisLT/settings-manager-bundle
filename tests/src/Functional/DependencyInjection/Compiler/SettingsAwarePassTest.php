@@ -3,20 +3,17 @@ declare(strict_types=1);
 
 namespace Helis\SettingsManagerBundle\Tests\Functional\DependencyInjection\Compiler;
 
+use App\AbstractWebTestCase;
 use App\FinalImportantService;
 use App\ImportantService;
-use Liip\FunctionalTestBundle\Test\WebTestCase;
-use Liip\TestFixturesBundle\Test\FixturesTrait;
 
-class SettingsAwarePassTest extends WebTestCase
+class SettingsAwarePassTest extends AbstractWebTestCase
 {
-    use FixturesTrait;
-
     public function testIsEnabled(): void
     {
         $this->loadFixtures([]);
 
-        $service = $this->getContainer()->get(ImportantService::class);
+        $service = $this->getDependencyInjectionContainer()->get(ImportantService::class);
 
         $this->assertTrue($service->isEnabled());
     }
@@ -25,7 +22,7 @@ class SettingsAwarePassTest extends WebTestCase
     {
         $this->loadFixtures([]);
 
-        $service = $this->getContainer()->get(FinalImportantService::class);
+        $service = $this->getDependencyInjectionContainer()->get(FinalImportantService::class);
 
         $this->assertTrue($service->isEnabled());
     }

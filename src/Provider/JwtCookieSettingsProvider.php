@@ -6,9 +6,11 @@ namespace Helis\SettingsManagerBundle\Provider;
 
 use Helis\SettingsManagerBundle\Model\SettingModel;
 use Lcobucci\Clock\FrozenClock;
-use Lcobucci\JWT\Builder;
-use Lcobucci\JWT\Parser;
-use Lcobucci\JWT\Signer\Key;
+use Lcobucci\JWT\Encoding\ChainedFormatter;
+use Lcobucci\JWT\Encoding\JoseEncoder;
+use Lcobucci\JWT\Token\Builder;
+use Lcobucci\JWT\Token\Parser;
+use Lcobucci\JWT\Signer\Key\InMemory;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
 use Lcobucci\JWT\Validation\Constraint\IssuedBy;
 use Lcobucci\JWT\Validation\Constraint\RelatedTo;
@@ -39,12 +41,12 @@ class JwtCookieSettingsProvider extends AbstractBaseCookieSettingsProvider
         $validator = new Validator();
         $constraints = [
             new ValidAt(new FrozenClock(new \DateTimeImmutable())),
-            new SignedWith(new Sha256(), new Key($this->publicKey)),
+            new SignedWith(new Sha256(), $this->getKey($this->publicKey)),
             new IssuedBy($this->issuer),
             new RelatedTo($this->subject),
         ];
 
-        $parser = new Parser();
+        $parser = new Parser(new JoseEncoder());
 
         try {
             $token = $parser->parse($rawToken);
@@ -66,7 +68,7 @@ class JwtCookieSettingsProvider extends AbstractBaseCookieSettingsProvider
                 ->serializer
                 ->deserialize($token->claims()->get('dt'), SettingModel::class.'[]', 'json');
         } catch (\Throwable $e) {
-            $this->logger && $this->logger->warning(sprintf('%s: '.strtolower($e), (new \ReflectionObject($this))->getShortName()), [
+            $this->logger && $this->logger->warning(sprintf('%s: '.strtolower($e->getMessage()), (new \ReflectionObject($this))->getShortName()), [
                 'sRawToken' => $rawToken,
             ]);
 
@@ -83,15 +85,24 @@ class JwtCookieSettingsProvider extends AbstractBaseCookieSettingsProvider
         $now = new \DateTimeImmutable();
         $expiresAt = $now->add(new \DateInterval('PT'.$this->ttl.'S'));
 
-        $token = (new Builder())
+        $token = (new Builder(new JoseEncoder(), ChainedFormatter::default()))
             ->issuedAt($now)
             ->canOnlyBeUsedAfter($now)
             ->issuedBy($this->issuer)
             ->relatedTo($this->subject)
             ->expiresAt($expiresAt)
             ->withClaim('dt', $this->serializer->serialize($settings, 'json'))
-            ->getToken(new Sha256(), new Key($this->privateKey));
+            ->getToken(new Sha256(), $this->getKey($this->privateKey));
 
-        return (string)$token;
+        return $token->toString();
+    }
+
+    private function getKey(string $content): InMemory
+    {
+        if (strpos($content, 'file://') === 0) {
+            return InMemory::file(substr($content, 7));
+        }
+
+        return InMemory::plainText($content);
     }
 }
