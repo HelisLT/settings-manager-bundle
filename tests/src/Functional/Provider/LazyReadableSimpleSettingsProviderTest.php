@@ -10,7 +10,7 @@ class LazyReadableSimpleSettingsProviderTest extends AbstractReadableSettingsPro
 {
     protected function createProvider(): SettingsProviderInterface
     {
-        $serializer = $this->getContainer()->get('settings_manager.serializer');
+        $serializer = $this->getDependencyInjectionContainer()->get('settings_manager.serializer');
         $normDomains = [];
         $normSettings = [];
         $settingsKeyMap = [];

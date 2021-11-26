@@ -2,7 +2,7 @@ framework:
     secret: "supersecret"
     test: ~
     router:
-        resource: "%kernel.root_dir%/config/routing_test.yml"
+        resource: "%kernel.project_dir%/tests/app/config/routing_test.yml"
         strict_requirements: "%kernel.debug%"
     php_errors:
         log: true
@@ -19,12 +19,13 @@ security:
         main:
             pattern: ^/
             anonymous: ~
-            logout_on_user_change: true
 
 liip_functional_test:
     command_verbosity: normal
 
 liip_test_fixtures:
+    keep_database_and_schema: true
+    cache_metadata: true
     cache_db:
         sqlite: liip_test_fixtures.services_database_backup.sqlite
 
@@ -69,7 +70,7 @@ helis_settings_manager:
         command: true
         controller: true
     settings_files:
-        - '%kernel.root_dir%/config/extra_settings.yml'
+        - '%kernel.project_dir%/tests/app/config/extra_settings.yml'
     settings:
         - name: foo
           description: 'foo desc'
@@ -118,15 +119,15 @@ services:
         public: true
 
     App\DataFixtures\:
-        resource: '%kernel.root_dir%/../bundle/DataFixtures/*'
+        resource: '%kernel.project_dir%/tests/bundle/DataFixtures/*'
         tags: [doctrine.fixture.orm]
 
     App\Command\:
-        resource: '%kernel.root_dir%/../bundle/Command/*'
+        resource: '%kernel.project_dir%/tests/bundle/Command/*'
         tags: [console.command]
 
     App\Controller\:
-        resource: '%kernel.root_dir%/../bundle/Controller/*'
+        resource: '%kernel.project_dir%/tests/bundle/Controller/*'
         tags: [controller.service_arguments]
 
     Helis\SettingsManagerBundle\Provider\DoctrineOrmSettingsProvider:

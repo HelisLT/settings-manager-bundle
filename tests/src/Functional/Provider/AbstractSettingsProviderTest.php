@@ -9,7 +9,7 @@ use Helis\SettingsManagerBundle\Model\Type;
 
 abstract class AbstractSettingsProviderTest extends AbstractReadableSettingsProviderTest
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

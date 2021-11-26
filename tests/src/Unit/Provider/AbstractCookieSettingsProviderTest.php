@@ -12,6 +12,7 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Helis\SettingsManagerBundle\Model\DomainModel;
 use Helis\SettingsManagerBundle\Model\SettingModel;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
 abstract class AbstractCookieSettingsProviderTest extends TestCase
@@ -23,7 +24,7 @@ abstract class AbstractCookieSettingsProviderTest extends TestCase
     protected $serializer;
     protected $cookieName;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->cookieName = 'Orange';
         $this->serializer = $this->getMockBuilder(SerializerInterface::class)->getMock();
@@ -34,26 +35,15 @@ abstract class AbstractCookieSettingsProviderTest extends TestCase
 
     public function testOnKernelResponseNothingChanged()
     {
-        $eventMock = $this
-            ->getMockBuilder(ResponseEvent::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $event = new ResponseEvent($this->createMock(HttpKernelInterface::class), new Request(), 1, $response = new Response());
 
-        $eventMock->expects($this->once())->method('isMasterRequest')->willReturn(true);
-        $eventMock->expects($this->once())->method('getResponse')->willReturn(new Response());
-        $eventMock->expects($this->never())->method('getRequest');
-
-        $this->provider->onKernelResponse($eventMock);
+        $this->provider->onKernelResponse($event);
+        $this->assertCount(0, $response->headers->getCookies());
     }
 
-    public function testOnKernelResponse()
+    public function testOnKernelResponse(): Cookie
     {
-        $eventMock = $this->getMockBuilder(ResponseEvent::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $eventMock->expects($this->once())->method('isMasterRequest')->willReturn(true);
-        $eventMock->expects($this->exactly(2))->method('getResponse')->willReturn($response = new Response());
-        $eventMock->expects($this->never())->method('getRequest');
+        $event = new ResponseEvent($this->createMock(HttpKernelInterface::class), new Request(), 1, $response = new Response());
 
         $settingStub = $this->createMock(SettingModel::class);
 
@@ -65,11 +55,10 @@ abstract class AbstractCookieSettingsProviderTest extends TestCase
             ->willReturn('serialized_settings');
 
         $this->provider->save($settingStub);
-        $this->provider->onKernelResponse($eventMock);
+        $this->provider->onKernelResponse($event);
 
         $this->assertCount(1, $cookies = $response->headers->getCookies());
 
-        /** @var Cookie $cookie */
         $cookie = $cookies[0];
         $this->assertEquals($this->cookieName, $cookie->getName(), 'Cookie name does not match');
         $this->assertNotEmpty($cookie->getValue(), 'Cookie value should not be empty');

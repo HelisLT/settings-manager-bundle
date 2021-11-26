@@ -1,0 +1,30 @@
+<?php
+declare(strict_types=1);
+
+namespace App;
+
+use Doctrine\Common\DataFixtures\Executor\AbstractExecutor;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Tools\SchemaTool;
+use Liip\FunctionalTestBundle\Test\WebTestCase;
+use Liip\TestFixturesBundle\Services\DatabaseToolCollection;
+
+abstract class AbstractWebTestCase extends WebTestCase
+{
+    public function loadFixtures(array $groups): ?AbstractExecutor
+    {
+        $this->createSchemaIfMissing();
+
+        return $this->getDependencyInjectionContainer()->get(DatabaseToolCollection::class)->get()->loadFixtures($groups);
+    }
+
+    private function createSchemaIfMissing()
+    {
+        /** @var EntityManagerInterface $om */
+        $om = $this->getDependencyInjectionContainer()->get('doctrine')->getManager();
+        if (!$om->getConnection()->getSchemaManager()->tablesExist('settings_test_setting')) {
+            $schemaTool = new SchemaTool($om);
+            $schemaTool->createSchema($om->getMetadataFactory()->getAllMetadata());
+        }
+    }
+}

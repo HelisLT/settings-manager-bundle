@@ -4,20 +4,17 @@ declare(strict_types=1);
 
 namespace Helis\SettingsManagerBundle\Tests\Functional\Settings;
 
+use App\AbstractWebTestCase;
 use Helis\SettingsManagerBundle\Provider\SettingsProviderInterface;
 use Helis\SettingsManagerBundle\Settings\ProvidersManager;
 use Helis\SettingsManagerBundle\Settings\SettingsManager;
 use App\Entity\Setting;
-use Liip\FunctionalTestBundle\Test\WebTestCase;
-use Liip\TestFixturesBundle\Test\FixturesTrait;
 
 /**
  * @IgnoreAnnotation("dataProvider")
  */
-class ProvidersManagerTest extends WebTestCase
+class ProvidersManagerTest extends AbstractWebTestCase
 {
-    use FixturesTrait;
-
     /**
      * @var ProvidersManager
      */
@@ -33,7 +30,7 @@ class ProvidersManagerTest extends WebTestCase
      */
     public function loadServices(): void
     {
-        $this->settingsManager = $this->getContainer()->get(SettingsManager::class);
+        $this->settingsManager = $this->getDependencyInjectionContainer()->get(SettingsManager::class);
         $this->settingsWarmUpService = new ProvidersManager($this->settingsManager);
     }
 

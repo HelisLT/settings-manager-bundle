@@ -20,7 +20,7 @@ class DecoratingCacheSettingsProviderTest extends DecoratingPredisSettingsProvid
 
     private $countingProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $kernel = static::bootKernel();
 
@@ -50,7 +50,7 @@ class DecoratingCacheSettingsProviderTest extends DecoratingPredisSettingsProvid
             $this->markTestSkipped('Running redis server required');
         }
 
-        $container = $this->getContainer();
+        $container = $this->getDependencyInjectionContainer();
 
         $this->countingProvider = new CountingCallsSettingsProvider(
             new DoctrineOrmSettingsProvider(

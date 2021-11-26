@@ -4,14 +4,11 @@ declare(strict_types=1);
 
 namespace Helis\SettingsManagerBundle\Tests\Functional\Subscriber;
 
+use App\AbstractWebTestCase;
 use App\DataFixtures\ORM\LoadSwitchableCommandData;
-use Liip\FunctionalTestBundle\Test\WebTestCase;
-use Liip\TestFixturesBundle\Test\FixturesTrait;
 
-class SwitchableCommandSubscriberTest extends WebTestCase
+class SwitchableCommandSubscriberTest extends AbstractWebTestCase
 {
-    use FixturesTrait;
-
     public function testSkippedCommand()
     {
         $this->markTestSkipped('CommandTester do not dispatch events.');

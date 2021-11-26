@@ -5,7 +5,6 @@ namespace Helis\SettingsManagerBundle\Tests\Functional\Provider;
 
 use Helis\SettingsManagerBundle\Provider\DoctrineOrmSettingsProvider;
 use Helis\SettingsManagerBundle\Provider\SettingsProviderInterface;
-use Liip\TestFixturesBundle\Test\FixturesTrait;
 use Predis\Client;
 use Predis\CommunicationException;
 use Helis\SettingsManagerBundle\Provider\DecoratingPredisSettingsProvider;
@@ -14,14 +13,12 @@ use App\Entity\Tag;
 
 class DecoratingPredisSettingsProviderTest extends AbstractSettingsProviderTest
 {
-    use FixturesTrait;
-
     /**
      * @var Client|\Redis
      */
     protected $redis;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->loadFixtures([]);
 
@@ -41,7 +38,7 @@ class DecoratingPredisSettingsProviderTest extends AbstractSettingsProviderTest
             $this->markTestSkipped('Running redis server required');
         }
 
-        $container = $this->getContainer();
+        $container = $this->getDependencyInjectionContainer();
 
         return new DecoratingPredisSettingsProvider(
             new DoctrineOrmSettingsProvider(

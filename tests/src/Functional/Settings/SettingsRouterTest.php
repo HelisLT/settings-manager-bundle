@@ -3,23 +3,20 @@ declare(strict_types=1);
 
 namespace Helis\SettingsManagerBundle\Tests\Functional\Settings;
 
+use App\AbstractWebTestCase;
 use Helis\SettingsManagerBundle\Exception\SettingNotFoundException;
 use Helis\SettingsManagerBundle\Exception\TaggedSettingsNotFoundException;
 use Helis\SettingsManagerBundle\Settings\SettingsStore;
-use Liip\FunctionalTestBundle\Test\WebTestCase;
 use Helis\SettingsManagerBundle\Model\Type;
 use Helis\SettingsManagerBundle\Settings\SettingsManager;
 use Helis\SettingsManagerBundle\Settings\SettingsRouter;
 use App\DataFixtures\ORM\LoadSettingsData;
-use Liip\TestFixturesBundle\Test\FixturesTrait;
 
 /**
  * @IgnoreAnnotation("dataProvider")
  */
-class SettingsRouterTest extends WebTestCase
+class SettingsRouterTest extends AbstractWebTestCase
 {
-    use FixturesTrait;
-
     /**
      * @var SettingsRouter
      */
@@ -28,11 +25,11 @@ class SettingsRouterTest extends WebTestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
-        $this->settingsRouter = $this->getContainer()->get(SettingsRouter::class);
+        $this->settingsRouter = $this->getDependencyInjectionContainer()->get(SettingsRouter::class);
     }
 
     /**
@@ -245,7 +242,7 @@ class SettingsRouterTest extends WebTestCase
      */
     public function testWarmUpClear(string $tagName, string $settingName): void {
         $this->loadFixtures([LoadSettingsData::class]);
-        $settingsStore = $this->getContainer()->get(SettingsStore::class);
+        $settingsStore = $this->getDependencyInjectionContainer()->get(SettingsStore::class);
         $settings = $this->settingsRouter->getSettingsByTag($tagName);
 
         $this->assertArrayHasKey($settingName, $settings);
@@ -295,7 +292,7 @@ class SettingsRouterTest extends WebTestCase
         $setting = $this->settingsRouter->getSetting('foo');
         $this->assertFalse($setting->getData());
 
-        $settingsManager = $this->getContainer()->get(SettingsManager::class);
+        $settingsManager = $this->getDependencyInjectionContainer()->get(SettingsManager::class);
         $setting->setData(true);
         $settingsManager->save($setting);
 
