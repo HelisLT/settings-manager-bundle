@@ -15,13 +15,13 @@ abstract class AbstractWebTestCase extends WebTestCase
     {
         $this->createSchemaIfMissing();
 
-        return $this->getDependencyInjectionContainer()->get(DatabaseToolCollection::class)->get()->loadFixtures($groups);
+        return $this->getContainer()->get(DatabaseToolCollection::class)->get()->loadFixtures($groups);
     }
 
     private function createSchemaIfMissing()
     {
         /** @var EntityManagerInterface $om */
-        $om = $this->getDependencyInjectionContainer()->get('doctrine')->getManager();
+        $om = $this->getContainer()->get('doctrine')->getManager();
         if (!$om->getConnection()->getSchemaManager()->tablesExist('settings_test_setting')) {
             $schemaTool = new SchemaTool($om);
             $schemaTool->createSchema($om->getMetadataFactory()->getAllMetadata());

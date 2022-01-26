@@ -27,7 +27,7 @@ class DecoratingRedisSettingsProviderTest extends DecoratingPredisSettingsProvid
             $this->markTestSkipped('Running redis server required');
         }
 
-        $container = $this->getDependencyInjectionContainer();
+        $container = $this->getContainer();
 
         return new DecoratingRedisSettingsProvider(
             new DoctrineOrmSettingsProvider(
