@@ -2,11 +2,8 @@ parameters:
     level: 2
     paths:
         - %currentWorkingDirectory%/src
-        - %currentWorkingDirectory%/tests/src
     excludePaths:
         - %currentWorkingDirectory%/src/DependencyInjection/Configuration.php
-    ignoreErrors:
-        - '#Trying to mock an undefined method.+#'
 
 includes:
     - vendor/phpstan/phpstan-phpunit/extension.neon
