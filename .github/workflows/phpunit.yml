@@ -16,5 +16,7 @@ jobs:
       with:
         version: 9.5
         php_version: 7.4
-        configuration: phpunit.xml.dist
+        memory_limit: 1G
         bootstrap: vendor/autoload.php
+        configuration: phpunit.xml.dist
+        args: --coverage-text
