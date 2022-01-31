@@ -17,13 +17,16 @@ class SettingsExtension extends AbstractExtension
         $this->settingsRouter = $settingsRouter;
     }
 
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
             new TwigFunction('setting_get', [$this, 'getSetting']),
         ];
     }
 
+    /**
+     * @return mixed
+     */
     public function getSetting(string $settingName, $defaultValue = null)
     {
         return $this->settingsRouter->get($settingName, $defaultValue);

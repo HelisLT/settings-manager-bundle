@@ -25,7 +25,7 @@ class SettingsCollector implements DataCollectorInterface
         $this->data = $this->settingsStore->getValues();
     }
 
-    public function getName()
+    public function getName(): string
     {
         return 'settings_manager.settings_collector';
     }

@@ -19,15 +19,17 @@ class SwitchablePrintCommand extends Command implements SwitchableCommandInterfa
         return $router->getBool('switchable_command_enabled');
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('switchable:print')
             ->addArgument('value', InputArgument::REQUIRED);
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->write($input->getArgument('value'));
+
+        return 0;
     }
 }

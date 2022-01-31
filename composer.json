@@ -23,7 +23,7 @@
         "classmap": ["tests/app/AppKernel.php"]
     },
     "require": {
-        "php": ">=7.1.3",
+        "php": ">=7.4",
         "ext-json": "*",
         "doctrine/collections": "^1.5",
         "myclabs/php-enum": "^1.5",
