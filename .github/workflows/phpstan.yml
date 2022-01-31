@@ -1,0 +1,19 @@
+name: PHPStan
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  phpstan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: php-actions/composer@v5
+
+      - name: PHPStan Static Analysis
+        uses: php-actions/phpstan@v3
+        with:
+          configuration: phpstan.neon.dist
+          version: 1.4.3
+          php_version: 7.4
