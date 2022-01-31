@@ -129,7 +129,6 @@ class SettingsManager implements LoggerAwareInterface
 
     /**
      * @param string[] $domainNames
-     * @param string   $tagName
      *
      * @return SettingModel[]
      */
@@ -305,7 +304,6 @@ class SettingsManager implements LoggerAwareInterface
 
     /**
      * @param SettingModel[] $settings
-     * @param string         $providerName
      *
      * @return SettingModel[]
      */

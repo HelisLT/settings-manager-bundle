@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Helis\SettingsManagerBundle\Tests\Unit\Twig;
 
-use PHPUnit\Framework\MockObject\MockObject;
 use Helis\SettingsManagerBundle\Settings\SettingsRouter;
 use Helis\SettingsManagerBundle\Twig\SettingsExtension;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Twig\TwigFunction;
 

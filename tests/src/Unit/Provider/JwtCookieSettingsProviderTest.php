@@ -10,8 +10,8 @@ use Helis\SettingsManagerBundle\Provider\AbstractBaseCookieSettingsProvider;
 use Helis\SettingsManagerBundle\Provider\JwtCookieSettingsProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class JwtCookieSettingsProviderTest extends AbstractCookieSettingsProviderTest
@@ -19,15 +19,15 @@ class JwtCookieSettingsProviderTest extends AbstractCookieSettingsProviderTest
     protected function createProvider(): AbstractBaseCookieSettingsProvider
     {
         return $this->createProviderWithKeys(
-            'file://' . __DIR__ . '/Fixtures/public.key',
-            'file://' . __DIR__ . '/Fixtures/private.key'
+            'file://'.__DIR__.'/Fixtures/public.key',
+            'file://'.__DIR__.'/Fixtures/private.key'
         );
     }
 
     public function testNoPrivateKey(): void
     {
         // No private key provided => no cookie will be set
-        $provider = $this->createProviderWithKeys('file://' . __DIR__ . '/Fixtures/public.key');
+        $provider = $this->createProviderWithKeys('file://'.__DIR__.'/Fixtures/public.key');
         $event = new ResponseEvent($this->createMock(HttpKernelInterface::class), new Request(), 1, $response = new Response());
 
         $settingStub = $this->createMock(SettingModel::class);
@@ -53,7 +53,7 @@ class JwtCookieSettingsProviderTest extends AbstractCookieSettingsProviderTest
                 'ZWRfc2V0dGluZ3MifQ.U_bpV8Jwj-ja1fNnHuCOEK0CuCebR8cc3ytDpdIqJL5Iy_Sqb2Kpp7q0rsIcRaiXIIoDJu7vFVUpH9c6'.
                 '4xCPxLahIvQLEICJmBp0B7AZ9Ddtw1mL7uf83VJqv_hg97DOTs1sB3jEwkoSTwr_jhVsyth1CkOzzy3IyoDKTwLWEv-m_WqV-nZ'.
                 'sdT856ujCvCyzeCX43Z4NWjW4o_s1mjTbtuyn0vXJD4cQlNqPoqYcXJsTCRCERj6tZ_BjZ3IFbNBCq20OjIh24Vs1U8wdgXbIz8'.
-                'zfc3rTq4YzKDUksF17Sy1f8_kfAKuHbCHB-kr4fIcJ2VIOvg7R5iWbAsvzO8XGgw'
+                'zfc3rTq4YzKDUksF17Sy1f8_kfAKuHbCHB-kr4fIcJ2VIOvg7R5iWbAsvzO8XGgw',
         ]);
 
         $domainStub = $this->createMock(DomainModel::class);
@@ -75,8 +75,8 @@ class JwtCookieSettingsProviderTest extends AbstractCookieSettingsProviderTest
     {
         $previousProvider = $this->provider;
         $this->provider = $this->createProviderWithKeys(
-            'file://' . __DIR__ . '/Fixtures/public.key',
-            file_get_contents(__DIR__ . '/Fixtures/private.key')
+            'file://'.__DIR__.'/Fixtures/public.key',
+            file_get_contents(__DIR__.'/Fixtures/private.key')
         );
 
         $this->testOnKernelResponse();

@@ -15,7 +15,7 @@ trait DomainNameExtractTrait
      */
     protected function extractDomainNames(array $domainModels): array
     {
-        return array_map(function (DomainModel $model) {
+        return array_map(function(DomainModel $model) {
             return $model->getName();
         }, $domainModels);
     }

@@ -16,7 +16,7 @@ class CountingCallsSettingsProvider extends DecoratingRedisSettingsProvider
             $this->calls[__FUNCTION__] = 0;
         }
 
-        $this->calls[__FUNCTION__]++;
+        ++$this->calls[__FUNCTION__];
 
         return parent::getSettings($domainNames);
     }
@@ -27,7 +27,7 @@ class CountingCallsSettingsProvider extends DecoratingRedisSettingsProvider
             $this->calls[__FUNCTION__] = 0;
         }
 
-        $this->calls[__FUNCTION__]++;
+        ++$this->calls[__FUNCTION__];
 
         return parent::getSettingsByName($domainNames, $settingNames);
     }
@@ -38,7 +38,7 @@ class CountingCallsSettingsProvider extends DecoratingRedisSettingsProvider
             $this->calls[__FUNCTION__] = 0;
         }
 
-        $this->calls[__FUNCTION__]++;
+        ++$this->calls[__FUNCTION__];
 
         return parent::getSettingsByTag($domainNames, $tagName);
     }

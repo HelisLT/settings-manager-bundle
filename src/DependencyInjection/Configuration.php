@@ -42,7 +42,7 @@ class Configuration implements ConfigurationInterface
                     ->addDefaultsIfNotSet()
                     ->canBeEnabled()
                     ->validate()
-                        ->ifTrue(function ($v) {
+                        ->ifTrue(function($v) {
                             return $v['enabled'] && !isset($v['service_id']);
                         })
                         ->thenInvalid('logger service_id is missing')
@@ -75,7 +75,6 @@ class Configuration implements ConfigurationInterface
                 ->append($this->getListenersNode())
             ->end();
 
-
         return $treeBuilder;
     }
 
@@ -85,7 +84,7 @@ class Configuration implements ConfigurationInterface
         $node = $treeBuilder->getRootNode();
 
         $node
-        ->arrayPrototype()
+            ->arrayPrototype()
             ->children()
                 ->scalarNode('name')->isRequired()->end()
                 ->scalarNode('description')->end()
@@ -93,7 +92,7 @@ class Configuration implements ConfigurationInterface
                     ->addDefaultsIfNotSet()
                     ->beforeNormalization()
                         ->ifString()
-                        ->then(function ($v) {
+                        ->then(function($v) {
                             return [
                                 'name' => $v,
                                 'enabled' => true, // domains from config are enabled by default
@@ -111,7 +110,7 @@ class Configuration implements ConfigurationInterface
                     ->arrayPrototype()
                         ->beforeNormalization()
                         ->ifString()
-                        ->then(function ($v) {
+                        ->then(function($v) {
                             return ['name' => $v];
                         })
                         ->end()
@@ -127,7 +126,7 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('data')
                     ->beforeNormalization()
                     ->always()
-                    ->then(function ($v) {
+                    ->then(function($v) {
                         if (is_string($v) || is_int($v) || is_float($v)) {
                             return ['value' => $v];
                         }

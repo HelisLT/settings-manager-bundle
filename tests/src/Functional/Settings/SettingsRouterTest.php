@@ -1,16 +1,17 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Helis\SettingsManagerBundle\Tests\Functional\Settings;
 
 use App\AbstractWebTestCase;
+use App\DataFixtures\ORM\LoadSettingsData;
 use Helis\SettingsManagerBundle\Exception\SettingNotFoundException;
 use Helis\SettingsManagerBundle\Exception\TaggedSettingsNotFoundException;
-use Helis\SettingsManagerBundle\Settings\SettingsStore;
 use Helis\SettingsManagerBundle\Model\Type;
 use Helis\SettingsManagerBundle\Settings\SettingsManager;
 use Helis\SettingsManagerBundle\Settings\SettingsRouter;
-use App\DataFixtures\ORM\LoadSettingsData;
+use Helis\SettingsManagerBundle\Settings\SettingsStore;
 
 /**
  * @IgnoreAnnotation("dataProvider")
@@ -32,9 +33,6 @@ class SettingsRouterTest extends AbstractWebTestCase
         $this->settingsRouter = $this->getContainer()->get(SettingsRouter::class);
     }
 
-    /**
-     * @return array
-     */
     public function getSettingDataProvider(): array
     {
         return [
@@ -47,18 +45,13 @@ class SettingsRouterTest extends AbstractWebTestCase
                 [],
                 Type::YAML(),
                 ['amazing' => ['foo', 'foo', 'foo', 'yee'], 'cool' => ['yes' => ['yes', 'no']], 'damn' => 5],
-                'config'
+                'config',
             ],
         ];
     }
 
     /**
-     * @param string $settingName
-     * @param string $expectedDescription
-     * @param array $expectedTags
-     * @param Type $expectedType
      * @param mixed $expectedData
-     * @param string $expectedProvider
      *
      * @dataProvider getSettingDataProvider
      */
@@ -92,9 +85,6 @@ class SettingsRouterTest extends AbstractWebTestCase
         }
     }
 
-    /**
-     * @return array
-     */
     public function mustGetSettingDataProvider(): array
     {
         return [
@@ -109,19 +99,14 @@ class SettingsRouterTest extends AbstractWebTestCase
                 Type::YAML(),
                 ['amazing' => ['foo', 'foo', 'foo', 'yee'], 'cool' => ['yes' => ['yes', 'no']], 'damn' => 5],
                 'config',
-                SettingNotFoundException::class
+                SettingNotFoundException::class,
             ],
         ];
     }
 
     /**
-     * @param string $settingName
-     * @param string $expectedDescription
-     * @param array $expectedTags
-     * @param Type $expectedType
+     * @param Type  $expectedType
      * @param mixed $expectedData
-     * @param string $expectedProvider
-     * @param string|null $expectedException
      *
      * @dataProvider mustGetSettingDataProvider
      */
@@ -240,7 +225,8 @@ class SettingsRouterTest extends AbstractWebTestCase
     /**
      * @dataProvider warmUpClearDataProvider
      */
-    public function testWarmUpClear(string $tagName, string $settingName): void {
+    public function testWarmUpClear(string $tagName, string $settingName): void
+    {
         $this->loadFixtures([LoadSettingsData::class]);
         $settingsStore = $this->getContainer()->get(SettingsStore::class);
         $settings = $this->settingsRouter->getSettingsByTag($tagName);

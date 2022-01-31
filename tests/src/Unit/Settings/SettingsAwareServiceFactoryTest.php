@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Helis\SettingsManagerBundle\Tests\Unit\Settings;
 
 use Helis\SettingsManagerBundle\Exception\SettingNotFoundException;
-use PHPUnit\Framework\MockObject\MockObject;
 use Helis\SettingsManagerBundle\Settings\SettingsAwareServiceFactory;
-use PHPUnit\Framework\TestCase;
 use Helis\SettingsManagerBundle\Settings\SettingsRouter;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 class SettingsAwareServiceFactoryTest extends TestCase
 {
@@ -71,7 +71,7 @@ class SettingsAwareServiceFactoryTest extends TestCase
 
         $factory->get([
             'zomg_active' => ['setter' => 'setEnabled', 'must' => true],
-            'gg_count' => ['setter' => 'setGGCount', 'must' => true]
+            'gg_count' => ['setter' => 'setGGCount', 'must' => true],
         ], $object);
     }
 
@@ -93,7 +93,7 @@ class SettingsAwareServiceFactoryTest extends TestCase
             ->will($this->throwException(new SettingNotFoundException('zomg_active')));
 
         $factory->get([
-            'zomg_active' => ['setter' => 'setEnabled', 'must' => true]
+            'zomg_active' => ['setter' => 'setEnabled', 'must' => true],
         ], $object);
     }
 }

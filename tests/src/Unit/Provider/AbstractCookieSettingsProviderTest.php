@@ -1,17 +1,18 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Helis\SettingsManagerBundle\Tests\Unit\Provider;
 
+use Helis\SettingsManagerBundle\Model\DomainModel;
+use Helis\SettingsManagerBundle\Model\SettingModel;
 use Helis\SettingsManagerBundle\Provider\AbstractBaseCookieSettingsProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
-use Helis\SettingsManagerBundle\Model\DomainModel;
-use Helis\SettingsManagerBundle\Model\SettingModel;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -92,7 +93,7 @@ abstract class AbstractCookieSettingsProviderTest extends TestCase
             ->serializer
             ->expects($this->once())
             ->method('deserialize')
-            ->with('serialized_settings', SettingModel::class . '[]', 'json')
+            ->with('serialized_settings', SettingModel::class.'[]', 'json')
             ->willReturn([$settingStub]);
 
         $this->provider->onKernelRequest($eventMock);

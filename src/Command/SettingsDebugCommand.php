@@ -161,7 +161,7 @@ EOF
     {
         $tags = $model
             ->getTags()
-            ->map(function (TagModel $tagModel) {
+            ->map(function(TagModel $tagModel) {
                 return $tagModel->getName();
             })
             ->toArray();

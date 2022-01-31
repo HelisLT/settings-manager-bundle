@@ -16,7 +16,7 @@ class HelisSettingsManagerBundleTest extends WebTestCase
         $container = $this->getContainer();
         $services = $container->getServiceIds();
 
-        $services = array_filter($services, function (string $id): bool {
+        $services = array_filter($services, function(string $id): bool {
             return strpos($id, 'settings_manager.') === 0
                 || strpos($id, 'Helis\SettingsManagerBundle') === 0;
         });

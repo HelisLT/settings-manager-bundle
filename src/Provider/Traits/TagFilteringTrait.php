@@ -15,7 +15,6 @@ trait TagFilteringTrait
 {
     /**
      * @param array|SettingModel[] $settings
-     * @param string               $tagName
      *
      * @return array|SettingModel[]
      */

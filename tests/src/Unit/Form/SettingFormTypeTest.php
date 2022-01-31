@@ -31,7 +31,7 @@ class SettingFormTypeTest extends TypeTestCase
             ->setType(Type::BOOL())
             ->setData(true);
 
-        # 0: bool as bool
+        // 0: bool as bool
         yield [$formData1, $data1, $object1];
 
         // test string submit
@@ -49,7 +49,7 @@ class SettingFormTypeTest extends TypeTestCase
             ->setDomain(new DomainModel())
             ->setData('2.5678');
 
-        # 1: float as string
+        // 1: float as string
         yield [$formData2, $data2, $object2];
 
         // test float submit
@@ -67,15 +67,11 @@ class SettingFormTypeTest extends TypeTestCase
             ->setDomain(new DomainModel())
             ->setData(2.57);
 
-        # 2: float as round float
+        // 2: float as round float
         yield [$formData3, $data3, $object3];
     }
 
     /**
-     * @param array        $formData
-     * @param SettingModel $data
-     * @param SettingModel $expectedObject
-     *
      * @dataProvider submitValidDataProvider
      */
     public function testSubmitValidData(array $formData, SettingModel $data, SettingModel $expectedObject)

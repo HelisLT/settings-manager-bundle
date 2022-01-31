@@ -11,10 +11,10 @@ use Helis\SettingsManagerBundle\Provider\Traits\TagFilteringTrait;
 
 final class SettingsProviderMock implements SettingsProviderInterface
 {
-    private static $settings = [];
-
     use ReadOnlyProviderTrait;
     use TagFilteringTrait;
+
+    private static $settings = [];
 
     public static function addSetting(SettingModel $setting)
     {
@@ -90,4 +90,3 @@ final class SettingsProviderMock implements SettingsProviderInterface
         return array_values($out);
     }
 }
-

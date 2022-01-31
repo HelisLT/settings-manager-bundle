@@ -1,15 +1,16 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Helis\SettingsManagerBundle\Tests\Functional\Settings;
 
 use App\AbstractWebTestCase;
-use Helis\SettingsManagerBundle\Model\SettingModel;
-use Helis\SettingsManagerBundle\Model\DomainModel;
-use Helis\SettingsManagerBundle\Provider\SettingsProviderInterface;
-use Helis\SettingsManagerBundle\Settings\SettingsManager;
 use App\DataFixtures\ORM\LoadSettingsData;
 use App\Entity\Setting;
+use Helis\SettingsManagerBundle\Model\DomainModel;
+use Helis\SettingsManagerBundle\Model\SettingModel;
+use Helis\SettingsManagerBundle\Provider\SettingsProviderInterface;
+use Helis\SettingsManagerBundle\Settings\SettingsManager;
 
 /**
  * @IgnoreAnnotation("dataProvider")
@@ -99,14 +100,14 @@ class SettingsManagerTest extends AbstractWebTestCase
             [LoadSettingsData::DOMAIN_NAME_1],
             'fixture',
             2,
-            ['bazinga', 'foo']
+            ['bazinga', 'foo'],
         ];
 
         yield [
             [LoadSettingsData::DOMAIN_NAME_1],
             'experimental',
             1,
-            ['baz']
+            ['baz'],
         ];
 
         yield [[LoadSettingsData::DOMAIN_NAME_2], 'fixture', 1, ['tuna']];
@@ -115,7 +116,7 @@ class SettingsManagerTest extends AbstractWebTestCase
             [LoadSettingsData::DOMAIN_NAME_1, LoadSettingsData::DOMAIN_NAME_2],
             'fixture',
             3,
-            ['bazinga', 'foo', 'tuna']
+            ['bazinga', 'foo', 'tuna'],
         ];
 
         yield [[LoadSettingsData::DOMAIN_NAME_1, LoadSettingsData::DOMAIN_NAME_2], 'non-existing', 0, []];

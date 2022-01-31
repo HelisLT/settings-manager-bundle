@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Helis\SettingsManagerBundle\Tests\Functional\Provider;
@@ -113,8 +114,9 @@ abstract class AbstractSettingsProviderTest extends AbstractReadableSettingsProv
 
     public function testDelete()
     {
-        $sortCallback = function (SettingModel $a, SettingModel$b) {
+        $sortCallback = function(SettingModel $a, SettingModel $b) {
             $v = $a->getName() <=> $b->getName();
+
             return $v !== 0 ? $v * -1 : $v;
         };
 
@@ -192,7 +194,7 @@ abstract class AbstractSettingsProviderTest extends AbstractReadableSettingsProv
     public function testDeleteDomain()
     {
         $domainNames = array_map(
-            function (DomainModel $model) {
+            function(DomainModel $model) {
                 return $model->getName();
             },
             $this->provider->getDomains()

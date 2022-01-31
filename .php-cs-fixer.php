@@ -25,6 +25,9 @@ return $config
         'function_declaration' => [
             'closure_function_spacing' => 'none',
         ],
+        'cast_spaces' => [
+            'space' => 'none',
+        ],
     ])
     ->setFinder($finder)
 ;

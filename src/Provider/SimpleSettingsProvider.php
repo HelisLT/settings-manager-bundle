@@ -11,7 +11,8 @@ use Helis\SettingsManagerBundle\Provider\Traits\WritableProviderTrait;
 
 class SimpleSettingsProvider implements SettingsProviderInterface
 {
-    use WritableProviderTrait, TagFilteringTrait;
+    use WritableProviderTrait;
+    use TagFilteringTrait;
 
     protected $settings;
 

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Helis\SettingsManagerBundle\Tests\Functional\Provider;
@@ -135,7 +136,7 @@ abstract class AbstractReadableSettingsProviderTest extends AbstractWebTestCase
                     ['kiwi', 'apples', 'float', 1.2, []],
                     ['tuna', 'sea', 'string', 'fishing', ['fixture']],
                 ],
-            ]
+            ],
         ];
     }
 
@@ -146,23 +147,23 @@ abstract class AbstractReadableSettingsProviderTest extends AbstractWebTestCase
     {
         $settings = $this->provider->getSettings($domainNames);
 
-        $map =  array_map(function (SettingModel $model) {
+        $map = array_map(function(SettingModel $model) {
             return [
                 $model->getName(),
                 $model->getDomain()->getName(),
                 $model->getType()->getValue(),
                 $model->getData(),
-                $model->getTags()->map(function (TagModel $tag) {
+                $model->getTags()->map(function(TagModel $tag) {
                     return $tag->getName();
                 })->toArray(),
             ];
         }, $settings);
 
-        usort($map, function ($a, $b) {
+        usort($map, function($a, $b) {
             return $a[0].$a[1] <=> $b[0].$b[1];
         });
 
-        usort($expectedSettingsMap, function ($a, $b) {
+        usort($expectedSettingsMap, function($a, $b) {
             return $a[0].$a[1] <=> $b[0].$b[1];
         });
 
@@ -177,7 +178,7 @@ abstract class AbstractReadableSettingsProviderTest extends AbstractWebTestCase
                 ['bazinga'],
                 [
                     ['bazinga', 'default', 'bool', false, ['fixture']],
-                ]
+                ],
             ],
             [
                 ['default'],
@@ -185,7 +186,7 @@ abstract class AbstractReadableSettingsProviderTest extends AbstractWebTestCase
                 [
                     ['bazinga', 'default', 'bool', false, ['fixture']],
                     ['foo', 'default', 'bool', true, ['fixture']],
-                ]
+                ],
             ],
             [
                 ['default', 'apples'],
@@ -194,7 +195,7 @@ abstract class AbstractReadableSettingsProviderTest extends AbstractWebTestCase
                     ['bazinga', 'default', 'bool', false, ['fixture']],
                     ['bazinga', 'apples', 'bool', true, []],
                     ['foo', 'default', 'bool', true, ['fixture']],
-                ]
+                ],
             ],
             [
                 ['default', 'sea'],
@@ -202,7 +203,7 @@ abstract class AbstractReadableSettingsProviderTest extends AbstractWebTestCase
                 [
                     ['foo', 'default', 'bool', true, ['fixture']],
                     ['tuna', 'sea', 'string', 'fishing', ['fixture']],
-                ]
+                ],
             ],
             [
                 ['default', 'sea', 'apples'],
@@ -211,7 +212,7 @@ abstract class AbstractReadableSettingsProviderTest extends AbstractWebTestCase
                     ['foo', 'default', 'bool', true, ['fixture']],
                     ['tuna', 'sea', 'string', 'fishing', ['fixture']],
                     ['kiwi', 'apples', 'float', 1.2, []],
-                ]
+                ],
             ],
             [
                 ['default', 'sea', 'apples', 'pear'],
@@ -220,7 +221,7 @@ abstract class AbstractReadableSettingsProviderTest extends AbstractWebTestCase
                     ['foo', 'default', 'bool', true, ['fixture']],
                     ['tuna', 'sea', 'string', 'fishing', ['fixture']],
                     ['kiwi', 'apples', 'float', 1.2, []],
-                ]
+                ],
             ],
         ];
     }
@@ -232,23 +233,23 @@ abstract class AbstractReadableSettingsProviderTest extends AbstractWebTestCase
     {
         $settings = $this->provider->getSettingsByName($domainNames, $settingNames);
 
-        $map =  array_map(function (SettingModel $model) {
+        $map = array_map(function(SettingModel $model) {
             return [
                 $model->getName(),
                 $model->getDomain()->getName(),
                 $model->getType()->getValue(),
                 $model->getData(),
-                $model->getTags()->map(function (TagModel $tag) {
+                $model->getTags()->map(function(TagModel $tag) {
                     return $tag->getName();
                 })->toArray(),
             ];
         }, $settings);
 
-        usort($map, function ($a, $b) {
+        usort($map, function($a, $b) {
             return $a[0].$a[1] <=> $b[0].$b[1];
         });
 
-        usort($expectedSettingsMap, function ($a, $b) {
+        usort($expectedSettingsMap, function($a, $b) {
             return $a[0].$a[1] <=> $b[0].$b[1];
         });
 
@@ -261,7 +262,7 @@ abstract class AbstractReadableSettingsProviderTest extends AbstractWebTestCase
             [
                 ['default'],
                 'non-existing-tag',
-                []
+                [],
             ],
             [
                 ['default'],
@@ -269,7 +270,7 @@ abstract class AbstractReadableSettingsProviderTest extends AbstractWebTestCase
                 [
                     ['bazinga', 'default', 'bool', false],
                     ['foo', 'default', 'bool', true],
-                ]
+                ],
             ],
             [
                 ['default', 'sea', 'apples'],
@@ -278,7 +279,7 @@ abstract class AbstractReadableSettingsProviderTest extends AbstractWebTestCase
                     ['bazinga', 'default', 'bool', false],
                     ['foo', 'default', 'bool', true],
                     ['tuna', 'sea', 'string', 'fishing'],
-                ]
+                ],
             ],
         ];
     }
@@ -290,7 +291,7 @@ abstract class AbstractReadableSettingsProviderTest extends AbstractWebTestCase
     {
         $settings = $this->provider->getSettingsByTag($domainNames, $tagName);
 
-        $map =  array_map(function (SettingModel $model) {
+        $map = array_map(function(SettingModel $model) {
             return [
                 $model->getName(),
                 $model->getDomain()->getName(),
@@ -299,11 +300,11 @@ abstract class AbstractReadableSettingsProviderTest extends AbstractWebTestCase
             ];
         }, $settings);
 
-        usort($map, function ($a, $b) {
+        usort($map, function($a, $b) {
             return $a[0].$a[1] <=> $b[0].$b[1];
         });
 
-        usort($expectedSettingsMap, function ($a, $b) {
+        usort($expectedSettingsMap, function($a, $b) {
             return $a[0].$a[1] <=> $b[0].$b[1];
         });
 
@@ -312,18 +313,18 @@ abstract class AbstractReadableSettingsProviderTest extends AbstractWebTestCase
 
     public function testGetDomains()
     {
-        $domainNames = array_map(function (DomainModel $model) {
+        $domainNames = array_map(function(DomainModel $model) {
             return $model->getName();
         }, $this->provider->getDomains(false));
 
         sort($domainNames);
 
-        $this->assertEquals(['apples', 'default', 'sea',], $domainNames);
+        $this->assertEquals(['apples', 'default', 'sea'], $domainNames);
     }
 
     public function testGetOnlyEnabledDomains()
     {
-        $domainNames = array_map(function (DomainModel $model) {
+        $domainNames = array_map(function(DomainModel $model) {
             return $model->getName();
         }, $this->provider->getDomains(true));
 

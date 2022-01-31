@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Helis\SettingsManagerBundle\Tests\Functional\Provider;
@@ -20,7 +21,7 @@ class DecoratingRedisSettingsProviderTest extends DecoratingPredisSettingsProvid
         $this->redis = new \Redis();
 
         try {
-            if (!@$this->redis->connect(getenv('REDIS_HOST'), (int) getenv('REDIS_PORT'), 1.0)) {
+            if (!@$this->redis->connect(getenv('REDIS_HOST'), (int)getenv('REDIS_PORT'), 1.0)) {
                 $this->markTestSkipped('Running redis server required');
             }
         } catch (\RedisException $e) {

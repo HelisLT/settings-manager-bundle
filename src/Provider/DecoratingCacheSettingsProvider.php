@@ -18,7 +18,7 @@ class DecoratingCacheSettingsProvider implements ModificationAwareSettingsProvid
     use DomainNameExtractTrait;
 
     private const LOCK_RETRY_INTERVAL_MS = 50000; // microseconds
-    private const LOCK_RESOURCE = __CLASS__ . 'settings-cache';
+    private const LOCK_RESOURCE = __CLASS__.'settings-cache';
     private const LOCK_MAX_READER_FAILED_ACQUIRES = 2;
 
     private $decoratingProvider;
@@ -148,7 +148,7 @@ class DecoratingCacheSettingsProvider implements ModificationAwareSettingsProvid
         $this->clearIfNeeded($lock);
 
         if (!$lock->acquireRead()) {
-            $depth++;
+            ++$depth;
             if ($depth === self::LOCK_MAX_READER_FAILED_ACQUIRES) {
                 // fallback to decorating provider bypassing cache if lock acquire fails for certain time
                 return $this->decoratingProvider->getSettings($domainNames);
@@ -182,7 +182,7 @@ class DecoratingCacheSettingsProvider implements ModificationAwareSettingsProvid
         $this->clearIfNeeded($lock);
 
         if (!$lock->acquireRead()) {
-            $depth++;
+            ++$depth;
             if ($depth === self::LOCK_MAX_READER_FAILED_ACQUIRES) {
                 // fallback to decorating provider bypassing cache if lock acquire fails for certain time
                 return $this->decoratingProvider->getSettingsByName($domainNames, $settingNames);
@@ -215,7 +215,7 @@ class DecoratingCacheSettingsProvider implements ModificationAwareSettingsProvid
         $this->clearIfNeeded($lock);
 
         if (!$lock->acquireRead()) {
-            $depth++;
+            ++$depth;
             if ($depth === self::LOCK_MAX_READER_FAILED_ACQUIRES) {
                 // fallback to decorating provider bypassing cache if lock acquire fails for certain time
                 return $this->decoratingProvider->getSettingsByTag($domainNames, $tagName);
@@ -249,7 +249,7 @@ class DecoratingCacheSettingsProvider implements ModificationAwareSettingsProvid
         $this->clearIfNeeded($lock);
 
         if (!$lock->acquireRead()) {
-            $depth++;
+            ++$depth;
             if ($depth === self::LOCK_MAX_READER_FAILED_ACQUIRES) {
                 return $this->decoratingProvider->getDomains($onlyEnabled);
             }
@@ -390,8 +390,6 @@ class DecoratingCacheSettingsProvider implements ModificationAwareSettingsProvid
      *  - settings
      *  - setting names by domain
      *  - setting names by tag
-     *
-     * @param array $domainNames
      */
     private function warmupDomainSettings(array $domainNames): void
     {
@@ -440,9 +438,6 @@ class DecoratingCacheSettingsProvider implements ModificationAwareSettingsProvid
      *
      * As this method fetches only some particular settings from given domains,
      * it can build only settings cache items.
-     *
-     * @param array $domainNames
-     * @param array $settingNames
      */
     private function warmupParticularSettings(array $domainNames, array $settingNames): void
     {
@@ -480,9 +475,6 @@ class DecoratingCacheSettingsProvider implements ModificationAwareSettingsProvid
      * As this method fetches only tagged settings from given domains, it can build only these cache items:
      *  - settings
      *  - setting names by tag
-     *
-     * @param array  $domainNames
-     * @param string $tagName
      */
     private function warmupTaggedSettings(array $domainNames, string $tagName): void
     {
@@ -524,8 +516,6 @@ class DecoratingCacheSettingsProvider implements ModificationAwareSettingsProvid
     }
 
     /**
-     * @param string $domainName
-     *
      * @return string[]
      */
     private function getSettingNamesByDomain(string $domainName): array
@@ -534,9 +524,6 @@ class DecoratingCacheSettingsProvider implements ModificationAwareSettingsProvid
     }
 
     /**
-     * @param string $domainName
-     * @param string $tagName
-     *
      * @return string[]
      */
     private function getSettingNamesByTag(string $domainName, string $tagName): array

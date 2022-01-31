@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Helis\SettingsManagerBundle\Tests\Unit\Validator\Constraints;
@@ -43,7 +44,6 @@ class SettingTypeValidatorTest extends TestCase
     }
 
     /**
-     * @param Type  $type
      * @param mixed $data
      *
      * @dataProvider dataProviderTestValid
@@ -75,9 +75,7 @@ class SettingTypeValidatorTest extends TestCase
     }
 
     /**
-     * @param Type   $type
-     * @param mixed  $data
-     * @param string $message
+     * @param mixed $data
      *
      * @dataProvider dataProviderTestInvalid
      */

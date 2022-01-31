@@ -33,10 +33,7 @@ class SettingsRouter
     /**
      * Retrieves setting data or default value with string typehint.
      *
-     * @param string $settingName
      * @param string $defaultValue
-     *
-     * @return string
      */
     public function getString(string $settingName, $defaultValue = ''): string
     {
@@ -45,10 +42,6 @@ class SettingsRouter
 
     /**
      * Retrieves setting data with string typehint.
-     *
-     * @param string $settingName
-     *
-     * @return string
      *
      * @throws SettingNotFoundException
      */
@@ -60,10 +53,7 @@ class SettingsRouter
     /**
      * Retrieves setting data or default value with bool typehint.
      *
-     * @param string $settingName
-     * @param bool   $defaultValue
-     *
-     * @return bool
+     * @param bool $defaultValue
      */
     public function getBool(string $settingName, $defaultValue = false): bool
     {
@@ -72,10 +62,6 @@ class SettingsRouter
 
     /**
      * Retrieves setting data with bool typehint.
-     *
-     * @param string $settingName
-     *
-     * @return bool
      *
      * @throws SettingNotFoundException
      */
@@ -87,10 +73,7 @@ class SettingsRouter
     /**
      * Retrieves setting data or default value with int typehint.
      *
-     * @param string $settingName
-     * @param int    $defaultValue
-     *
-     * @return int
+     * @param int $defaultValue
      */
     public function getInt(string $settingName, $defaultValue = 0): int
     {
@@ -99,10 +82,6 @@ class SettingsRouter
 
     /**
      * Retrieves setting data with int typehint.
-     *
-     * @param string $settingName
-     *
-     * @return int
      *
      * @throws SettingNotFoundException
      */
@@ -114,10 +93,7 @@ class SettingsRouter
     /**
      * Retrieves setting data or default value with float typehint.
      *
-     * @param string $settingName
-     * @param float  $defaultValue
-     *
-     * @return float
+     * @param float $defaultValue
      */
     public function getFloat(string $settingName, $defaultValue = .0): float
     {
@@ -126,10 +102,6 @@ class SettingsRouter
 
     /**
      * Retrieves setting data with float typehint.
-     *
-     * @param string $settingName
-     *
-     * @return float
      *
      * @throws SettingNotFoundException
      */
@@ -141,10 +113,7 @@ class SettingsRouter
     /**
      * Retrieves setting data or default value with array typehint.
      *
-     * @param string $settingName
-     * @param array  $defaultValue
-     *
-     * @return array
+     * @param array $defaultValue
      */
     public function getArray(string $settingName, $defaultValue = []): array
     {
@@ -153,10 +122,6 @@ class SettingsRouter
 
     /**
      * Retrieves setting data with array typehint.
-     *
-     * @param string $settingName
-     *
-     * @return array
      *
      * @throws SettingNotFoundException
      */
@@ -168,8 +133,7 @@ class SettingsRouter
     /**
      * Returns data from setting or default value if setting not found.
      *
-     * @param string $settingName
-     * @param mixed  $defaultValue
+     * @param mixed $defaultValue
      *
      * @return mixed
      */
@@ -183,8 +147,6 @@ class SettingsRouter
     /**
      * Returns data from setting.
      *
-     * @param string $settingName
-     *
      * @return mixed
      *
      * @throws SettingNotFoundException
@@ -196,10 +158,6 @@ class SettingsRouter
 
     /**
      * Returns setting model.
-     *
-     * @param string $settingName
-     *
-     * @return SettingModel|null
      */
     public function getSetting(string $settingName): ?SettingModel
     {
@@ -208,10 +166,6 @@ class SettingsRouter
 
     /**
      * Returns setting model.
-     *
-     * @param string $settingName
-     *
-     * @return SettingModel
      *
      * @throws SettingNotFoundException
      */
@@ -233,8 +187,6 @@ class SettingsRouter
     }
 
     /**
-     * @param string $tagName
-     *
      * @return SettingModel[]
      *
      * @throws TaggedSettingsNotFoundException
@@ -313,7 +265,7 @@ class SettingsRouter
     {
         if (empty($this->settingsStore->getDomainNames(false)) || $force) {
             $this->settingsStore->setDomainNames(array_map(
-                function (DomainModel $domainModel) {
+                function(DomainModel $domainModel) {
                     return $domainModel->getName();
                 },
                 $this->settingsManager->getDomains(null, true)

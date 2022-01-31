@@ -21,10 +21,10 @@ class SettingsAwareServiceFactory implements LoggerAwareInterface
     }
 
     /**
-     * @param array $callMap
      * @param mixed $object
      *
      * @return mixed
+     *
      * @throws SettingNotFoundException
      */
     public function get(array $callMap, $object)

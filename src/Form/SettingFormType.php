@@ -36,7 +36,7 @@ class SettingFormType extends AbstractType
                 'disabled' => true,
                 'translation_domain' => 'HelisSettingsManager',
                 'choice_translation_domain' => 'HelisSettingsManager',
-                'choice_label' => function (string $type) {
+                'choice_label' => function(string $type) {
                     return 'type.'.strtolower($type);
                 },
                 'label' => 'edit.form.type',
@@ -47,7 +47,7 @@ class SettingFormType extends AbstractType
                 'required' => false,
             ]);
 
-        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function(FormEvent $event) {
             /** @var SettingModel $model */
             $model = $event->getData();
             if ($model === null) {

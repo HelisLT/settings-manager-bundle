@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Helis\SettingsManagerBundle\Tests\Functional\Settings;
 
 use App\AbstractWebTestCase;
+use App\Entity\Setting;
 use Helis\SettingsManagerBundle\Provider\SettingsProviderInterface;
 use Helis\SettingsManagerBundle\Settings\ProvidersManager;
 use Helis\SettingsManagerBundle\Settings\SettingsManager;
-use App\Entity\Setting;
 
 /**
  * @IgnoreAnnotation("dataProvider")
