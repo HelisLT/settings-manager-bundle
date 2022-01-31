@@ -84,7 +84,7 @@ class HelisSettingsManagerExtension extends Extension
             ->register(WarmupSettingsManagerExtension::class, WarmupSettingsManagerExtension::class)
             ->addMethodCall('setSettingsRouter', [new Reference(SettingsRouter::class)])
             ->addMethodCall('setDivider', [$config['divider']])
-            ->addTag('enqueue.consumption.extension', ['priority' => $config['priority']]);
+            ->addTag('enqueue.transport.consumption_extension', ['priority' => $config['priority'], 'transport' => 'all']);
     }
 
     private function loadSettingsManager(array $config, ContainerBuilder $container): void
