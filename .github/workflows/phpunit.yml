@@ -19,4 +19,3 @@ jobs:
         memory_limit: 1G
         bootstrap: vendor/autoload.php
         configuration: phpunit.xml.dist
-        args: --coverage-text
