@@ -14,30 +14,19 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-/**
- * Class SettingsDebugCommand.
- */
 class SettingsDebugCommand extends Command
 {
     protected static $defaultName = 'debug:settings';
 
-    /**
-     * @var SettingsManager
-     */
     protected $settingsManager;
 
-    /**
-     * SettingsDebugCommand constructor.
-     */
     public function __construct(SettingsManager $settingsManager)
     {
         parent::__construct();
+
         $this->settingsManager = $settingsManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure()
     {
         $this->setDefinition([
@@ -67,10 +56,7 @@ EOF
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
 
@@ -106,12 +92,12 @@ EOF
                     $domains,
                     $tag
                 )) as $settingModel) {
-                    $tableRows[] = $this->_renderSettingsRow($settingModel);
+                    $tableRows[] = $this->renderSettingsRow($settingModel);
                 }
             } else {
                 // Display all settings
                 foreach ($this->settingsManager->getSettingsByDomain($domains) as $settingModel) {
-                    $tableRows[] = $this->_renderSettingsRow($settingModel);
+                    $tableRows[] = $this->renderSettingsRow($settingModel);
                 }
             }
 
@@ -141,9 +127,11 @@ EOF
 
             $io->table($tableHeaders, $tableRows);
         }
+
+        return 0;
     }
 
-    private function _renderSettingsRow(SettingModel $settingModel): array
+    private function renderSettingsRow(SettingModel $settingModel): array
     {
         return [
             $settingModel->getName(),

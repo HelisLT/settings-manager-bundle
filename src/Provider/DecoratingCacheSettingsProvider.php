@@ -21,22 +21,11 @@ class DecoratingCacheSettingsProvider implements ModificationAwareSettingsProvid
     private const LOCK_RESOURCE = __CLASS__ . 'settings-cache';
     private const LOCK_MAX_READER_FAILED_ACQUIRES = 2;
 
-    /** @var SettingsProviderInterface */
     private $decoratingProvider;
-
-    /** @var SerializerInterface */
     protected $serializer;
-
-    /** @var AdapterInterface */
     private $cache;
-
-    /** @var LockFactory */
     private $lockFactory;
-
-    /** @var int */
     private $checkValidityInterval;
-
-    /** @var string */
     private $modificationTimeKey = 'settings_modification_time';
 
     public function __construct(

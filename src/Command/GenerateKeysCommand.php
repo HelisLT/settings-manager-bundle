@@ -31,7 +31,7 @@ class GenerateKeysCommand extends Command
             ->setDescription('Generate asymmetric private and public keys.');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): void
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
         $io->title('Settings generate keys');
@@ -44,16 +44,18 @@ class GenerateKeysCommand extends Command
         if (false === $writePrivateResult) {
             $io->error('Could not write to private key path');
 
-            return;
+            return 1;
         }
 
         $writePublicResult = file_put_contents($input->getArgument('public_key_path'), $rawPublic);
         if (false === $writePublicResult) {
             $io->error('Could not write to public key path');
 
-            return;
+            return 1;
         }
 
         $io->success('Saved generated keys');
+
+        return 0;
     }
 }

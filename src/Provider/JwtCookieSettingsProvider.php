@@ -12,6 +12,7 @@ use Lcobucci\JWT\Token\Builder;
 use Lcobucci\JWT\Token\Parser;
 use Lcobucci\JWT\Signer\Key\InMemory;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
+use Lcobucci\JWT\Token\Plain;
 use Lcobucci\JWT\Validation\Constraint\IssuedBy;
 use Lcobucci\JWT\Validation\Constraint\RelatedTo;
 use Lcobucci\JWT\Validation\Constraint\SignedWith;
@@ -49,6 +50,7 @@ class JwtCookieSettingsProvider extends AbstractBaseCookieSettingsProvider
         $parser = new Parser(new JoseEncoder());
 
         try {
+            /** @var Plain $token */
             $token = $parser->parse($rawToken);
 
             if (!$validator->validate($token, ...$constraints)) {

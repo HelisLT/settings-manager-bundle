@@ -49,7 +49,8 @@ class SettingFormType extends AbstractType
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
             /** @var SettingModel $model */
-            if (($model = $event->getData()) === null) {
+            $model = $event->getData();
+            if ($model === null) {
                 return;
             }
 

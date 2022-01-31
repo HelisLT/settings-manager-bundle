@@ -19,6 +19,7 @@ class WarmUpProvidersCommand extends Command
     public function __construct(ProvidersManager $providersManager)
     {
         parent::__construct();
+
         $this->providersManager = $providersManager;
     }
 
@@ -50,7 +51,7 @@ class WarmUpProvidersCommand extends Command
             ->setDescription('Warm ups settings providers');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): void
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
         $io->title('Settings providers warm up');
@@ -62,5 +63,7 @@ class WarmUpProvidersCommand extends Command
         );
 
         $io->success('Providers warmed up');
+
+        return 0;
     }
 }
