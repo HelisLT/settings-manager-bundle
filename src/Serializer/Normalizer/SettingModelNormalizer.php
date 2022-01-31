@@ -23,6 +23,9 @@ class SettingModelNormalizer implements NormalizerInterface, DenormalizerInterfa
     use NormalizerAwareTrait;
     use ObjectToPopulateTrait;
 
+    /**
+     * @return mixed
+     */
     public function denormalize($data, $class, $format = null, array $context = [])
     {
         $object = $this->extractObjectToPopulate($class, $context) ?? new $class();
@@ -42,7 +45,7 @@ class SettingModelNormalizer implements NormalizerInterface, DenormalizerInterfa
         return $object;
     }
 
-    public function supportsDenormalization($data, $type, $format = null)
+    public function supportsDenormalization($data, $type, $format = null): bool
     {
         return is_a($type, SettingModel::class, true);
     }
@@ -50,7 +53,7 @@ class SettingModelNormalizer implements NormalizerInterface, DenormalizerInterfa
     /**
      * @param SettingModel $object
      */
-    public function normalize($object, $format = null, array $context = [])
+    public function normalize($object, $format = null, array $context = []): array
     {
         return [
             'name' => $object->getName(),
@@ -63,7 +66,7 @@ class SettingModelNormalizer implements NormalizerInterface, DenormalizerInterfa
         ];
     }
 
-    public function supportsNormalization($data, $format = null)
+    public function supportsNormalization($data, $format = null): bool
     {
         return $data instanceof SettingModel;
     }

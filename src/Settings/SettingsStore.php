@@ -137,7 +137,7 @@ class SettingsStore extends ArrayCollection
         }
     }
 
-    public function clear()
+    public function clear(): void
     {
         $this->settingsByProvider = [];
         $this->domainNames = [];
