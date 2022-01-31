@@ -29,7 +29,7 @@ class SettingsRouterTest extends AbstractWebTestCase
     {
         parent::setUp();
 
-        $this->settingsRouter = $this->getDependencyInjectionContainer()->get(SettingsRouter::class);
+        $this->settingsRouter = $this->getContainer()->get(SettingsRouter::class);
     }
 
     /**
@@ -242,7 +242,7 @@ class SettingsRouterTest extends AbstractWebTestCase
      */
     public function testWarmUpClear(string $tagName, string $settingName): void {
         $this->loadFixtures([LoadSettingsData::class]);
-        $settingsStore = $this->getDependencyInjectionContainer()->get(SettingsStore::class);
+        $settingsStore = $this->getContainer()->get(SettingsStore::class);
         $settings = $this->settingsRouter->getSettingsByTag($tagName);
 
         $this->assertArrayHasKey($settingName, $settings);
@@ -292,7 +292,7 @@ class SettingsRouterTest extends AbstractWebTestCase
         $setting = $this->settingsRouter->getSetting('foo');
         $this->assertFalse($setting->getData());
 
-        $settingsManager = $this->getDependencyInjectionContainer()->get(SettingsManager::class);
+        $settingsManager = $this->getContainer()->get(SettingsManager::class);
         $setting->setData(true);
         $settingsManager->save($setting);
 

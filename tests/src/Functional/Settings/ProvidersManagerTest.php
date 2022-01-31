@@ -30,7 +30,7 @@ class ProvidersManagerTest extends AbstractWebTestCase
      */
     public function loadServices(): void
     {
-        $this->settingsManager = $this->getDependencyInjectionContainer()->get(SettingsManager::class);
+        $this->settingsManager = $this->getContainer()->get(SettingsManager::class);
         $this->settingsWarmUpService = new ProvidersManager($this->settingsManager);
     }
 

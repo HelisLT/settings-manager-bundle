@@ -28,7 +28,7 @@ class SettingsManagerTest extends AbstractWebTestCase
     {
         parent::setUp();
 
-        $this->settingsManager = $this->getDependencyInjectionContainer()->get(SettingsManager::class);
+        $this->settingsManager = $this->getContainer()->get(SettingsManager::class);
     }
 
     public function testGetProviders()
@@ -158,7 +158,7 @@ class SettingsManagerTest extends AbstractWebTestCase
         $this->assertTrue($this->settingsManager->save($setting));
 
         // assert from orm
-        $doctrine = $this->getDependencyInjectionContainer()->get('doctrine');
+        $doctrine = $this->getContainer()->get('doctrine');
         $settingEntity = $doctrine
             ->getRepository(Setting::class)
             ->findOneBy(['domain.name' => 'test_save', 'name' => 'baz']);
@@ -223,7 +223,7 @@ class SettingsManagerTest extends AbstractWebTestCase
         $this->settingsManager->updateDomain($domain);
         /** @var SettingModel $setting */
         $setting = $this
-            ->getDependencyInjectionContainer()
+            ->getContainer()
             ->get('doctrine')
             ->getRepository(Setting::class)
             ->findOneBy(['domain.name' => $domain->getName()]);
