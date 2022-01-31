@@ -14,3 +14,4 @@ jobs:
         version: 9.5
         php_version: 7.4
         configuration: phpunit.xml.dist
+        bootstrap: vendor/autoload.php
