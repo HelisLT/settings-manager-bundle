@@ -59,7 +59,7 @@
         "phpunit/phpunit": "^8.5|^9.5",
         "predis/predis": "^1.1",
         "symfony/asset": "^4.4|^5.3",
-        "symfony/framework-bundle": "^4.4|^5.3",
+        "symfony/framework-bundle": "^4.4|^5.3.15",
         "symfony/lock": "^5.3",
         "symfony/monolog-bundle": "~3.7.0",
         "symfony/phpunit-bridge": "^4.4|^5.3",
