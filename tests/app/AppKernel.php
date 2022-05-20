@@ -26,6 +26,7 @@ class AppKernel extends Kernel
             new \Doctrine\Bundle\FixturesBundle\DoctrineFixturesBundle(),
             new \Liip\FunctionalTestBundle\LiipFunctionalTestBundle(),
             new \Liip\TestFixturesBundle\LiipTestFixturesBundle(),
+            new \FOS\JsRoutingBundle\FOSJsRoutingBundle(),
             new \App\AppBundle(),
         ];
     }

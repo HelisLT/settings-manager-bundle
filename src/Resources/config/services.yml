@@ -8,6 +8,8 @@ services:
         public: true
         arguments:
             $settingsManager: '@Helis\SettingsManagerBundle\Settings\SettingsManager'
+        calls:
+            - ['setContainer', ['@Psr\Container\ContainerInterface']]
         tags:
             - { name: controller.service_arguments }
 
@@ -17,6 +19,8 @@ services:
             $settingsManager: '@Helis\SettingsManagerBundle\Settings\SettingsManager'
             $eventManager: '@Helis\SettingsManagerBundle\Settings\EventManagerInterface'
             $validator: '@validator'
+        calls:
+            - ['setContainer', ['@Psr\Container\ContainerInterface']]
         tags:
             - { name: controller.service_arguments }
 
