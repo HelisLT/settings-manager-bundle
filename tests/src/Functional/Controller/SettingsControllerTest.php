@@ -17,4 +17,15 @@ class SettingsControllerTest extends AbstractWebTestCase
 
         $this->assertStatusCode(200, $client);
     }
+
+    public function testEditAction()
+    {
+        $client = $this->makeClient();
+        $this->loadFixtures([]);
+
+        foreach (['foo', 'tuna', 'wth_yaml', 'choice', 'integer'] as $settingName) {
+            $client->request('GET', '/default/' . $settingName);
+            $this->assertStatusCode(200, $client);
+        }
+    }
 }

@@ -70,7 +70,7 @@ class SettingsManagerTest extends AbstractWebTestCase
 
     public function getSettingsByDomainDataProvider()
     {
-        yield [LoadSettingsData::DOMAIN_NAME_1, 6, ['foo', 'baz', 'tuna', 'wth_yaml', 'choice', 'bazinga']];
+        yield [LoadSettingsData::DOMAIN_NAME_1, 7, ['foo', 'baz', 'tuna', 'wth_yaml', 'choice', 'integer', 'bazinga']];
 
         yield [LoadSettingsData::DOMAIN_NAME_2, 1, ['tuna']];
     }

@@ -68,7 +68,6 @@ class SettingFormType extends AbstractType
                     ->add('data', IntegerType::class, [
                         'translation_domain' => 'HelisSettingsManager',
                         'label' => 'edit.form.value',
-                        'scale' => 0,
                     ]);
             } elseif ($model->getType()->equals(Type::FLOAT())) {
                 $event
