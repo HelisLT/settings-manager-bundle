@@ -114,6 +114,12 @@ helis_settings_manager:
           choices: ['choice1', 'choice2']
           data: 'choice1'
 
+        - name: integer
+          description: 'integer example'
+          domain: default
+          type: int
+          data: 10
+
 services:
     _defaults:
         public: true
