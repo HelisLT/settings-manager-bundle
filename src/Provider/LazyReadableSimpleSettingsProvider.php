@@ -10,48 +10,30 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 class LazyReadableSimpleSettingsProvider extends ReadableSimpleSettingsProvider
 {
-    private $serializer;
-    private $normDomains;
-    private $normSettings;
-
-    private $settingsKeyMap;
-    private $domainsKeyMap;
-
-    private $modelSettings;
-    private $modelDomains;
-    private $modelDomainsEnabled;
+    private array $modelSettings = [];
+    private array $modelDomains = [];
+    private array $modelDomainsEnabled = [];
 
     public function __construct(
-        DenormalizerInterface $serializer,
-        array $normDomains,
-        array $normSettings,
-        array $settingsKeyMap,
-        array $domainsKeyMap
+        private readonly DenormalizerInterface $serializer,
+        private array $normDomains,
+        private array $normSettings,
+        private readonly array $settingsKeyMap,
+        private readonly array $domainsKeyMap
     ) {
         parent::__construct([]);
-
-        $this->serializer = $serializer;
-        $this->normDomains = $normDomains;
-        $this->normSettings = $normSettings;
-
-        $this->settingsKeyMap = $settingsKeyMap;
-        $this->domainsKeyMap = $domainsKeyMap;
-
-        $this->modelSettings = [];
-        $this->modelDomains = [];
-        $this->modelDomainsEnabled = [];
     }
 
     public function getSettings(array $domainNames): array
     {
         $keys = array_intersect_key($this->domainsKeyMap, array_flip($domainNames));
-        if (empty($keys)) {
+        if ($keys === []) {
             return [];
         }
         $keys = array_merge(...array_values($keys));
         $normSettings = array_intersect_key($this->normSettings, array_flip($keys));
 
-        if (!empty($normSettings)) {
+        if ($normSettings !== []) {
             $modelSettings = $this->serializer->denormalize($normSettings, SettingModel::class.'[]');
             $this->modelSettings = array_merge($this->modelSettings, $modelSettings);
             $this->normSettings = array_diff_key($this->normSettings, $modelSettings);
@@ -59,14 +41,14 @@ class LazyReadableSimpleSettingsProvider extends ReadableSimpleSettingsProvider
 
         $modelSettings = array_intersect_key($this->modelSettings, array_flip($keys));
 
-        return empty($modelSettings) ? [] : array_values($modelSettings);
+        return $modelSettings === [] ? [] : array_values($modelSettings);
     }
 
     public function getSettingsByName(array $domainNames, array $settingNames): array
     {
         $settingKeys = array_intersect_key($this->settingsKeyMap, array_flip($settingNames));
         $domainKeys = array_intersect_key($this->domainsKeyMap, array_flip($domainNames));
-        if (empty($settingKeys) || empty($domainKeys)) {
+        if ($settingKeys === [] || $domainKeys === []) {
             return [];
         }
 
@@ -76,7 +58,7 @@ class LazyReadableSimpleSettingsProvider extends ReadableSimpleSettingsProvider
         ));
         $normSettings = array_intersect_key($this->normSettings, $keys);
 
-        if (!empty($normSettings)) {
+        if ($normSettings !== []) {
             $modelSettings = $this->serializer->denormalize($normSettings, SettingModel::class.'[]');
             $this->modelSettings = array_merge($this->modelSettings, $modelSettings);
             $this->normSettings = array_diff_key($this->normSettings, $modelSettings);
@@ -84,17 +66,19 @@ class LazyReadableSimpleSettingsProvider extends ReadableSimpleSettingsProvider
 
         $modelSettings = array_intersect_key($this->modelSettings, $keys);
 
-        return empty($modelSettings) ? [] : array_values($modelSettings);
+        return $modelSettings === [] ? [] : array_values($modelSettings);
     }
 
     public function getDomains(bool $onlyEnabled = false): array
     {
-        if (count($this->normDomains) > 0 && count($this->modelDomains) === 0) {
+        if ($this->normDomains !== [] && $this->modelDomains === []) {
             foreach ($this->normDomains as $normDomain) {
                 /** @var DomainModel $model */
                 $model = $this->serializer->denormalize($normDomain, DomainModel::class);
                 $this->modelDomains[] = $model;
-                $model->isEnabled() && ($this->modelDomainsEnabled[] = $model);
+                if ($model->isEnabled()) {
+                    $this->modelDomainsEnabled[] = $model;
+                }
             }
             $this->normDomains = [];
         }

@@ -14,13 +14,9 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class WarmUpProvidersCommand extends Command
 {
-    private $providersManager;
-
-    public function __construct(ProvidersManager $providersManager)
+    public function __construct(private readonly ProvidersManager $providersManager)
     {
         parent::__construct();
-
-        $this->providersManager = $providersManager;
     }
 
     protected function configure(): void

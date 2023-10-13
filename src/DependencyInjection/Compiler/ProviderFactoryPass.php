@@ -12,11 +12,8 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class ProviderFactoryPass implements CompilerPassInterface
 {
-    private $tag;
-
-    public function __construct(string $tag = 'settings_manager.provider_factory')
+    public function __construct(private readonly string $tag = 'settings_manager.provider_factory')
     {
-        $this->tag = $tag;
     }
 
     public function process(ContainerBuilder $container)

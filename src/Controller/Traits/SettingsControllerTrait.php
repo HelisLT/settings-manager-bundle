@@ -9,10 +9,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 trait SettingsControllerTrait
 {
-    /**
-     * @var SettingsRouter
-     */
-    protected $settingsRouter;
+    protected ?SettingsRouter $settingsRouter = null;
 
     /**
      * @required

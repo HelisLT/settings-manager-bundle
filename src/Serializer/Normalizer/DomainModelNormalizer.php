@@ -16,14 +16,22 @@ class DomainModelNormalizer implements NormalizerInterface, DenormalizerInterfac
     /**
      * @return mixed
      */
-    public function denormalize($data, $class, $format = null, array $context = [])
+    public function denormalize($data, $type, $format = null, array $context = [])
     {
-        $object = $this->extractObjectToPopulate($class, $context) ?? new $class();
+        $object = $this->extractObjectToPopulate($type, $context) ?? new $type();
 
-        isset($data['name']) && $object->setName($data['name']);
-        isset($data['enabled']) && $object->setEnabled($data['enabled']);
-        isset($data['read_only']) && $object->setReadOnly($data['read_only']);
-        isset($data['priority']) && $object->setPriority($data['priority']);
+        if (isset($data['name'])) {
+            $object->setName($data['name']);
+        }
+        if (isset($data['enabled'])) {
+            $object->setEnabled($data['enabled']);
+        }
+        if (isset($data['read_only'])) {
+            $object->setReadOnly($data['read_only']);
+        }
+        if (isset($data['priority'])) {
+            $object->setPriority($data['priority']);
+        }
 
         return $object;
     }
@@ -49,5 +57,12 @@ class DomainModelNormalizer implements NormalizerInterface, DenormalizerInterfac
     public function supportsNormalization($data, $format = null): bool
     {
         return $data instanceof DomainModel;
+    }
+
+    public function getSupportedTypes(?string $format): array
+    {
+        return [
+            DomainModel::class => true,
+        ];
     }
 }

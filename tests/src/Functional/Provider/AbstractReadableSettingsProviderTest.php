@@ -106,7 +106,7 @@ abstract class AbstractReadableSettingsProviderTest extends AbstractWebTestCase
         ];
     }
 
-    public function dataProviderTestGetSettings(): array
+    public static function dataProviderTestGetSettings(): array
     {
         return [
             [
@@ -170,7 +170,7 @@ abstract class AbstractReadableSettingsProviderTest extends AbstractWebTestCase
         $this->assertEquals($expectedSettingsMap, $map);
     }
 
-    public function dataProviderTestGetSettingsByName(): array
+    public static function dataProviderTestGetSettingsByName(): array
     {
         return [
             [
@@ -256,7 +256,7 @@ abstract class AbstractReadableSettingsProviderTest extends AbstractWebTestCase
         $this->assertEquals($map, $expectedSettingsMap);
     }
 
-    public function dataProviderTestGetSettingsByTag(): array
+    public static function dataProviderTestGetSettingsByTag(): array
     {
         return [
             [

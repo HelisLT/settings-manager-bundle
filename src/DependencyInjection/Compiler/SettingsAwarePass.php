@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Helis\SettingsManagerBundle\DependencyInjection\Compiler;
 
 use Helis\SettingsManagerBundle\Settings\SettingsAwareServiceFactory;
+use ReflectionClass;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
@@ -12,11 +13,8 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class SettingsAwarePass implements CompilerPassInterface
 {
-    private $tag;
-
-    public function __construct(string $tag = 'settings_manager.setting_aware')
+    public function __construct(private readonly string $tag = 'settings_manager.setting_aware')
     {
-        $this->tag = $tag;
     }
 
     public function process(ContainerBuilder $container)
@@ -47,7 +45,7 @@ class SettingsAwarePass implements CompilerPassInterface
                 ->setArguments([$callMap, new Reference("{$serviceId}_base")])
                 ->setFactory([new Reference(SettingsAwareServiceFactory::class), 'get'])
                 ->setPublic($definition->isPublic())
-                ->setLazy(!(new \ReflectionClass($definition->getClass()))->isFinal())
+                ->setLazy(!(new ReflectionClass($definition->getClass()))->isFinal())
                 ->setTags($initialTags);
         }
     }

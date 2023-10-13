@@ -14,11 +14,8 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class DomainController extends AbstractController
 {
-    private $settingsManager;
-
-    public function __construct(SettingsManager $settingsManager)
+    public function __construct(private readonly SettingsManager $settingsManager)
     {
-        $this->settingsManager = $settingsManager;
     }
 
     public function indexAction(): Response

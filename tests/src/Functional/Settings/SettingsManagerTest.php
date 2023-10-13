@@ -68,7 +68,7 @@ class SettingsManagerTest extends AbstractWebTestCase
         }
     }
 
-    public function getSettingsByDomainDataProvider()
+    public static function getSettingsByDomainDataProvider()
     {
         yield [LoadSettingsData::DOMAIN_NAME_1, 7, ['foo', 'baz', 'tuna', 'wth_yaml', 'choice', 'integer', 'bazinga']];
 
@@ -94,7 +94,7 @@ class SettingsManagerTest extends AbstractWebTestCase
         }
     }
 
-    public function getSettingsByTagDataProvider(): \Generator
+    public static function getSettingsByTagDataProvider(): \Generator
     {
         yield [
             [LoadSettingsData::DOMAIN_NAME_1],

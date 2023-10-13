@@ -8,10 +8,7 @@ use Helis\SettingsManagerBundle\Settings\SettingsRouter;
 
 trait SettingsRouterAwareTrait
 {
-    /**
-     * @var SettingsRouter
-     */
-    protected $settingsRouter;
+    protected ?SettingsRouter $settingsRouter = null;
 
     /**
      * @required

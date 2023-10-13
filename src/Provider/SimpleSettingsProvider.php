@@ -14,14 +14,11 @@ class SimpleSettingsProvider implements SettingsProviderInterface
     use WritableProviderTrait;
     use TagFilteringTrait;
 
-    protected $settings;
-
     /**
      * @param SettingModel[] $settings
      */
-    public function __construct(array $settings = [])
+    public function __construct(protected array $settings = [])
     {
-        $this->settings = $settings;
     }
 
     public function getSettings(array $domainNames): array
@@ -112,7 +109,7 @@ class SimpleSettingsProvider implements SettingsProviderInterface
     {
         $updated = false;
 
-        foreach ($this->settings as $k => &$setting) {
+        foreach ($this->settings as $setting) {
             if ($setting->getDomain()->getName() === $domainModel->getName()) {
                 $setting->setDomain($domainModel);
                 $updated = true;

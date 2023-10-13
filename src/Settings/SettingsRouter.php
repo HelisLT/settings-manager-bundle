@@ -13,29 +13,14 @@ use Helis\SettingsManagerBundle\SettingsManagerEvents;
 
 class SettingsRouter
 {
-    private $settingsManager;
-    private $settingsStore;
-    private $eventManager;
-    private $treatAsDefaultProviders;
-
-    public function __construct(
-        SettingsManager $settingsManager,
-        SettingsStore $settingsStore,
-        EventManagerInterface $eventManager,
-        $treatAsDefaultProviders = []
-    ) {
-        $this->settingsManager = $settingsManager;
-        $this->settingsStore = $settingsStore;
-        $this->eventManager = $eventManager;
-        $this->treatAsDefaultProviders = $treatAsDefaultProviders;
+    public function __construct(private readonly SettingsManager $settingsManager, private readonly SettingsStore $settingsStore, private readonly EventManagerInterface $eventManager, private readonly array $treatAsDefaultProviders = [])
+    {
     }
 
     /**
      * Retrieves setting data or default value with string typehint.
-     *
-     * @param string $defaultValue
      */
-    public function getString(string $settingName, $defaultValue = ''): string
+    public function getString(string $settingName, string $defaultValue = ''): string
     {
         return $this->get($settingName, $defaultValue);
     }
@@ -52,10 +37,8 @@ class SettingsRouter
 
     /**
      * Retrieves setting data or default value with bool typehint.
-     *
-     * @param bool $defaultValue
      */
-    public function getBool(string $settingName, $defaultValue = false): bool
+    public function getBool(string $settingName, bool $defaultValue = false): bool
     {
         return $this->get($settingName, $defaultValue);
     }
@@ -72,10 +55,8 @@ class SettingsRouter
 
     /**
      * Retrieves setting data or default value with int typehint.
-     *
-     * @param int $defaultValue
      */
-    public function getInt(string $settingName, $defaultValue = 0): int
+    public function getInt(string $settingName, int $defaultValue = 0): int
     {
         return $this->get($settingName, $defaultValue);
     }
@@ -92,10 +73,8 @@ class SettingsRouter
 
     /**
      * Retrieves setting data or default value with float typehint.
-     *
-     * @param float $defaultValue
      */
-    public function getFloat(string $settingName, $defaultValue = .0): float
+    public function getFloat(string $settingName, float $defaultValue = .0): float
     {
         return $this->get($settingName, $defaultValue);
     }
@@ -112,10 +91,8 @@ class SettingsRouter
 
     /**
      * Retrieves setting data or default value with array typehint.
-     *
-     * @param array $defaultValue
      */
-    public function getArray(string $settingName, $defaultValue = []): array
+    public function getArray(string $settingName, array $defaultValue = []): array
     {
         return $this->get($settingName, $defaultValue);
     }
@@ -132,12 +109,8 @@ class SettingsRouter
 
     /**
      * Returns data from setting or default value if setting not found.
-     *
-     * @param mixed $defaultValue
-     *
-     * @return mixed
      */
-    public function get(string $settingName, $defaultValue = false)
+    public function get(string $settingName, mixed $defaultValue = false): mixed
     {
         $setting = $this->getSetting($settingName);
 
@@ -195,7 +168,7 @@ class SettingsRouter
     {
         $settings = $this->doGetSettingsByTag($tagName);
 
-        if (count($settings) === 0) {
+        if ($settings === []) {
             throw new TaggedSettingsNotFoundException($tagName);
         }
 
@@ -229,7 +202,7 @@ class SettingsRouter
             $setting = $this->settingsStore->get($settingName);
         } else {
             $this->warmupDomains();
-            if (empty($this->settingsStore->getDomainNames())) {
+            if ($this->settingsStore->getDomainNames() === []) {
                 return null;
             }
 
@@ -263,11 +236,9 @@ class SettingsRouter
      */
     private function warmupDomains(bool $force = false): void
     {
-        if (empty($this->settingsStore->getDomainNames(false)) || $force) {
+        if ($this->settingsStore->getDomainNames(false) === [] || $force) {
             $this->settingsStore->setDomainNames(array_map(
-                function(DomainModel $domainModel) {
-                    return $domainModel->getName();
-                },
+                fn(DomainModel $domainModel) => $domainModel->getName(),
                 $this->settingsManager->getDomains(null, true)
             ));
         }
@@ -278,7 +249,7 @@ class SettingsRouter
      */
     private function warmupSettings(array $settingNames): void
     {
-        if (!empty($this->settingsStore->getDomainNames())) {
+        if ($this->settingsStore->getDomainNames() !== []) {
             $this->settingsStore->setSettings(
                 $this->settingsManager->getSettingsByName($this->settingsStore->getDomainNames(), $settingNames)
             );
@@ -287,7 +258,7 @@ class SettingsRouter
 
     private function warmupSettingsByTag(string $tagName): void
     {
-        if (!empty($this->settingsStore->getDomainNames())) {
+        if ($this->settingsStore->getDomainNames() !== []) {
             $this->settingsStore->setSettingsByTag(
                 $tagName,
                 $this->settingsManager->getSettingsByTag(array_values($this->settingsStore->getDomainNames()), $tagName)

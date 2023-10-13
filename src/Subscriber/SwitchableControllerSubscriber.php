@@ -13,11 +13,8 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 class SwitchableControllerSubscriber implements EventSubscriberInterface
 {
-    private $settingsRouter;
-
-    public function __construct(SettingsRouter $settingsRouter)
+    public function __construct(private readonly SettingsRouter $settingsRouter)
     {
-        $this->settingsRouter = $settingsRouter;
     }
 
     public static function getSubscribedEvents(): array

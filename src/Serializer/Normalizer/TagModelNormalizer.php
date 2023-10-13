@@ -16,14 +16,13 @@ class TagModelNormalizer implements NormalizerInterface, DenormalizerInterface, 
     use SerializerAwareTrait;
     use ObjectToPopulateTrait;
 
-    /**
-     * @return mixed
-     */
-    public function denormalize($data, $class, $format = null, array $context = [])
+    public function denormalize($data, $type, $format = null, array $context = []): mixed
     {
-        $object = $this->extractObjectToPopulate($class, $context) ?? new $class();
+        $object = $this->extractObjectToPopulate($type, $context) ?? new $type();
 
-        isset($data['name']) && $object->setName($data['name']);
+        if (isset($data['name'])) {
+            $object->setName($data['name']);
+        }
 
         return $object;
     }
@@ -46,5 +45,12 @@ class TagModelNormalizer implements NormalizerInterface, DenormalizerInterface, 
     public function supportsNormalization($data, $format = null): bool
     {
         return $data instanceof TagModel;
+    }
+
+    public function getSupportedTypes(?string $format): array
+    {
+        return [
+            TagModel::class => true,
+        ];
     }
 }

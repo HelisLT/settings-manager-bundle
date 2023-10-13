@@ -12,15 +12,8 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 class SimpleSettingsProviderFactory implements ProviderFactoryInterface
 {
-    private $serializer;
-    private $normalizedData;
-    private $readOnly;
-
-    public function __construct(DenormalizerInterface $serializer, array $normalizedData, bool $readOnly = true)
+    public function __construct(private readonly DenormalizerInterface $serializer, private readonly array $normalizedData, private readonly bool $readOnly = true)
     {
-        $this->serializer = $serializer;
-        $this->normalizedData = $normalizedData;
-        $this->readOnly = $readOnly;
     }
 
     public function get(): SettingsProviderInterface

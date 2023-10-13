@@ -19,22 +19,10 @@ class SettingsManager implements LoggerAwareInterface
     use LoggerAwareTrait;
 
     /**
-     * @var SettingsProviderInterface[]
-     */
-    private $providers;
-
-    /**
-     * @var EventManagerInterface
-     */
-    private $eventManager;
-
-    /**
      * @param SettingsProviderInterface[] $providers
      */
-    public function __construct(array $providers, EventManagerInterface $eventManager)
+    public function __construct(private array $providers, private readonly EventManagerInterface $eventManager)
     {
-        $this->providers = $providers;
-        $this->eventManager = $eventManager;
     }
 
     /**
@@ -103,7 +91,7 @@ class SettingsManager implements LoggerAwareInterface
             $settings[] = array_values($providerSettings);
 
             // check if already has enough
-            if (count($settingNames) === 0) {
+            if ($settingNames === []) {
                 break;
             }
         }
@@ -151,11 +139,11 @@ class SettingsManager implements LoggerAwareInterface
         if ($settingModel->getProviderName()) {
             try {
                 $result = $this->providers[$settingModel->getProviderName()]->save($settingModel);
-            } catch (ReadOnlyProviderException $e) {
+            } catch (ReadOnlyProviderException) {
                 $result = false;
             }
 
-            if ($result === true) {
+            if ($result) {
                 $this->logger && $this->logger->info('SettingsManager: setting updated', [
                     'sSettingName' => $settingModel->getName(),
                     'sSettingType' => $settingModel->getType()->getValue(),
@@ -185,7 +173,7 @@ class SettingsManager implements LoggerAwareInterface
             }
 
             try {
-                if (!$provider->isReadOnly() && $provider->save($settingModel) !== false) {
+                if (!$provider->isReadOnly() && $provider->save($settingModel)) {
                     $this->logger && $this->logger->info('SettingsManager: setting saved', [
                         'sSettingName' => $settingModel->getName(),
                         'sSettingType' => $settingModel->getType()->getValue(),
@@ -201,7 +189,7 @@ class SettingsManager implements LoggerAwareInterface
 
                     return true;
                 }
-            } catch (ReadOnlyProviderException $e) {
+            } catch (ReadOnlyProviderException) {
                 // go to next provider
             }
         }

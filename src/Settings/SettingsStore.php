@@ -6,37 +6,33 @@ namespace Helis\SettingsManagerBundle\Settings;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Helis\SettingsManagerBundle\Model\SettingModel;
+use LogicException;
 
 class SettingsStore extends ArrayCollection
 {
     /**
      * @var SettingModel[][]
      */
-    private $settingsByProvider;
+    private array $settingsByProvider = [];
 
     /**
      * @var SettingModel[][]
      */
-    private $settingsByTag;
+    private array $settingsByTag = [];
 
     /**
      * @var string[]
      */
-    private $domainNames;
+    private array $domainNames = [];
 
     /**
      * @var string[]
      */
-    private $additionalDomainNames;
+    private array $additionalDomainNames = [];
 
     public function __construct(array $elements = [])
     {
         parent::__construct($elements);
-
-        $this->settingsByProvider = [];
-        $this->domainNames = [];
-        $this->additionalDomainNames = [];
-        $this->settingsByTag = [];
     }
 
     /**
@@ -51,9 +47,9 @@ class SettingsStore extends ArrayCollection
 
     public function addSetting(string $settingName, ?SettingModel $settingModel): void
     {
-        if ($settingModel !== null) {
+        if ($settingModel instanceof SettingModel) {
             if ($settingName !== $settingModel->getName()) {
-                throw new \LogicException('SettingModel name does not match provided name');
+                throw new LogicException('SettingModel name does not match provided name');
             }
 
             $this->settingsByProvider[$settingModel->getProviderName()][$settingName] = $settingModel;
@@ -74,7 +70,7 @@ class SettingsStore extends ArrayCollection
         foreach ($settings as $setting) {
             if ($setting !== null) {
                 if (!$setting->hasTag($tagName)) {
-                    throw new \LogicException('SettingModel does not have provided tag');
+                    throw new LogicException('SettingModel does not have provided tag');
                 }
 
                 $this->settingsByTag[$tagName][$setting->getName()] = $setting;
@@ -108,12 +104,12 @@ class SettingsStore extends ArrayCollection
      */
     public function isWarm(): bool
     {
-        return $this->count() > 0 || !empty($this->settingsByTag);
+        return $this->count() > 0 || $this->settingsByTag !== [];
     }
 
     public function getDomainNames(bool $includeAdditional = true): array
     {
-        if (empty($this->additionalDomainNames) || $includeAdditional === false) {
+        if ($this->additionalDomainNames === [] || $includeAdditional === false) {
             return $this->domainNames;
         }
 

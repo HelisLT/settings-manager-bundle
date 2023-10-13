@@ -9,14 +9,14 @@ use Doctrine\Common\Collections\Collection;
 
 class SettingModel
 {
-    protected $name;
-    protected $description;
-    protected $domain;
-    protected $tags;
-    protected $type;
-    protected $data = [];
-    protected $providerName;
-    protected $choices = [];
+    protected ?string $name = null;
+    protected ?string $description = null;
+    protected ?DomainModel$domain;
+    protected Collection $tags;
+    protected ?Type $type;
+    protected array $data = [];
+    protected ?string $providerName;
+    protected array $choices = [];
 
     public function __construct()
     {

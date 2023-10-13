@@ -12,8 +12,7 @@ use Redis;
 /** @property Redis|Client|Pipeline $redis */
 trait RedisModificationTrait
 {
-    /** @var string */
-    private $modificationTimeKey = 'settings_modification_time';
+    private string $modificationTimeKey = 'settings_modification_time';
 
     public function setModificationTimeKey(string $modificationTimeKey): void
     {
@@ -32,7 +31,7 @@ trait RedisModificationTrait
     {
         $time = (int)$this->redis->get($this->modificationTimeKey);
 
-        if (empty($time)) {
+        if ($time === 0) {
             $time = $this->setModificationTime();
         }
 

@@ -7,8 +7,9 @@ framework:
     php_errors:
         log: true
     session:
-        storage_id: session.storage.mock_file
+        storage_factory_id: session.storage.factory.mock_file
     validation: ~
+    http_method_override: false
 
 security:
     providers:
@@ -18,7 +19,6 @@ security:
     firewalls:
         main:
             pattern: ^/
-            anonymous: ~
 
 liip_functional_test:
     command_verbosity: normal

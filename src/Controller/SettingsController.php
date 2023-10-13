@@ -20,25 +20,15 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class SettingsController extends AbstractController
 {
-    private $settingsManager;
-    private $eventManager;
-    private $validator;
-
-    public function __construct(
-        SettingsManager $settingsManager,
-        EventManagerInterface $eventManager,
-        ValidatorInterface $validator
-    ) {
-        $this->settingsManager = $settingsManager;
-        $this->eventManager = $eventManager;
-        $this->validator = $validator;
+    public function __construct(private readonly SettingsManager $settingsManager, private readonly EventManagerInterface $eventManager, private readonly ValidatorInterface $validator)
+    {
     }
 
     public function indexAction(string $domainName): Response
     {
         $settings = $this->settingsManager->getSettingsByDomain([$domainName]);
 
-        if ($domainName !== DomainModel::DEFAULT_NAME && count($settings) === 0) {
+        if ($domainName !== DomainModel::DEFAULT_NAME && $settings === []) {
             return $this->redirectToRoute('settings_index');
         }
 
@@ -63,7 +53,7 @@ class SettingsController extends AbstractController
             throw $this->createNotFoundException('Setting not found in '.$domainName.' domain');
         }
 
-        if ($setting->getType()->equals(Type::BOOL())) {
+        if ($setting->getType()->equals(Type::BOOL)) {
             $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
         } else {
             throw new BadRequestHttpException('Quick edit is only allowed for setttings with type bool');

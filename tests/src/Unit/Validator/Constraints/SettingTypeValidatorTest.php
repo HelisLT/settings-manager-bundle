@@ -27,7 +27,7 @@ class SettingTypeValidatorTest extends TestCase
         $this->validator = $builder->getValidator();
     }
 
-    public function dataProviderTestValid(): array
+    public static function dataProviderTestValid(): array
     {
         return [
             [Type::INT(), 13],
@@ -58,7 +58,7 @@ class SettingTypeValidatorTest extends TestCase
         $this->assertCount(0, $violations);
     }
 
-    public function dataProviderTestInvalid(): array
+    public static function dataProviderTestInvalid(): array
     {
         return [
             [Type::BOOL(), 12, 'Setting data value should be of type bool.'],

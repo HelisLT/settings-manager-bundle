@@ -23,24 +23,35 @@ class SettingModelNormalizer implements NormalizerInterface, DenormalizerInterfa
     use NormalizerAwareTrait;
     use ObjectToPopulateTrait;
 
-    /**
-     * @return mixed
-     */
-    public function denormalize($data, $class, $format = null, array $context = [])
+    public function denormalize($data, $type, $format = null, array $context = []): mixed
     {
-        $object = $this->extractObjectToPopulate($class, $context) ?? new $class();
+        $object = $this->extractObjectToPopulate($type, $context) ?? new $type();
 
-        isset($data['name']) && $object->setName($data['name']);
-        isset($data['description']) && $object->setDescription($data['description']);
-        isset($data['domain']) && $object->setDomain(
-            $this->denormalizer->denormalize($data['domain'], DomainModel::class, $format, $context)
-        );
-        isset($data['type']) && $object->setType(new Type($data['type']));
-        isset($data['data']) && $object->setDataValue($data['data']);
-        isset($data['tags']) && $object->setTags(new ArrayCollection(
-            $this->denormalizer->denormalize($data['tags'], TagModel::class.'[]', $format, $context)
-        ));
-        isset($data['choices']) && $object->setChoices($data['choices']);
+        if (isset($data['name'])) {
+            $object->setName($data['name']);
+        }
+        if (isset($data['description'])) {
+            $object->setDescription($data['description']);
+        }
+        if (isset($data['domain'])) {
+            $object->setDomain(
+                $this->denormalizer->denormalize($data['domain'], DomainModel::class, $format, $context)
+            );
+        }
+        if (isset($data['type'])) {
+            $object->setType(new Type($data['type']));
+        }
+        if (isset($data['data'])) {
+            $object->setDataValue($data['data']);
+        }
+        if (isset($data['tags'])) {
+            $object->setTags(new ArrayCollection(
+                $this->denormalizer->denormalize($data['tags'], TagModel::class.'[]', $format, $context)
+            ));
+        }
+        if (isset($data['choices'])) {
+            $object->setChoices($data['choices']);
+        }
 
         return $object;
     }
@@ -69,5 +80,12 @@ class SettingModelNormalizer implements NormalizerInterface, DenormalizerInterfa
     public function supportsNormalization($data, $format = null): bool
     {
         return $data instanceof SettingModel;
+    }
+
+    public function getSupportedTypes(?string $format): array
+    {
+        return [
+            SettingModel::class => true,
+        ];
     }
 }

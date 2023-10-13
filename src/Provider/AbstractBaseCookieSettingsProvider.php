@@ -9,8 +9,10 @@ use Helis\SettingsManagerBundle\Model\SettingModel;
 use Helis\SettingsManagerBundle\Provider\Traits\WritableProviderTrait;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
+use ReflectionObject;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Cookie;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -20,32 +22,17 @@ abstract class AbstractBaseCookieSettingsProvider extends SimpleSettingsProvider
 {
     use LoggerAwareTrait;
     use WritableProviderTrait;
-
-    protected $serializer;
-    protected $cookieName;
-    protected $ttl;
-    protected $issuer;
-    protected $subject;
-    protected $cookiePath;
-    protected $cookieDomain;
-    protected $changed;
+    protected ?string $cookieDomain = null;
+    protected bool $changed = false;
 
     public function __construct(
-        SerializerInterface $serializer,
-        string $cookieName,
-        int $ttl = 86400,
-        string $issuer = 'settings_manager',
-        string $subject = 'settings',
-        string $cookiePath = '/'
+        protected SerializerInterface $serializer,
+        protected string $cookieName,
+        protected int $ttl = 86400,
+        protected string $issuer = 'settings_manager',
+        protected string $subject = 'settings',
+        protected string $cookiePath = '/'
     ) {
-        $this->serializer = $serializer;
-        $this->cookieName = $cookieName;
-        $this->ttl = $ttl;
-        $this->issuer = $issuer;
-        $this->subject = $subject;
-        $this->cookiePath = $cookiePath;
-        $this->changed = false;
-
         parent::__construct([]);
     }
 
@@ -61,7 +48,7 @@ abstract class AbstractBaseCookieSettingsProvider extends SimpleSettingsProvider
 
     public function onKernelRequest(RequestEvent $event): void
     {
-        if (!$event->isMasterRequest()
+        if (!$event->isMainRequest()
             || ($rawToken = $event->getRequest()->cookies->get($this->cookieName)) === null
         ) {
             return;
@@ -72,18 +59,13 @@ abstract class AbstractBaseCookieSettingsProvider extends SimpleSettingsProvider
 
     public function onKernelResponse(ResponseEvent $event): void
     {
-        if (!$event->isMasterRequest() || $event->getResponse() === null || !$this->changed) {
-            return;
-        }
-
-        // cache is still warm
-        if (!$this->changed) {
+        if (!$event->isMainRequest() || !$event->getResponse() instanceof Response || !$this->changed) {
             return;
         }
 
         // no settings to save
-        if (empty($this->settings)) {
-            // also check for a cookie if needs to be cleared
+        if ($this->settings == []) {
+            // also check whether a cookie needs to be cleared
             if ($event->getRequest()->cookies->has($this->cookieName)) {
                 $event->getResponse()->headers->clearCookie($this->cookieName, $this->cookiePath, $this->cookieDomain);
             }
@@ -93,9 +75,9 @@ abstract class AbstractBaseCookieSettingsProvider extends SimpleSettingsProvider
 
         $token = $this->buildToken($this->settings);
 
-        if (empty($token)) {
+        if ($token === '') {
             $this->logger && $this->logger->error(
-                sprintf('%s: failed to build token', (new \ReflectionObject($this))->getShortName())
+                sprintf('%s: failed to build token', (new ReflectionObject($this))->getShortName())
             );
 
             return;
@@ -120,7 +102,9 @@ abstract class AbstractBaseCookieSettingsProvider extends SimpleSettingsProvider
     public function save(SettingModel $settingModel): bool
     {
         $output = parent::save($settingModel);
-        $output && $this->changed = true;
+        if ($output) {
+            $this->changed = true;
+        }
 
         return $output;
     }
@@ -128,7 +112,9 @@ abstract class AbstractBaseCookieSettingsProvider extends SimpleSettingsProvider
     public function delete(SettingModel $settingModel): bool
     {
         $output = parent::delete($settingModel);
-        $output && $this->changed = true;
+        if ($output) {
+            $this->changed = true;
+        }
 
         return $output;
     }
@@ -136,7 +122,9 @@ abstract class AbstractBaseCookieSettingsProvider extends SimpleSettingsProvider
     public function updateDomain(DomainModel $domainModel): bool
     {
         $output = parent::updateDomain($domainModel);
-        $output && $this->changed = true;
+        if ($output) {
+            $this->changed = true;
+        }
 
         return $output;
     }
@@ -144,7 +132,9 @@ abstract class AbstractBaseCookieSettingsProvider extends SimpleSettingsProvider
     public function deleteDomain(string $domainName): bool
     {
         $output = parent::deleteDomain($domainName);
-        $output && $this->changed = true;
+        if ($output) {
+            $this->changed = true;
+        }
 
         return $output;
     }

@@ -12,6 +12,7 @@ services:
             - ['setContainer', ['@Psr\Container\ContainerInterface']]
         tags:
             - { name: controller.service_arguments }
+            - { name: container.service_subscriber }
 
     Helis\SettingsManagerBundle\Controller\SettingsController:
         public: true
@@ -23,6 +24,7 @@ services:
             - ['setContainer', ['@Psr\Container\ContainerInterface']]
         tags:
             - { name: controller.service_arguments }
+            - { name: container.service_subscriber }
 
     Helis\SettingsManagerBundle\Settings\SettingsAwareServiceFactory:
         arguments:

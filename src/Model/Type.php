@@ -18,10 +18,10 @@ use MyCLabs\Enum\Enum;
  */
 class Type extends Enum
 {
-    public const STRING = 'string';
-    public const BOOL = 'bool';
-    public const INT = 'int';
-    public const FLOAT = 'float';
-    public const YAML = 'yaml';
-    public const CHOICE = 'choice';
+    final public const STRING = 'string';
+    final public const BOOL = 'bool';
+    final public const INT = 'int';
+    final public const FLOAT = 'float';
+    final public const YAML = 'yaml';
+    final public const CHOICE = 'choice';
 }

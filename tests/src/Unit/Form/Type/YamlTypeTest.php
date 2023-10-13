@@ -9,7 +9,7 @@ use Symfony\Component\Form\Test\TypeTestCase;
 
 class YamlTypeTest extends TypeTestCase
 {
-    public function dataProviderTestSubmit(): array
+    public static function dataProviderTestSubmit(): array
     {
         return [
             [json_encode('pineapple'), ['pineapple']],

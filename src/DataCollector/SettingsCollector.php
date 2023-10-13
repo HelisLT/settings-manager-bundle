@@ -8,19 +8,17 @@ use Helis\SettingsManagerBundle\Settings\SettingsStore;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
+use Throwable;
 
 class SettingsCollector implements DataCollectorInterface
 {
-    private $settingsStore;
-    private $data;
+    private array $data = [];
 
-    public function __construct(SettingsStore $settingsStore)
+    public function __construct(private readonly SettingsStore $settingsStore)
     {
-        $this->settingsStore = $settingsStore;
-        $this->data = [];
     }
 
-    public function collect(Request $request, Response $response, \Throwable $exception = null)
+    public function collect(Request $request, Response $response, Throwable $exception = null)
     {
         $this->data = $this->settingsStore->getValues();
     }

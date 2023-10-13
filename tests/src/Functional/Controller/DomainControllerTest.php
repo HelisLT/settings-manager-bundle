@@ -10,7 +10,7 @@ class DomainControllerTest extends AbstractWebTestCase
 {
     public function testIndexAction()
     {
-        $client = $this->makeClient();
+        $client = static::createClient();
         $this->loadFixtures([]);
 
         $client->request('GET', '/domains');

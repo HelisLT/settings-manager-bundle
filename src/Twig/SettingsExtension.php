@@ -10,11 +10,8 @@ use Twig\TwigFunction;
 
 class SettingsExtension extends AbstractExtension
 {
-    private $settingsRouter;
-
-    public function __construct(SettingsRouter $settingsRouter)
+    public function __construct(private readonly SettingsRouter $settingsRouter)
     {
-        $this->settingsRouter = $settingsRouter;
     }
 
     public function getFunctions(): array
@@ -24,10 +21,7 @@ class SettingsExtension extends AbstractExtension
         ];
     }
 
-    /**
-     * @return mixed
-     */
-    public function getSetting(string $settingName, $defaultValue = null)
+    public function getSetting(string $settingName, $defaultValue = null): mixed
     {
         return $this->settingsRouter->get($settingName, $defaultValue);
     }

@@ -34,7 +34,7 @@ class ProvidersManagerTest extends AbstractWebTestCase
         $this->settingsWarmUpService = new ProvidersManager($this->settingsManager);
     }
 
-    public function warmUpDataProvider(): array
+    public static function warmUpDataProvider(): array
     {
         return [
             [

@@ -21,25 +21,17 @@ class DecoratingPredisSettingsProvider implements ModificationAwareSettingsProvi
 
     private const DOMAIN_KEY = 'domain';
     private const HASHMAP_KEY = 'hashmap';
+    protected Client $redis;
 
-    protected $decoratingProvider;
-    protected $redis;
-    protected $serializer;
-
-    protected $ttl;
-    protected $namespace;
+    protected int $ttl = 604800;
+    protected string $namespace = 'settings_provider_cache';
 
     public function __construct(
-        SettingsProviderInterface $decoratingProvider,
+        protected SettingsProviderInterface $decoratingProvider,
         Client $redis,
-        SerializerInterface $serializer
+        protected SerializerInterface $serializer
     ) {
-        $this->decoratingProvider = $decoratingProvider;
         $this->redis = $redis;
-        $this->serializer = $serializer;
-
-        $this->ttl = 604800;
-        $this->namespace = 'settings_provider_cache';
     }
 
     public function setTtl(int $ttl)
@@ -69,8 +61,8 @@ class DecoratingPredisSettingsProvider implements ModificationAwareSettingsProvi
 
         $out = [];
 
-        foreach ($result as $d => $domainGroup) {
-            foreach ($domainGroup as $s => $item) {
+        foreach ($result as $domainGroup) {
+            foreach ($domainGroup as $item) {
                 if ($item !== null) {
                     $out[] = $this->serializer->deserialize($item, SettingModel::class, 'json');
                 }
@@ -94,8 +86,8 @@ class DecoratingPredisSettingsProvider implements ModificationAwareSettingsProvi
 
         $out = [];
 
-        foreach ($result as $d => $domainGroup) {
-            foreach ($domainGroup as $s => $item) {
+        foreach ($result as $domainGroup) {
+            foreach ($domainGroup as $item) {
                 if ($item !== null) {
                     $out[] = $this->serializer->deserialize($item, SettingModel::class, 'json');
                 }
@@ -171,7 +163,7 @@ class DecoratingPredisSettingsProvider implements ModificationAwareSettingsProvi
 
         $domains = $this->decoratingProvider->getDomains($onlyEnabled);
 
-        if (count($domains) > 0) {
+        if ($domains !== []) {
             $dictionary = [];
             foreach ($domains as $domain) {
                 $dictionary[$domain->getName()] = $this->serializer->serialize($domain, 'json');
@@ -240,15 +232,11 @@ class DecoratingPredisSettingsProvider implements ModificationAwareSettingsProvi
             return;
         }
 
-        if ($domainName !== null) {
-            $domains = [$domainName];
-        } else {
-            $domains = $this->extractDomainNames($this->decoratingProvider->getDomains());
-        }
+        $domains = $domainName !== null ? [$domainName] : $this->extractDomainNames($this->decoratingProvider->getDomains());
 
         $settings = $this->decoratingProvider->getSettings($domains);
 
-        if (!empty($settings)) {
+        if ($settings !== []) {
             $this->redis->pipeline(function(Pipeline $pipe) use ($settings, $key, $isBuilt) {
                 foreach ($settings as $setting) {
                     $pipe->hset(
@@ -263,11 +251,9 @@ class DecoratingPredisSettingsProvider implements ModificationAwareSettingsProvi
                 }
             });
             $this->setModificationTime();
-        } else {
-            if ($isBuilt === null || (int)$isBuilt === 0) {
-                $this->redis->setex($key, $this->ttl, 1);
-                $this->setModificationTime();
-            }
+        } elseif ($isBuilt === null || (int)$isBuilt === 0) {
+            $this->redis->setex($key, $this->ttl, 1);
+            $this->setModificationTime();
         }
     }
 }

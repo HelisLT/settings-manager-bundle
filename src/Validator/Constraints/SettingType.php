@@ -8,9 +8,9 @@ use Symfony\Component\Validator\Constraint;
 
 class SettingType extends Constraint
 {
-    public $message = 'Setting data value should be of type {{ type }}.';
+    public string $message = 'Setting data value should be of type {{ type }}.';
 
-    public function getTargets()
+    public function getTargets(): string
     {
         return Constraint::CLASS_CONSTRAINT;
     }

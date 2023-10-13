@@ -36,9 +36,7 @@ class SettingFormType extends AbstractType
                 'disabled' => true,
                 'translation_domain' => 'HelisSettingsManager',
                 'choice_translation_domain' => 'HelisSettingsManager',
-                'choice_label' => function(string $type) {
-                    return 'type.'.strtolower($type);
-                },
+                'choice_label' => fn(string $type) => 'type.'.strtolower($type),
                 'label' => 'edit.form.type',
             ])
             ->add('description', TextareaType::class, [

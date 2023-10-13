@@ -87,7 +87,7 @@ abstract class AbstractCookieSettingsProviderTest extends TestCase
         $settingStub = $this->createMock(SettingModel::class);
         $settingStub->method('getDomain')->willReturn($domainStub);
 
-        $eventMock->expects($this->once())->method('isMasterRequest')->willReturn(true);
+        $eventMock->expects($this->once())->method('isMainRequest')->willReturn(true);
         $eventMock->expects($this->once())->method('getRequest')->willReturn($request);
         $this
             ->serializer
@@ -109,7 +109,7 @@ abstract class AbstractCookieSettingsProviderTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $eventMock->expects($this->once())->method('isMasterRequest')->willReturn(true);
+        $eventMock->expects($this->once())->method('isMainRequest')->willReturn(true);
         $eventMock->expects($this->once())->method('getRequest')->willReturn(new Request());
         $this->serializer->expects($this->never())->method('deserialize');
 

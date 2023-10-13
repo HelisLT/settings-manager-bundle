@@ -12,14 +12,8 @@ class ProvidersManager
 {
     use DomainNameExtractTrait;
 
-    /**
-     * @var SettingsManager
-     */
-    private $settingsManager;
-
-    public function __construct(SettingsManager $settingsManager)
+    public function __construct(private readonly SettingsManager $settingsManager)
     {
-        $this->settingsManager = $settingsManager;
     }
 
     /**
@@ -48,7 +42,7 @@ class ProvidersManager
     {
         $configProvider = $this->settingsManager->getProvider($provider);
 
-        if (empty($domains)) {
+        if ($domains === []) {
             $domainNames = $this->extractDomainNames($configProvider->getDomains());
         }
 
@@ -64,10 +58,6 @@ class ProvidersManager
         $settings = $provider->getSettings($domainNames);
 
         $missingSettings = $this->getDiff($sourceSettings, $settings);
-
-        if (empty($missingSettings)) {
-            return;
-        }
 
         foreach ($missingSettings as $settings) {
             $provider->save($settings);

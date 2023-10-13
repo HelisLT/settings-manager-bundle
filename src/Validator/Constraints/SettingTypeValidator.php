@@ -18,7 +18,7 @@ class SettingTypeValidator extends ConstraintValidator
         }
 
         $type = $value->getType();
-        if ($type === null || $value->getData() === null) {
+        if (!$type instanceof \Helis\SettingsManagerBundle\Model\Type || $value->getData() === null) {
             return;
         }
 

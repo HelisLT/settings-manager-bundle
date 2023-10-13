@@ -33,7 +33,7 @@ class SettingsRouterTest extends AbstractWebTestCase
         $this->settingsRouter = $this->getContainer()->get(SettingsRouter::class);
     }
 
-    public function getSettingDataProvider(): array
+    public static function getSettingDataProvider(): array
     {
         return [
             ['foo', 'fixture bool foo setting', [], Type::BOOL(), true, 'orm'],
@@ -85,7 +85,7 @@ class SettingsRouterTest extends AbstractWebTestCase
         }
     }
 
-    public function mustGetSettingDataProvider(): array
+    public static function mustGetSettingDataProvider(): array
     {
         return [
             ['non-existing', '', [], null, null, '', SettingNotFoundException::class],
@@ -148,7 +148,7 @@ class SettingsRouterTest extends AbstractWebTestCase
         }
     }
 
-    public function getSettingsByTagDataProvider(): array
+    public static function getSettingsByTagDataProvider(): array
     {
         return [
             ['experimental', 1, ['baz']],
@@ -178,7 +178,7 @@ class SettingsRouterTest extends AbstractWebTestCase
         }
     }
 
-    public function mustGetSettingsByTagDataProvider(): array
+    public static function mustGetSettingsByTagDataProvider(): array
     {
         return [
             ['experimental', 1, ['baz'], null],
@@ -215,7 +215,7 @@ class SettingsRouterTest extends AbstractWebTestCase
         }
     }
 
-    public function warmUpClearDataProvider(): array
+    public static function warmUpClearDataProvider(): array
     {
         return [
             ['fixture', 'bazinga'],

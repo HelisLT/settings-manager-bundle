@@ -8,13 +8,8 @@ use Helis\SettingsManagerBundle\Settings\SettingsStore;
 
 class SettingsProcessor
 {
-    private $settingsStore;
-    private $providerNames;
-
-    public function __construct(SettingsStore $settingsManager, array $providerNames)
+    public function __construct(private readonly SettingsStore $settingsStore, private readonly array $providerNames)
     {
-        $this->settingsStore = $settingsManager;
-        $this->providerNames = $providerNames;
     }
 
     public function __invoke(array $record): array

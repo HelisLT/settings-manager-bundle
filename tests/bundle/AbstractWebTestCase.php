@@ -22,7 +22,9 @@ abstract class AbstractWebTestCase extends WebTestCase
     {
         /** @var EntityManagerInterface $om */
         $om = $this->getContainer()->get('doctrine')->getManager();
-        if (!$om->getConnection()->getSchemaManager()->tablesExist('settings_test_setting')) {
+        $om->getConnection()->setNestTransactionsWithSavepoints(true);
+
+        if (!$om->getConnection()->createSchemaManager()->tablesExist(['settings_test_setting'])) {
             $schemaTool = new SchemaTool($om);
             $schemaTool->createSchema($om->getMetadataFactory()->getAllMetadata());
         }

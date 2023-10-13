@@ -7,6 +7,7 @@ namespace Helis\SettingsManagerBundle\Command;
 use Helis\SettingsManagerBundle\Model\SettingModel;
 use Helis\SettingsManagerBundle\Model\TagModel;
 use Helis\SettingsManagerBundle\Settings\SettingsManager;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -14,17 +15,12 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
+#[AsCommand(name: 'debug:settings')]
 class SettingsDebugCommand extends Command
 {
-    protected static $defaultName = 'debug:settings';
-
-    protected $settingsManager;
-
-    public function __construct(SettingsManager $settingsManager)
+    public function __construct(protected SettingsManager $settingsManager)
     {
         parent::__construct();
-
-        $this->settingsManager = $settingsManager;
     }
 
     protected function configure()
@@ -64,7 +60,7 @@ EOF
         if ($input->getOption('domains')) {
             $tableHeaders = ['Name', 'Priority', 'Enabled', 'Read only'];
             $tableRows = [];
-            foreach ($this->settingsManager->getDomains() as $key => $domain) {
+            foreach ($this->settingsManager->getDomains() as $domain) {
                 $tableRows[] = [
                     $domain->getName(),
                     $domain->getPriority(),
@@ -147,11 +143,11 @@ EOF
     private function dataToScalar($data)
     {
         if (is_array($data)) {
-            $data = empty($data) ? '-' : var_export($data, true);
+            $data = $data === [] ? '-' : var_export($data, true);
         }
 
         if (is_bool($data)) {
-            $data = $data === true ? 'true' : 'false';
+            $data = $data ? 'true' : 'false';
         }
 
         return is_scalar($data) ? $data : '-';
@@ -161,9 +157,7 @@ EOF
     {
         $tags = $model
             ->getTags()
-            ->map(function(TagModel $tagModel) {
-                return $tagModel->getName();
-            })
+            ->map(fn(TagModel $tagModel) => $tagModel->getName())
             ->toArray();
 
         return empty($tags) ? '-' : implode("\n", $tags);

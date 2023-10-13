@@ -12,7 +12,7 @@ use Symfony\Component\Form\Test\TypeTestCase;
 
 class SettingFormTypeTest extends TypeTestCase
 {
-    public function submitValidDataProvider()
+    public static function submitValidDataProvider()
     {
         // test bool submit
         $data1 = new SettingModel();

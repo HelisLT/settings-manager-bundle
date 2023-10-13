@@ -19,7 +19,7 @@ class ConfigurationTest extends TestCase
         $this->processor = new Processor();
     }
 
-    public function configurationProcessDataProvider(): array
+    public static function configurationProcessDataProvider(): array
     {
         return [
             // case 1: empty

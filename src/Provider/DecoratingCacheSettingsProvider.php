@@ -20,26 +20,10 @@ class DecoratingCacheSettingsProvider implements ModificationAwareSettingsProvid
     private const LOCK_RETRY_INTERVAL_MS = 50000; // microseconds
     private const LOCK_RESOURCE = __CLASS__.'settings-cache';
     private const LOCK_MAX_READER_FAILED_ACQUIRES = 2;
+    private string $modificationTimeKey = 'settings_modification_time';
 
-    private $decoratingProvider;
-    protected $serializer;
-    private $cache;
-    private $lockFactory;
-    private $checkValidityInterval;
-    private $modificationTimeKey = 'settings_modification_time';
-
-    public function __construct(
-        ModificationAwareSettingsProviderInterface $decoratingProvider,
-        SerializerInterface $serializer,
-        AdapterInterface $cache,
-        LockFactory $lockFactory,
-        int $checkValidityInterval = 30
-    ) {
-        $this->decoratingProvider = $decoratingProvider;
-        $this->serializer = $serializer;
-        $this->lockFactory = $lockFactory;
-        $this->cache = $cache;
-        $this->checkValidityInterval = $checkValidityInterval;
+    public function __construct(private readonly ModificationAwareSettingsProviderInterface $decoratingProvider, protected SerializerInterface $serializer, private readonly AdapterInterface $cache, private readonly LockFactory $lockFactory, private readonly int $checkValidityInterval = 30)
+    {
     }
 
     /**
@@ -268,7 +252,7 @@ class DecoratingCacheSettingsProvider implements ModificationAwareSettingsProvid
             } else {
                 $domains = $this->decoratingProvider->getDomains($onlyEnabled);
 
-                if (!empty($domains)) {
+                if ($domains !== []) {
                     $this->storeCached($cacheItem, $this->serializeArray($domains));
                 }
             }
@@ -291,7 +275,7 @@ class DecoratingCacheSettingsProvider implements ModificationAwareSettingsProvid
             $missingDomainNames[] = $domainName;
         }
 
-        if (count($missingDomainNames) > 0) {
+        if ($missingDomainNames !== []) {
             $lock = $this->lockFactory->createLock(__FUNCTION__);
             if (!$lock->acquire()) {
                 usleep(self::LOCK_RETRY_INTERVAL_MS);
@@ -330,7 +314,7 @@ class DecoratingCacheSettingsProvider implements ModificationAwareSettingsProvid
             }
         }
 
-        if (count($missingSettingNames) > 0) {
+        if ($missingSettingNames !== []) {
             $missingDomainNames = array_values($missingDomainNames);
             $missingSettingNames = array_values($missingSettingNames);
 
@@ -364,7 +348,7 @@ class DecoratingCacheSettingsProvider implements ModificationAwareSettingsProvid
             $missingDomainNames[] = $domainName;
         }
 
-        if (count($missingDomainNames) > 0) {
+        if ($missingDomainNames !== []) {
             $lock = $this->lockFactory->createLock(__FUNCTION__);
             if (!$lock->acquire()) {
                 usleep(self::LOCK_RETRY_INTERVAL_MS);
@@ -559,7 +543,7 @@ class DecoratingCacheSettingsProvider implements ModificationAwareSettingsProvid
         $cacheItem->set($value);
         $this->cache->saveDeferred($cacheItem);
 
-        if (true === $commit) {
+        if ($commit) {
             $this->cache->commit();
         }
     }
