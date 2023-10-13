@@ -11,7 +11,7 @@ class SwitchableControllerSubscriberTest extends AbstractWebTestCase
 {
     public function testControllerDisabled()
     {
-        $client = $this->makeClient();
+        $client = self::createClient();
         $this->loadFixtures([]);
 
         $client->request('GET', '/print/batman');
@@ -21,7 +21,7 @@ class SwitchableControllerSubscriberTest extends AbstractWebTestCase
 
     public function testControllerEnabled()
     {
-        $client = $this->makeClient();
+        $client = self::createClient();
         $this->loadFixtures([LoadSwitchableControllerData::class]);
 
         $client->request('GET', '/print/batman');

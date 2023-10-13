@@ -20,8 +20,11 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class SettingsController extends AbstractController
 {
-    public function __construct(private readonly SettingsManager $settingsManager, private readonly EventManagerInterface $eventManager, private readonly ValidatorInterface $validator)
-    {
+    public function __construct(
+        private readonly SettingsManager $settingsManager,
+        private readonly EventManagerInterface $eventManager,
+        private readonly ValidatorInterface $validator
+    ) {
     }
 
     public function indexAction(string $domainName): Response
@@ -53,7 +56,7 @@ class SettingsController extends AbstractController
             throw $this->createNotFoundException('Setting not found in '.$domainName.' domain');
         }
 
-        if ($setting->getType()->equals(Type::BOOL)) {
+        if ($setting->getType() === Type::BOOL) {
             $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
         } else {
             throw new BadRequestHttpException('Quick edit is only allowed for setttings with type bool');
@@ -86,7 +89,7 @@ class SettingsController extends AbstractController
 
         return $this->render('@HelisSettingsManager/Settings/edit.html.twig', [
             'form' => $form->createView(),
-            'settingType' => $setting->getType()->getValue(),
+            'settingType' => $setting->getType()->value,
             'domainName' => $domainName,
         ]);
     }

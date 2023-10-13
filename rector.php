@@ -5,8 +5,6 @@ use Rector\CodeQuality\Rector\Empty_\SimplifyEmptyCheckOnEmptyArrayRector;
 use Rector\Core\ValueObject\PhpVersion;
 use Rector\Config\RectorConfig;
 use Rector\Php81\Rector\Array_\FirstClassCallableRector;
-use Rector\Php81\Rector\Class_\MyCLabsClassToEnumRector;
-use Rector\Php81\Rector\MethodCall\MyCLabsMethodCallToEnumConstRector;
 use Rector\Set\ValueObject\SetList;
 
 return static function (RectorConfig $rectorConfig): void {
@@ -29,8 +27,6 @@ return static function (RectorConfig $rectorConfig): void {
 
     $rectorConfig->skip([
         SimplifyEmptyCheckOnEmptyArrayRector::class,
-        MyCLabsClassToEnumRector::class,
-        MyCLabsMethodCallToEnumConstRector::class,
         FirstClassCallableRector::class,
     ]);
 

@@ -95,12 +95,12 @@ class AwsSsmSettingsProvider extends SimpleSettingsProvider
         }
     }
 
-    private function resolveType($value): string
+    private function resolveType(mixed $value): string
     {
         $type = gettype($value);
 
         if (isset(self::TYPE_MAP[$type])) {
-            return self::TYPE_MAP[$type];
+            return self::TYPE_MAP[$type]->value;
         }
 
         throw new UnknownTypeException($type);

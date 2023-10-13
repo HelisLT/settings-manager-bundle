@@ -10,7 +10,7 @@ class SettingsControllerTest extends AbstractWebTestCase
 {
     public function testIndexAction()
     {
-        $client = $this->makeClient();
+        $client = self::createClient();
         $this->loadFixtures([]);
 
         $client->request('GET', '/');
@@ -20,7 +20,7 @@ class SettingsControllerTest extends AbstractWebTestCase
 
     public function testEditAction()
     {
-        $client = $this->makeClient();
+        $client = self::createClient();
         $this->loadFixtures([]);
 
         foreach (['foo', 'tuna', 'wth_yaml', 'choice', 'integer'] as $settingName) {

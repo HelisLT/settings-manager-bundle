@@ -31,16 +31,16 @@
                                     {% endfor %}
                                 </p>
                             </td>
-                            <td>{{ ('type.'~setting.getType().getValue()) | lower | trans() }}</td>
+                            <td>{{ ('type.'~setting.getType().value) | lower | trans() }}</td>
                             <td>{{ setting.getDomain().getName() }}</td>
                             <td width="30%" style="word-break: break-word;">
-                                {% if setting.getType.getValue is constant('Helis\\SettingsManagerBundle\\Model\\Type::BOOL') %}
+                                {% if setting.getType.value is constant('Helis\\SettingsManagerBundle\\Model\\Type::BOOL') %}
                                     <input
                                             type="checkbox"
                                             name="{{ setting.getName() | lower }}"
                                             data-url-quick-edit="{{ path('settings_quick_edit', {domainName: setting.getDomain().getName(), settingName: setting.getName()}) }}"
                                             {% if setting.getData is same as(true) %}checked{% endif %}>
-                                {% elseif setting.getType.getValue is constant('Helis\\SettingsManagerBundle\\Model\\Type::YAML')  %}
+                                {% elseif setting.getType.value is constant('Helis\\SettingsManagerBundle\\Model\\Type::YAML')  %}
                                     {{ setting.getData() | json_encode }}
                                 {% else %}
                                     {{ setting.getData() }}

@@ -15,7 +15,8 @@ Helis\SettingsManagerBundle\Model\SettingModel:
             unique: false
         type:
             name: type
-            type: setting_type_enum
+            type: string
+            enumType: Helis\SettingsManagerBundle\Model\Type
             nullable: false
         data:
             name: data

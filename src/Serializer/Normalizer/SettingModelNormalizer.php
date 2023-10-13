@@ -39,7 +39,7 @@ class SettingModelNormalizer implements NormalizerInterface, DenormalizerInterfa
             );
         }
         if (isset($data['type'])) {
-            $object->setType(new Type($data['type']));
+            $object->setType(Type::from($data['type']));
         }
         if (isset($data['data'])) {
             $object->setDataValue($data['data']);
@@ -70,7 +70,7 @@ class SettingModelNormalizer implements NormalizerInterface, DenormalizerInterfa
             'name' => $object->getName(),
             'description' => $object->getDescription(),
             'domain' => $this->normalizer->normalize($object->getDomain(), $format, $context),
-            'type' => $object->getType()->getValue(),
+            'type' => $object->getType()->value,
             'data' => $object->getDataValue(),
             'tags' => $this->normalizer->normalize($object->getTags(), $format, $context),
             'choices' => $object->getChoices(),

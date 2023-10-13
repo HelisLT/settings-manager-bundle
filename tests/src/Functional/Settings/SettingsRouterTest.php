@@ -36,14 +36,14 @@ class SettingsRouterTest extends AbstractWebTestCase
     public static function getSettingDataProvider(): array
     {
         return [
-            ['foo', 'fixture bool foo setting', [], Type::BOOL(), true, 'orm'],
-            ['baz', 'baz desc', ['experimental', 'poo'], Type::BOOL(), true, 'config'],
-            ['tuna', 'tuna desc', [], Type::STRING(), 'fish', 'config'],
+            ['foo', 'fixture bool foo setting', [], Type::BOOL, true, 'orm'],
+            ['baz', 'baz desc', ['experimental', 'poo'], Type::BOOL, true, 'config'],
+            ['tuna', 'tuna desc', [], Type::STRING, 'fish', 'config'],
             [
                 'wth_yaml',
                 'ohohoho',
                 [],
-                Type::YAML(),
+                Type::YAML,
                 ['amazing' => ['foo', 'foo', 'foo', 'yee'], 'cool' => ['yes' => ['yes', 'no']], 'damn' => 5],
                 'config',
             ],
@@ -68,15 +68,15 @@ class SettingsRouterTest extends AbstractWebTestCase
 
         $this->assertNotFalse($settingName, 'Setting not found');
         $this->assertEquals($expectedDescription, $setting->getDescription());
-        $this->assertTrue($setting->getType()->equals($expectedType));
+        $this->assertTrue($setting->getType() === $expectedType);
         $this->assertEquals($expectedData, $setting->getData());
         $this->assertEquals($expectedProvider, $setting->getProviderName());
 
-        if ($expectedType->equals(Type::STRING())) {
+        if ($expectedType === Type::STRING) {
             $this->assertEquals($expectedData, $this->settingsRouter->getString($settingName));
-        } elseif ($expectedType->equals(Type::BOOL())) {
+        } elseif ($expectedType === Type::BOOL) {
             $this->assertEquals($expectedData, $this->settingsRouter->getBool($settingName));
-        } elseif ($expectedType->equals(Type::YAML())) {
+        } elseif ($expectedType === Type::YAML) {
             $this->assertEquals($expectedData, $this->settingsRouter->getArray($settingName));
         }
 
@@ -89,14 +89,14 @@ class SettingsRouterTest extends AbstractWebTestCase
     {
         return [
             ['non-existing', '', [], null, null, '', SettingNotFoundException::class],
-            ['foo', 'fixture bool foo setting', [], Type::BOOL(), true, 'orm', null],
-            ['baz', 'baz desc', ['experimental', 'poo'], Type::BOOL(), true, 'config', SettingNotFoundException::class],
-            ['tuna', 'tuna desc', [], Type::STRING(), 'fish', 'config', SettingNotFoundException::class],
+            ['foo', 'fixture bool foo setting', [], Type::BOOL, true, 'orm', null],
+            ['baz', 'baz desc', ['experimental', 'poo'], Type::BOOL, true, 'config', SettingNotFoundException::class],
+            ['tuna', 'tuna desc', [], Type::STRING, 'fish', 'config', SettingNotFoundException::class],
             [
                 'wth_yaml',
                 'ohohoho',
                 [],
-                Type::YAML(),
+                Type::YAML,
                 ['amazing' => ['foo', 'foo', 'foo', 'yee'], 'cool' => ['yes' => ['yes', 'no']], 'damn' => 5],
                 'config',
                 SettingNotFoundException::class,
@@ -105,9 +105,6 @@ class SettingsRouterTest extends AbstractWebTestCase
     }
 
     /**
-     * @param Type  $expectedType
-     * @param mixed $expectedData
-     *
      * @dataProvider mustGetSettingDataProvider
      */
     public function testMustGetSetting(
@@ -115,7 +112,7 @@ class SettingsRouterTest extends AbstractWebTestCase
         string $expectedDescription,
         array $expectedTags,
         ?Type $expectedType,
-        $expectedData,
+        mixed $expectedData,
         string $expectedProvider,
         ?string $expectedException
     ) {
@@ -130,15 +127,15 @@ class SettingsRouterTest extends AbstractWebTestCase
 
             $this->assertNotFalse($settingName, 'Setting not found');
             $this->assertEquals($expectedDescription, $setting->getDescription());
-            $this->assertTrue($setting->getType()->equals($expectedType));
+            $this->assertTrue($setting->getType() === $expectedType);
             $this->assertEquals($expectedData, $setting->getData());
             $this->assertEquals($expectedProvider, $setting->getProviderName());
 
-            if ($expectedType->equals(Type::STRING())) {
+            if ($expectedType === Type::STRING) {
                 $this->assertEquals($expectedData, $this->settingsRouter->getString($settingName));
-            } elseif ($expectedType->equals(Type::BOOL())) {
+            } elseif ($expectedType === Type::BOOL) {
                 $this->assertEquals($expectedData, $this->settingsRouter->getBool($settingName));
-            } elseif ($expectedType->equals(Type::YAML())) {
+            } elseif ($expectedType === Type::YAML) {
                 $this->assertEquals($expectedData, $this->settingsRouter->getArray($settingName));
             }
 

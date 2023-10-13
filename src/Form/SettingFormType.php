@@ -11,6 +11,7 @@ use Helis\SettingsManagerBundle\Model\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\EnumType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -22,7 +23,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class SettingFormType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('domain', DomainType::class)
@@ -31,12 +32,12 @@ class SettingFormType extends AbstractType
                 'translation_domain' => 'HelisSettingsManager',
                 'label' => 'edit.form.name',
             ])
-            ->add('type', ChoiceType::class, [
-                'choices' => Type::toArray(),
+            ->add('type', EnumType::class, [
+                'class' => Type::class,
                 'disabled' => true,
                 'translation_domain' => 'HelisSettingsManager',
                 'choice_translation_domain' => 'HelisSettingsManager',
-                'choice_label' => fn(string $type) => 'type.'.strtolower($type),
+                'choice_label' => fn(Type $type) => 'type.'.strtolower($type->value),
                 'label' => 'edit.form.type',
             ])
             ->add('description', TextareaType::class, [
@@ -52,7 +53,7 @@ class SettingFormType extends AbstractType
                 return;
             }
 
-            if ($model->getType()->equals(Type::BOOL())) {
+            if ($model->getType() === Type::BOOL) {
                 $event
                     ->getForm()
                     ->add('data', CheckboxType::class, [
@@ -60,14 +61,14 @@ class SettingFormType extends AbstractType
                         'label' => 'edit.form.is_enabled',
                         'required' => false,
                     ]);
-            } elseif ($model->getType()->equals(Type::INT())) {
+            } elseif ($model->getType() === Type::INT) {
                 $event
                     ->getForm()
                     ->add('data', IntegerType::class, [
                         'translation_domain' => 'HelisSettingsManager',
                         'label' => 'edit.form.value',
                     ]);
-            } elseif ($model->getType()->equals(Type::FLOAT())) {
+            } elseif ($model->getType() === Type::FLOAT) {
                 $event
                     ->getForm()
                     ->add('data', NumberType::class, [
@@ -75,7 +76,7 @@ class SettingFormType extends AbstractType
                         'label' => 'edit.form.value',
                         'scale' => 2,
                     ]);
-            } elseif ($model->getType()->equals(Type::YAML())) {
+            } elseif ($model->getType() === Type::YAML) {
                 $event
                     ->getForm()
                     ->add('data', YamlType::class, [
@@ -83,7 +84,7 @@ class SettingFormType extends AbstractType
                         'label' => 'edit.form.value',
                         'attr' => ['rows' => 12],
                     ]);
-            } elseif ($model->getType()->equals(Type::CHOICE())) {
+            } elseif ($model->getType() === Type::CHOICE) {
                 $event
                     ->getForm()
                     ->add('data', ChoiceType::class, [
@@ -106,7 +107,7 @@ class SettingFormType extends AbstractType
         });
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver
             ->setDefaults([

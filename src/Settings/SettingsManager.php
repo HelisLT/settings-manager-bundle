@@ -146,7 +146,7 @@ class SettingsManager implements LoggerAwareInterface
             if ($result) {
                 $this->logger && $this->logger->info('SettingsManager: setting updated', [
                     'sSettingName' => $settingModel->getName(),
-                    'sSettingType' => $settingModel->getType()->getValue(),
+                    'sSettingType' => $settingModel->getType()->value,
                     'sSettingValue' => json_encode($settingModel->getDataValue()),
                     'sDomainName' => $settingModel->getDomain()->getName(),
                     'sDomainEnabled' => $settingModel->getDomain()->isReadOnly(),
@@ -157,7 +157,7 @@ class SettingsManager implements LoggerAwareInterface
                     new SettingChangeEvent($settingModel)
                 );
 
-                return $result;
+                return true;
             }
         }
 
@@ -176,7 +176,7 @@ class SettingsManager implements LoggerAwareInterface
                 if (!$provider->isReadOnly() && $provider->save($settingModel)) {
                     $this->logger && $this->logger->info('SettingsManager: setting saved', [
                         'sSettingName' => $settingModel->getName(),
-                        'sSettingType' => $settingModel->getType()->getValue(),
+                        'sSettingType' => $settingModel->getType()->value,
                         'sSettingValue' => json_encode($settingModel->getDataValue()),
                         'sDomainName' => $settingModel->getDomain()->getName(),
                         'sDomainEnabled' => $settingModel->getDomain()->isReadOnly(),

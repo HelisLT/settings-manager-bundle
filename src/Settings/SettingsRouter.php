@@ -13,8 +13,12 @@ use Helis\SettingsManagerBundle\SettingsManagerEvents;
 
 class SettingsRouter
 {
-    public function __construct(private readonly SettingsManager $settingsManager, private readonly SettingsStore $settingsStore, private readonly EventManagerInterface $eventManager, private readonly array $treatAsDefaultProviders = [])
-    {
+    public function __construct(
+        private readonly SettingsManager $settingsManager,
+        private readonly SettingsStore $settingsStore,
+        private readonly EventManagerInterface $eventManager,
+        private readonly array $treatAsDefaultProviders = []
+    ) {
     }
 
     /**

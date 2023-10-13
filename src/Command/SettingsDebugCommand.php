@@ -23,7 +23,7 @@ class SettingsDebugCommand extends Command
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setDefinition([
             new InputArgument('name', InputArgument::OPTIONAL, 'A setting name'),
@@ -111,11 +111,12 @@ EOF
             $tableRows = [];
 
             if ($setting !== null) {
+                /* @var SettingModel $setting */
                 $tableRows[] = ['Name', $setting->getName()];
                 $tableRows[] = ['Description', $setting->getDescription() ?? '-'];
                 $tableRows[] = ['Domain', $setting->getDomain()->getName()];
                 $tableRows[] = ['Provider Name', $setting->getProviderName() ?? 'config'];
-                $tableRows[] = ['Type', $setting->getType()->getValue()];
+                $tableRows[] = ['Type', $setting->getType()->value];
                 $tableRows[] = ['Tags', $this->implodeTags($setting)];
                 $tableRows[] = ['Choices', $this->dataToScalar($setting->getChoices())];
                 $tableRows[] = ['Data', $this->dataToScalar($setting->getData())];
@@ -133,14 +134,14 @@ EOF
             $settingModel->getName(),
             $settingModel->getDescription(),
             $settingModel->getDomain()->getName(),
-            $settingModel->getType()->getValue(),
+            $settingModel->getType()->value,
             $this->dataToScalar($settingModel->getData()),
             $settingModel->getProviderName() ?? 'config',
             $this->implodeTags($settingModel),
         ];
     }
 
-    private function dataToScalar($data)
+    private function dataToScalar($data): float|bool|int|string
     {
         if (is_array($data)) {
             $data = $data === [] ? '-' : var_export($data, true);

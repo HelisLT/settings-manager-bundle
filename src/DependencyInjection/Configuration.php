@@ -114,7 +114,7 @@ class Configuration implements ConfigurationInterface
                     ->end()
                 ->end()
                 ->enumNode('type')
-                    ->values(array_values(Type::toArray()))
+                    ->values(array_column(Type::cases(), 'value'))
                     ->isRequired()
                 ->end()
                 ->arrayNode('data')

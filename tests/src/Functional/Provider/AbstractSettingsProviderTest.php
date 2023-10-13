@@ -28,7 +28,7 @@ abstract class AbstractSettingsProviderTest extends AbstractReadableSettingsProv
         $newSetting = new SettingModel();
         $newSetting
             ->setName('whale')
-            ->setType(Type::BOOL())
+            ->setType(Type::BOOL)
             ->setData(false)
             ->setDomain(reset($settings)->getDomain());
 
@@ -47,7 +47,7 @@ abstract class AbstractSettingsProviderTest extends AbstractReadableSettingsProv
         /** @var SettingModel $setting */
         $setting = $map['whale'];
         $this->assertEquals('whale', $setting->getName());
-        $this->assertTrue($setting->getType()->equals(Type::BOOL()));
+        $this->assertTrue($setting->getType() === Type::BOOL);
         $this->assertFalse($setting->getData());
         $this->assertEquals('sea', $setting->getDomain()->getName());
     }
@@ -87,7 +87,7 @@ abstract class AbstractSettingsProviderTest extends AbstractReadableSettingsProv
         $newSetting = new SettingModel();
         $newSetting
             ->setName('whale')
-            ->setType(Type::BOOL())
+            ->setType(Type::BOOL)
             ->setData(false)
             ->setDomain($newDomain);
 
@@ -106,7 +106,7 @@ abstract class AbstractSettingsProviderTest extends AbstractReadableSettingsProv
         /** @var SettingModel $setting */
         $setting = $map['whale'];
         $this->assertEquals('whale', $setting->getName());
-        $this->assertTrue($setting->getType()->equals(Type::BOOL()));
+        $this->assertTrue($setting->getType() === Type::BOOL);
         $this->assertFalse($setting->getData());
         $this->assertEquals('water', $setting->getDomain()->getName());
         $this->assertTrue($setting->getDomain()->isEnabled());

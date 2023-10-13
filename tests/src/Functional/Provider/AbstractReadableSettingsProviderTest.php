@@ -49,7 +49,7 @@ abstract class AbstractReadableSettingsProviderTest extends AbstractWebTestCase
         $setting0
             ->setName('bazinga')
             ->setDescription('fixture bool baz setting')
-            ->setType(Type::BOOL())
+            ->setType(Type::BOOL)
             ->setDomain($domain1)
             ->setData(false)
             ->addTag($tag1);
@@ -58,7 +58,7 @@ abstract class AbstractReadableSettingsProviderTest extends AbstractWebTestCase
         $setting1
             ->setName('foo')
             ->setDescription('fixture bool foo setting')
-            ->setType(Type::BOOL())
+            ->setType(Type::BOOL)
             ->setDomain($domain1)
             ->setData(true)
             ->addTag($tag1);
@@ -67,7 +67,7 @@ abstract class AbstractReadableSettingsProviderTest extends AbstractWebTestCase
         $setting2
             ->setName('tuna')
             ->setDescription('fixture string tuna setting')
-            ->setType(Type::STRING())
+            ->setType(Type::STRING)
             ->setDomain($domain2)
             ->setData('fishing')
             ->addTag($tag1);
@@ -76,7 +76,7 @@ abstract class AbstractReadableSettingsProviderTest extends AbstractWebTestCase
         $setting3
             ->setName('banana')
             ->setDescription('fixture int banana setting')
-            ->setType(Type::INT())
+            ->setType(Type::INT)
             ->setDomain($domain3)
             ->setData(10);
 
@@ -84,7 +84,7 @@ abstract class AbstractReadableSettingsProviderTest extends AbstractWebTestCase
         $setting4
             ->setName('kiwi')
             ->setDescription('fixture float kiwi setting')
-            ->setType(Type::FLOAT())
+            ->setType(Type::FLOAT)
             ->setDomain($domain3)
             ->setData(1.2);
 
@@ -92,7 +92,7 @@ abstract class AbstractReadableSettingsProviderTest extends AbstractWebTestCase
         $setting5
             ->setName('bazinga')
             ->setDescription('fixture bool baz setting')
-            ->setType(Type::BOOL())
+            ->setType(Type::BOOL)
             ->setDomain($domain3)
             ->setData(true);
 
@@ -151,7 +151,7 @@ abstract class AbstractReadableSettingsProviderTest extends AbstractWebTestCase
             return [
                 $model->getName(),
                 $model->getDomain()->getName(),
-                $model->getType()->getValue(),
+                $model->getType()->value,
                 $model->getData(),
                 $model->getTags()->map(function(TagModel $tag) {
                     return $tag->getName();
@@ -237,7 +237,7 @@ abstract class AbstractReadableSettingsProviderTest extends AbstractWebTestCase
             return [
                 $model->getName(),
                 $model->getDomain()->getName(),
-                $model->getType()->getValue(),
+                $model->getType()->value,
                 $model->getData(),
                 $model->getTags()->map(function(TagModel $tag) {
                     return $tag->getName();
@@ -295,7 +295,7 @@ abstract class AbstractReadableSettingsProviderTest extends AbstractWebTestCase
             return [
                 $model->getName(),
                 $model->getDomain()->getName(),
-                $model->getType()->getValue(),
+                $model->getType()->value,
                 $model->getData(),
             ];
         }, $settings);
