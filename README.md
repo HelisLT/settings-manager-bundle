@@ -224,10 +224,6 @@ This is a provider which reads and saves settings using `EntityManagerInterface`
 Required libraries:
 
  - [doctrine/orm](https://github.com/doctrine/doctrine2)
- - [acelaya/doctrine-enum-type](https://github.com/acelaya/doctrine-enum-type)
-
- > I am guessing you already have it :open_mouth:  
- `composer require doctrine/orm acelaya/doctrine-enum-type`
 
 Configuration example:
 
@@ -240,7 +236,7 @@ doctrine:
     orm:
         mappings:
             HelisSettingsManagerBundle:
-                type: yml
+                type: xml
                 is_bundle: true
                 dir: "Resources/config/doctrine"
                 alias: HelisSettingsManagerBundle
@@ -258,20 +254,14 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Helis\SettingsManagerBundle\Model\SettingModel;
 
-/**
- * @ORM\Entity()
- * @ORM\Table(name="setting")
- */
+#[ORM\Entity()]
+#[ORM\Table(name: "setting")]
 class Setting extends SettingModel
-{
-    /**
-     * @var int
-     *
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
-    protected $id;
+{     
+     #[ORM\Id]
+     #[ORM\GeneratedValue]
+     #[ORM\Column(type: "integer")]
+    protected int $id;
 }
 ```
 
