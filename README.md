@@ -6,7 +6,6 @@ Provides a nice way to define variables and inject them into application parts.
  - Multiple providers.
  - User interface.
 
-[![Build Status](https://travis-ci.org/HelisLT/settings-manager-bundle.svg?branch=master)](https://travis-ci.org/HelisLT/settings-manager-bundle)
 [![Latest Stable Version](https://poser.pugx.org/helis/settings-manager-bundle/v/stable)](https://packagist.org/packages/helis/settings-manager-bundle)
 [![License](https://poser.pugx.org/helis/settings-manager-bundle/license)](https://packagist.org/packages/helis/settings-manager-bundle)
 
