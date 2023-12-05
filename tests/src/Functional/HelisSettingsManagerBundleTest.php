@@ -4,19 +4,17 @@ declare(strict_types=1);
 
 namespace Helis\SettingsManagerBundle\Tests\Functional;
 
-use Liip\FunctionalTestBundle\Test\WebTestCase;
-use Symfony\Component\DependencyInjection\Container;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class HelisSettingsManagerBundleTest extends WebTestCase
+class HelisSettingsManagerBundleTest extends KernelTestCase
 {
-    public function testContainerLoad()
+    public function testContainerLoad(): void
     {
-        /** @var Container $container */
-        $container = $this->getContainer();
+        $container = static::getContainer();
         $services = $container->getServiceIds();
 
-        $services = array_filter($services, function(string $id): bool {
+        $services = array_filter($services, function (string $id): bool {
             return strpos($id, 'settings_manager.') === 0
                 || strpos($id, 'Helis\SettingsManagerBundle') === 0;
         });

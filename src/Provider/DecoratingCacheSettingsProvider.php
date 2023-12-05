@@ -26,17 +26,11 @@ class DecoratingCacheSettingsProvider implements ModificationAwareSettingsProvid
     {
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getSettings(array $domainNames): array
     {
         return $this->doGetSettings($domainNames, 0);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getSettingsByName(array $domainNames, array $settingNames): array
     {
         return $this->doGetSettingsByName($domainNames, $settingNames, 0);
@@ -47,9 +41,6 @@ class DecoratingCacheSettingsProvider implements ModificationAwareSettingsProvid
         return $this->doGetSettingsByTag($domainNames, $tagName, 0);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getDomains(bool $onlyEnabled = false): array
     {
         return $this->doGetDomains($onlyEnabled, 0);
@@ -570,7 +561,7 @@ class DecoratingCacheSettingsProvider implements ModificationAwareSettingsProvid
 
     private function setModificationTime(bool $commit = false): int
     {
-        $time = (int)round(microtime(true) * 10000);
+        $time = (int) round(microtime(true) * 10000);
         $cachedValue = $this->cache->getItem($this->modificationTimeKey);
         $cachedValue->set($time);
         $this->cache->saveDeferred($cachedValue);

@@ -21,9 +21,6 @@ class YamlTypeTest extends TypeTestCase
     }
 
     /**
-     * @param mixed $submitData
-     * @param mixed $expectedData
-     *
      * @dataProvider dataProviderTestSubmit
      */
     public function testSubmit($submitData, $expectedData)

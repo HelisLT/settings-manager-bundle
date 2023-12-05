@@ -8,24 +8,24 @@ use App\AbstractWebTestCase;
 
 class SettingsControllerTest extends AbstractWebTestCase
 {
-    public function testIndexAction()
+    public function testIndexAction(): void
     {
-        $client = self::createClient();
+        $client = static::createClient();
         $this->loadFixtures([]);
 
         $client->request('GET', '/');
 
-        $this->assertStatusCode(200, $client);
+        $this->assertResponseStatusCodeSame(200);
     }
 
-    public function testEditAction()
+    public function testEditAction(): void
     {
-        $client = self::createClient();
+        $client = static::createClient();
         $this->loadFixtures([]);
 
         foreach (['foo', 'tuna', 'wth_yaml', 'choice', 'integer'] as $settingName) {
             $client->request('GET', '/default/'.$settingName);
-            $this->assertStatusCode(200, $client);
+            $this->assertResponseStatusCodeSame(200);
         }
     }
 }

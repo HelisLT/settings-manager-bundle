@@ -18,19 +18,20 @@ use Helis\SettingsManagerBundle\Settings\SettingsStore;
  */
 class SettingsRouterTest extends AbstractWebTestCase
 {
-    /**
-     * @var SettingsRouter
-     */
-    private $settingsRouter;
+    private ?SettingsRouter $settingsRouter = null;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->settingsRouter = $this->getContainer()->get(SettingsRouter::class);
+        $this->settingsRouter = static::getContainer()->get(SettingsRouter::class);
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        $this->settingsRouter = null;
     }
 
     public static function getSettingDataProvider(): array
@@ -51,8 +52,6 @@ class SettingsRouterTest extends AbstractWebTestCase
     }
 
     /**
-     * @param mixed $expectedData
-     *
      * @dataProvider getSettingDataProvider
      */
     public function testGetSetting(
@@ -62,7 +61,7 @@ class SettingsRouterTest extends AbstractWebTestCase
         Type $expectedType,
         $expectedData,
         string $expectedProvider
-    ) {
+    ): void {
         $this->loadFixtures([LoadSettingsData::class]);
         $setting = $this->settingsRouter->getSetting($settingName);
 
@@ -115,7 +114,7 @@ class SettingsRouterTest extends AbstractWebTestCase
         mixed $expectedData,
         string $expectedProvider,
         ?string $expectedException
-    ) {
+    ): void {
         $this->loadFixtures([LoadSettingsData::class]);
 
         if ($expectedException) {
@@ -225,7 +224,7 @@ class SettingsRouterTest extends AbstractWebTestCase
     public function testWarmUpClear(string $tagName, string $settingName): void
     {
         $this->loadFixtures([LoadSettingsData::class]);
-        $settingsStore = $this->getContainer()->get(SettingsStore::class);
+        $settingsStore = static::getContainer()->get(SettingsStore::class);
         $settings = $this->settingsRouter->getSettingsByTag($tagName);
 
         $this->assertArrayHasKey($settingName, $settings);
@@ -254,7 +253,7 @@ class SettingsRouterTest extends AbstractWebTestCase
         $this->assertFalse($this->settingsRouter->isWarm());
     }
 
-    public function testWarmupWithoutSave()
+    public function testWarmupWithoutSave(): void
     {
         $this->loadFixtures([]);
 
@@ -267,7 +266,7 @@ class SettingsRouterTest extends AbstractWebTestCase
         $this->assertFalse($value);
     }
 
-    public function testWarmupWithSave()
+    public function testWarmupWithSave(): void
     {
         $this->loadFixtures([]);
 
@@ -275,7 +274,7 @@ class SettingsRouterTest extends AbstractWebTestCase
         $setting = $this->settingsRouter->getSetting('foo');
         $this->assertFalse($setting->getData());
 
-        $settingsManager = $this->getContainer()->get(SettingsManager::class);
+        $settingsManager = static::getContainer()->get(SettingsManager::class);
         $setting->setData(true);
         $settingsManager->save($setting);
 

@@ -5,26 +5,20 @@ services:
         autoconfigure: false
 
     Helis\SettingsManagerBundle\Controller\DomainController:
-        public: true
         arguments:
+            $twig: '@twig'
+            $formFactory: '@form.factory'
+            $urlGenerator: '@router'
             $settingsManager: '@Helis\SettingsManagerBundle\Settings\SettingsManager'
-        calls:
-            - ['setContainer', ['@Psr\Container\ContainerInterface']]
-        tags:
-            - { name: controller.service_arguments }
-            - { name: container.service_subscriber }
 
     Helis\SettingsManagerBundle\Controller\SettingsController:
-        public: true
         arguments:
+            $twig: '@twig'
+            $formFactory: '@form.factory'
+            $urlGenerator: '@router'
             $settingsManager: '@Helis\SettingsManagerBundle\Settings\SettingsManager'
             $eventManager: '@Helis\SettingsManagerBundle\Settings\EventManagerInterface'
             $validator: '@validator'
-        calls:
-            - ['setContainer', ['@Psr\Container\ContainerInterface']]
-        tags:
-            - { name: controller.service_arguments }
-            - { name: container.service_subscriber }
 
     Helis\SettingsManagerBundle\Settings\SettingsAwareServiceFactory:
         arguments:

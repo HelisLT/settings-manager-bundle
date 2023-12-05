@@ -9,6 +9,8 @@ use App\Entity\Tag;
 use Helis\SettingsManagerBundle\Provider\DecoratingRedisSettingsProvider;
 use Helis\SettingsManagerBundle\Provider\DoctrineOrmSettingsProvider;
 use Helis\SettingsManagerBundle\Provider\SettingsProviderInterface;
+use Redis;
+use RedisException;
 
 class DecoratingRedisSettingsProviderTest extends DecoratingPredisSettingsProviderTest
 {
@@ -18,17 +20,17 @@ class DecoratingRedisSettingsProviderTest extends DecoratingPredisSettingsProvid
             $this->markTestSkipped('phpredis extension required');
         }
 
-        $this->redis = new \Redis();
+        $this->redis = new Redis();
 
         try {
-            if (!@$this->redis->connect(getenv('REDIS_HOST'), (int)getenv('REDIS_PORT'), 1.0)) {
+            if (!@$this->redis->connect(getenv('REDIS_HOST'), (int) getenv('REDIS_PORT'), 1.0)) {
                 $this->markTestSkipped('Running redis server required');
             }
-        } catch (\RedisException $e) {
+        } catch (RedisException $e) {
             $this->markTestSkipped('Running redis server required');
         }
 
-        $container = $this->getContainer();
+        $container = static::getContainer();
 
         return new DecoratingRedisSettingsProvider(
             new DoctrineOrmSettingsProvider(

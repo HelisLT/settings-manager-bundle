@@ -10,11 +10,11 @@ use ParagonIE\Paseto\Protocol\Version2;
 
 class AsymmetricPasetoCookieSettingsProviderTest extends AbstractCookieSettingsProviderTest
 {
-    private static $asymmetricKey = null;
+    private static $asymmetricKey;
 
     protected function createProvider(): AbstractBaseCookieSettingsProvider
     {
-        //make separate encoding and decoding tests reuse same key pair
+        // make separate encoding and decoding tests reuse same key pair
         if (null === self::$asymmetricKey) {
             self::$asymmetricKey = Version2::generateAsymmetricSecretKey();
         }

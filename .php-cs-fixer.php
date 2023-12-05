@@ -13,20 +13,20 @@ $config = new PhpCsFixer\Config();
 return $config
     ->setRules([
         '@Symfony' => true,
-        'array_syntax' => ['syntax' => 'short'],
-        'fopen_flags' => false,
-        'protected_to_private' => false,
-        'combine_nested_dirname' => true,
         'yoda_style' => false,
-        'native_function_invocation' => false,
         'blank_line_after_opening_tag' => true,
         'declare_strict_types' => true,
-        'phpdoc_var_without_name' => false,
-        'function_declaration' => [
-            'closure_function_spacing' => 'none',
+        'phpdoc_to_comment' => false,
+        'single_line_throw' => false,
+        'global_namespace_import' => [
+            'import_classes' => true,
         ],
-        'cast_spaces' => [
-            'space' => 'none',
+        'ordered_imports' => [
+            'sort_algorithm' => 'alpha',
+            'imports_order' => ['class', 'function', 'const'],
+        ],
+        'array_syntax' => [
+            'syntax' => 'short',
         ],
     ])
     ->setFinder($finder)

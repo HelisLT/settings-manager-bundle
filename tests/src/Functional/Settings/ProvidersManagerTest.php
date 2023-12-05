@@ -15,23 +15,25 @@ use Helis\SettingsManagerBundle\Settings\SettingsManager;
  */
 class ProvidersManagerTest extends AbstractWebTestCase
 {
-    /**
-     * @var ProvidersManager
-     */
-    private $settingsWarmUpService;
-
-    /**
-     * @var SettingsManager
-     */
-    private $settingsManager;
+    private ?ProvidersManager $settingsWarmUpService = null;
+    private ?SettingsManager $settingsManager = null;
 
     /**
      * @before
      */
-    public function loadServices(): void
+    public function setUpServices(): void
     {
-        $this->settingsManager = $this->getContainer()->get(SettingsManager::class);
+        $this->settingsManager = static::getContainer()->get(SettingsManager::class);
         $this->settingsWarmUpService = new ProvidersManager($this->settingsManager);
+    }
+
+    /**
+     * @after
+     */
+    public function tearDownServices(): void
+    {
+        $this->settingsManager = null;
+        $this->settingsWarmUpService = null;
     }
 
     public static function warmUpDataProvider(): array

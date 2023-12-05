@@ -17,9 +17,6 @@ class SettingsExtensionTest extends TestCase
      */
     private $settingsRouter;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         parent::setUp();

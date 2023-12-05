@@ -19,7 +19,9 @@ class SwitchableControllerSubscriber implements EventSubscriberInterface
 
     public static function getSubscribedEvents(): array
     {
-        return [KernelEvents::CONTROLLER => ['onKernelController']];
+        return [
+            KernelEvents::CONTROLLER => ['onKernelController'],
+        ];
     }
 
     public function onKernelController(ControllerEvent $event): void

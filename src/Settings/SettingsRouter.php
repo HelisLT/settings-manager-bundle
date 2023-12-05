@@ -124,8 +124,6 @@ class SettingsRouter
     /**
      * Returns data from setting.
      *
-     * @return mixed
-     *
      * @throws SettingNotFoundException
      */
     public function mustGet(string $settingName)
@@ -242,7 +240,7 @@ class SettingsRouter
     {
         if ($this->settingsStore->getDomainNames(false) === [] || $force) {
             $this->settingsStore->setDomainNames(array_map(
-                fn(DomainModel $domainModel) => $domainModel->getName(),
+                fn (DomainModel $domainModel) => $domainModel->getName(),
                 $this->settingsManager->getDomains(null, true)
             ));
         }

@@ -15,16 +15,20 @@ use Helis\SettingsManagerBundle\Provider\SettingsProviderInterface;
 
 abstract class AbstractReadableSettingsProviderTest extends AbstractWebTestCase
 {
-    /**
-     * @var SettingsProviderInterface
-     */
-    protected $provider;
+    protected ?SettingsProviderInterface $provider = null;
 
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->provider = $this->createProvider();
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        $this->provider = null;
     }
 
     abstract protected function createProvider(): SettingsProviderInterface;
@@ -143,27 +147,27 @@ abstract class AbstractReadableSettingsProviderTest extends AbstractWebTestCase
     /**
      * @dataProvider dataProviderTestGetSettings
      */
-    public function testGetSettings(array $domainNames, array $expectedSettingsMap)
+    public function testGetSettings(array $domainNames, array $expectedSettingsMap): void
     {
         $settings = $this->provider->getSettings($domainNames);
 
-        $map = array_map(function(SettingModel $model) {
+        $map = array_map(function (SettingModel $model) {
             return [
                 $model->getName(),
                 $model->getDomain()->getName(),
                 $model->getType()->value,
                 $model->getData(),
-                $model->getTags()->map(function(TagModel $tag) {
+                $model->getTags()->map(function (TagModel $tag) {
                     return $tag->getName();
                 })->toArray(),
             ];
         }, $settings);
 
-        usort($map, function($a, $b) {
+        usort($map, function ($a, $b) {
             return $a[0].$a[1] <=> $b[0].$b[1];
         });
 
-        usort($expectedSettingsMap, function($a, $b) {
+        usort($expectedSettingsMap, function ($a, $b) {
             return $a[0].$a[1] <=> $b[0].$b[1];
         });
 
@@ -229,27 +233,27 @@ abstract class AbstractReadableSettingsProviderTest extends AbstractWebTestCase
     /**
      * @dataProvider dataProviderTestGetSettingsByName
      */
-    public function testGetSettingsByName(array $domainNames, array $settingNames, array $expectedSettingsMap)
+    public function testGetSettingsByName(array $domainNames, array $settingNames, array $expectedSettingsMap): void
     {
         $settings = $this->provider->getSettingsByName($domainNames, $settingNames);
 
-        $map = array_map(function(SettingModel $model) {
+        $map = array_map(function (SettingModel $model) {
             return [
                 $model->getName(),
                 $model->getDomain()->getName(),
                 $model->getType()->value,
                 $model->getData(),
-                $model->getTags()->map(function(TagModel $tag) {
+                $model->getTags()->map(function (TagModel $tag) {
                     return $tag->getName();
                 })->toArray(),
             ];
         }, $settings);
 
-        usort($map, function($a, $b) {
+        usort($map, function ($a, $b) {
             return $a[0].$a[1] <=> $b[0].$b[1];
         });
 
-        usort($expectedSettingsMap, function($a, $b) {
+        usort($expectedSettingsMap, function ($a, $b) {
             return $a[0].$a[1] <=> $b[0].$b[1];
         });
 
@@ -287,11 +291,11 @@ abstract class AbstractReadableSettingsProviderTest extends AbstractWebTestCase
     /**
      * @dataProvider dataProviderTestGetSettingsByTag
      */
-    public function testGetSettingsByTag(array $domainNames, string $tagName, array $expectedSettingsMap)
+    public function testGetSettingsByTag(array $domainNames, string $tagName, array $expectedSettingsMap): void
     {
         $settings = $this->provider->getSettingsByTag($domainNames, $tagName);
 
-        $map = array_map(function(SettingModel $model) {
+        $map = array_map(function (SettingModel $model) {
             return [
                 $model->getName(),
                 $model->getDomain()->getName(),
@@ -300,20 +304,20 @@ abstract class AbstractReadableSettingsProviderTest extends AbstractWebTestCase
             ];
         }, $settings);
 
-        usort($map, function($a, $b) {
+        usort($map, function ($a, $b) {
             return $a[0].$a[1] <=> $b[0].$b[1];
         });
 
-        usort($expectedSettingsMap, function($a, $b) {
+        usort($expectedSettingsMap, function ($a, $b) {
             return $a[0].$a[1] <=> $b[0].$b[1];
         });
 
         $this->assertEquals($map, $expectedSettingsMap);
     }
 
-    public function testGetDomains()
+    public function testGetDomains(): void
     {
-        $domainNames = array_map(function(DomainModel $model) {
+        $domainNames = array_map(function (DomainModel $model) {
             return $model->getName();
         }, $this->provider->getDomains(false));
 
@@ -322,9 +326,9 @@ abstract class AbstractReadableSettingsProviderTest extends AbstractWebTestCase
         $this->assertEquals(['apples', 'default', 'sea'], $domainNames);
     }
 
-    public function testGetOnlyEnabledDomains()
+    public function testGetOnlyEnabledDomains(): void
     {
-        $domainNames = array_map(function(DomainModel $model) {
+        $domainNames = array_map(function (DomainModel $model) {
             return $model->getName();
         }, $this->provider->getDomains(true));
 

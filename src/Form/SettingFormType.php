@@ -37,7 +37,7 @@ class SettingFormType extends AbstractType
                 'disabled' => true,
                 'translation_domain' => 'HelisSettingsManager',
                 'choice_translation_domain' => 'HelisSettingsManager',
-                'choice_label' => fn(Type $type) => 'type.'.strtolower($type->value),
+                'choice_label' => fn (Type $type) => 'type.'.strtolower($type->value),
                 'label' => 'edit.form.type',
             ])
             ->add('description', TextareaType::class, [
@@ -46,7 +46,7 @@ class SettingFormType extends AbstractType
                 'required' => false,
             ]);
 
-        $builder->addEventListener(FormEvents::PRE_SET_DATA, function(FormEvent $event) {
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
             /** @var SettingModel $model */
             $model = $event->getData();
             if ($model === null) {

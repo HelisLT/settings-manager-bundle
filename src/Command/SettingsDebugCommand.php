@@ -158,7 +158,7 @@ EOF
     {
         $tags = $model
             ->getTags()
-            ->map(fn(TagModel $tagModel) => $tagModel->getName())
+            ->map(fn (TagModel $tagModel) => $tagModel->getName())
             ->toArray();
 
         return empty($tags) ? '-' : implode("\n", $tags);

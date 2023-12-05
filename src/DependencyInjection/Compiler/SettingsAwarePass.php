@@ -17,7 +17,7 @@ class SettingsAwarePass implements CompilerPassInterface
     {
     }
 
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $definitions = $container->findTaggedServiceIds($this->tag);
 

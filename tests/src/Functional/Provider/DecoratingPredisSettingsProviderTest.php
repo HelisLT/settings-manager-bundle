@@ -11,13 +11,11 @@ use Helis\SettingsManagerBundle\Provider\DoctrineOrmSettingsProvider;
 use Helis\SettingsManagerBundle\Provider\SettingsProviderInterface;
 use Predis\Client;
 use Predis\CommunicationException;
+use Redis;
 
 class DecoratingPredisSettingsProviderTest extends AbstractSettingsProviderTest
 {
-    /**
-     * @var Client|\Redis
-     */
-    protected $redis;
+    protected Client|Redis|null $redis = null;
 
     protected function setUp(): void
     {
@@ -39,7 +37,7 @@ class DecoratingPredisSettingsProviderTest extends AbstractSettingsProviderTest
             $this->markTestSkipped('Running redis server required');
         }
 
-        $container = $this->getContainer();
+        $container = static::getContainer();
 
         return new DecoratingPredisSettingsProvider(
             new DoctrineOrmSettingsProvider(
@@ -55,6 +53,8 @@ class DecoratingPredisSettingsProviderTest extends AbstractSettingsProviderTest
     protected function tearDown(): void
     {
         $this->redis->flushdb();
+        $this->redis = null;
+
         parent::tearDown();
     }
 }

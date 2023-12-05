@@ -7,9 +7,6 @@ use Symfony\Component\HttpKernel\Kernel;
 
 class AppKernel extends Kernel
 {
-    /**
-     * {@inheritdoc}
-     */
     public function registerBundles(): iterable
     {
         return [
@@ -24,7 +21,6 @@ class AppKernel extends Kernel
 
             // for testing
             new \Doctrine\Bundle\FixturesBundle\DoctrineFixturesBundle(),
-            new \Liip\FunctionalTestBundle\LiipFunctionalTestBundle(),
             new \Liip\TestFixturesBundle\LiipTestFixturesBundle(),
             new \FOS\JsRoutingBundle\FOSJsRoutingBundle(),
             new \App\AppBundle(),

@@ -4,7 +4,7 @@ switchable_print:
         _controller: App\Controller\SwitchableController::printAction
 
 helis_settings_manager:
-    resource: "@HelisSettingsManagerBundle/Resources/config/routing.yml"
+    resource: "@HelisSettingsManagerBundle/Resources/config/routing.yaml"
     prefix:   /
 
 fos_js_routing:

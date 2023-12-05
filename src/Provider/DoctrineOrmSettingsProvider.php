@@ -159,7 +159,7 @@ class DoctrineOrmSettingsProvider implements SettingsProviderInterface
                 'dname' => $settingModel->getDomain()->getName(),
             ]);
 
-        $success = ((int)$qb->getQuery()->getSingleScalarResult()) > 0;
+        $success = ((int) $qb->getQuery()->getSingleScalarResult()) > 0;
 
         if ($success) {
             $this->entityManager->clear();
@@ -180,7 +180,7 @@ class DoctrineOrmSettingsProvider implements SettingsProviderInterface
             ->setParameter('priority', $domainModel->getPriority())
             ->setParameter('dname', $domainModel->getName());
 
-        $success = ((int)$qb->getQuery()->getSingleScalarResult()) > 0;
+        $success = ((int) $qb->getQuery()->getSingleScalarResult()) > 0;
 
         if ($success) {
             $this->entityManager->clear();
@@ -197,7 +197,7 @@ class DoctrineOrmSettingsProvider implements SettingsProviderInterface
             ->where($qb->expr()->eq('s.domain.name', ':dname'))
             ->setParameter('dname', $domainName);
 
-        $success = ((int)$qb->getQuery()->getSingleScalarResult()) > 0;
+        $success = ((int) $qb->getQuery()->getSingleScalarResult()) > 0;
 
         if ($success) {
             $this->entityManager->clear();

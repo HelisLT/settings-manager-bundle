@@ -6,7 +6,7 @@ services:
 
     Helis\SettingsManagerBundle\Menu\MenuBuilder:
         arguments:
-            - "@knp_menu.factory"
-            - '@Helis\SettingsManagerBundle\Settings\EventManagerInterface'
+            $factory: "@knp_menu.factory"
+            $eventManager: '@Helis\SettingsManagerBundle\Settings\EventManagerInterface'
         tags:
             - { name: knp_menu.menu_builder, method: createTopMenu, alias: settings_manager_top_menu }

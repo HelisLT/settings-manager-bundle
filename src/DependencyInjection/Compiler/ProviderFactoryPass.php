@@ -16,7 +16,7 @@ class ProviderFactoryPass implements CompilerPassInterface
     {
     }
 
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         foreach ($container->findTaggedServiceIds($this->tag) as $id => $attributes) {
             foreach ($attributes as $attribute) {

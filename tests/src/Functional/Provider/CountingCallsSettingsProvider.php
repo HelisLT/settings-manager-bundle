@@ -8,7 +8,7 @@ use Helis\SettingsManagerBundle\Provider\DecoratingRedisSettingsProvider;
 
 class CountingCallsSettingsProvider extends DecoratingRedisSettingsProvider
 {
-    private $calls = [];
+    private array $calls = [];
 
     public function getSettings(array $domainNames): array
     {

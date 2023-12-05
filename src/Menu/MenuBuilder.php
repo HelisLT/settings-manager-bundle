@@ -12,8 +12,10 @@ use Knp\Menu\ItemInterface;
 
 class MenuBuilder
 {
-    public function __construct(private readonly FactoryInterface $factory, private readonly EventManager $eventManager)
-    {
+    public function __construct(
+        private readonly FactoryInterface $factory,
+        private readonly EventManager $eventManager
+    ) {
     }
 
     public function createTopMenu(array $options): ItemInterface

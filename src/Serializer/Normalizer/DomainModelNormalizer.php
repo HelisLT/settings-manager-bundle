@@ -13,9 +13,6 @@ class DomainModelNormalizer implements NormalizerInterface, DenormalizerInterfac
 {
     use ObjectToPopulateTrait;
 
-    /**
-     * @return mixed
-     */
     public function denormalize($data, $type, $format = null, array $context = [])
     {
         $object = $this->extractObjectToPopulate($type, $context) ?? new $type();

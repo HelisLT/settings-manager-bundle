@@ -16,7 +16,7 @@ class ProviderPass implements CompilerPassInterface
     {
     }
 
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $services = [];
 

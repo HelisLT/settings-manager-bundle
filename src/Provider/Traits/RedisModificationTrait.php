@@ -21,7 +21,7 @@ trait RedisModificationTrait
 
     private function setModificationTime(): int
     {
-        $time = (int)round(microtime(true) * 10000);
+        $time = (int) round(microtime(true) * 10000);
         $this->redis->setex($this->modificationTimeKey, $this->ttl, $time);
 
         return $time;
@@ -29,7 +29,7 @@ trait RedisModificationTrait
 
     public function getModificationTime(): int
     {
-        $time = (int)$this->redis->get($this->modificationTimeKey);
+        $time = (int) $this->redis->get($this->modificationTimeKey);
 
         if ($time === 0) {
             $time = $this->setModificationTime();

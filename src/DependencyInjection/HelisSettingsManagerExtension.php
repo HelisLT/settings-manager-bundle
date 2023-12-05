@@ -23,29 +23,29 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Yaml\Yaml;
 
 class HelisSettingsManagerExtension extends Extension
 {
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
         $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
-        $loader->load('services.yml');
-        $loader->load('serializer.yml');
-        $loader->load('validators.yml');
-        $loader->load('command.yml');
+        $loader->load('command.yaml');
+        $loader->load('services.yaml');
+        $loader->load('serializer.yaml');
 
         $bundles = $container->getParameter('kernel.bundles');
 
         if (isset($bundles['TwigBundle'])) {
-            $loader->load('twig.yml');
+            $loader->load('twig.yaml');
         }
 
         if (isset($bundles['KnpMenuBundle'])) {
-            $loader->load('menu.yml');
+            $loader->load('menu.yaml');
         }
 
         if ($config['profiler']['enabled']) {
@@ -54,6 +54,10 @@ class HelisSettingsManagerExtension extends Extension
 
         if ($config['logger']['enabled']) {
             $container->setAlias('settings_manager.logger', $config['logger']['service_id']);
+        }
+
+        if (interface_exists(ValidatorInterface::class)) {
+            $loader->load('validators.yaml');
         }
 
         $this->loadSettingsManager($container);

@@ -222,11 +222,11 @@ class DecoratingRedisSettingsProvider implements ModificationAwareSettingsProvid
         return sprintf('%s[%s]', $this->namespace, $key);
     }
 
-    protected function buildHashmap(bool $force = false, ?string $domainName = null): void
+    protected function buildHashmap(bool $force = false, string $domainName = null): void
     {
         $key = $this->getHashMapKey();
         $isBuilt = $this->redis->get($key);
-        if ((int)$isBuilt === 1 && $force === false) {
+        if ((int) $isBuilt === 1 && $force === false) {
             return;
         }
 
@@ -243,12 +243,12 @@ class DecoratingRedisSettingsProvider implements ModificationAwareSettingsProvid
                     $this->serializer->serialize($setting, 'json')
                 );
             }
-            if ($isBuilt === false || (int)$isBuilt === 0) {
+            if ($isBuilt === false || (int) $isBuilt === 0) {
                 $pipe->setex($key, $this->ttl, 1);
             }
             $pipe->exec();
             $this->setModificationTime();
-        } elseif ($isBuilt === false || (int)$isBuilt === 0) {
+        } elseif ($isBuilt === false || (int) $isBuilt === 0) {
             $this->redis->setex($key, $this->ttl, 1);
             $this->setModificationTime();
         }

@@ -10,8 +10,10 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class ConfigureMenuEvent extends Event
 {
-    public function __construct(private readonly FactoryInterface $factory, private readonly ItemInterface $menu)
-    {
+    public function __construct(
+        private readonly FactoryInterface $factory,
+        private readonly ItemInterface $menu
+    ) {
     }
 
     public function getFactory(): FactoryInterface

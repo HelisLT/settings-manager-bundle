@@ -47,7 +47,7 @@ abstract class AbstractPasetoCookieSettingsProvider extends AbstractBaseCookieSe
                 ->serializer
                 ->deserialize($token->get('dt'), SettingModel::class.'[]', 'json');
         } catch (PasetoException $e) {
-            $this->logger && $this->logger->warning(sprintf('%s: '.strtolower((string)$e), (new ReflectionObject($this))->getShortName()), [
+            $this->logger && $this->logger->warning(sprintf('%s: '.strtolower((string) $e), (new ReflectionObject($this))->getShortName()), [
                 'sRawToken' => $rawToken,
             ]);
 
@@ -74,7 +74,7 @@ abstract class AbstractPasetoCookieSettingsProvider extends AbstractBaseCookieSe
             $token->setFooter($this->footer);
         }
 
-        return (string)$token;
+        return (string) $token;
     }
 
     public function setFooter(string $footer): void

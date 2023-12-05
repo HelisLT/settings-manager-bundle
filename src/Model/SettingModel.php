@@ -11,7 +11,7 @@ class SettingModel
 {
     protected ?string $name = null;
     protected ?string $description = null;
-    protected ?DomainModel$domain;
+    protected ?DomainModel $domain;
     protected Collection $tags;
     protected ?Type $type;
     protected array $data = [];

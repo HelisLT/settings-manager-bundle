@@ -9,6 +9,8 @@ use App\Entity\Tag;
 use Helis\SettingsManagerBundle\Provider\DecoratingCacheSettingsProvider;
 use Helis\SettingsManagerBundle\Provider\DoctrineOrmSettingsProvider;
 use Helis\SettingsManagerBundle\Provider\SettingsProviderInterface;
+use Redis;
+use RedisException;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Lock\LockFactory;
@@ -16,10 +18,8 @@ use Symfony\Component\Lock\Store\FlockStore;
 
 class DecoratingCacheSettingsProviderTest extends DecoratingPredisSettingsProviderTest
 {
-    /** @var AdapterInterface */
-    private $cache;
-
-    private $countingProvider;
+    private ?AdapterInterface $cache = null;
+    private ?CountingCallsSettingsProvider $countingProvider = null;
 
     protected function setUp(): void
     {
@@ -35,23 +35,31 @@ class DecoratingCacheSettingsProviderTest extends DecoratingPredisSettingsProvid
         $this->cache->clear();
     }
 
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        $this->cache = null;
+        $this->countingProvider = null;
+    }
+
     protected function createProvider(): SettingsProviderInterface
     {
         if (!extension_loaded('redis')) {
             $this->markTestSkipped('phpredis extension required');
         }
 
-        $this->redis = new \Redis();
+        $this->redis = new Redis();
 
         try {
-            if (!@$this->redis->connect(getenv('REDIS_HOST'), (int)getenv('REDIS_PORT'), 1.0)) {
+            if (!@$this->redis->connect(getenv('REDIS_HOST'), (int) getenv('REDIS_PORT'), 1.0)) {
                 $this->markTestSkipped('Running redis server required');
             }
-        } catch (\RedisException $e) {
+        } catch (RedisException $e) {
             $this->markTestSkipped('Running redis server required');
         }
 
-        $container = $this->getContainer();
+        $container = static::getContainer();
 
         $this->countingProvider = new CountingCallsSettingsProvider(
             new DoctrineOrmSettingsProvider(
@@ -75,7 +83,7 @@ class DecoratingCacheSettingsProviderTest extends DecoratingPredisSettingsProvid
     /**
      * @dataProvider dataProviderTestGetSettings
      */
-    public function testGetSettings(array $domainNames, array $expectedSettingsMap)
+    public function testGetSettings(array $domainNames, array $expectedSettingsMap): void
     {
         parent::testGetSettings($domainNames, $expectedSettingsMap);
 
@@ -108,7 +116,7 @@ class DecoratingCacheSettingsProviderTest extends DecoratingPredisSettingsProvid
     /**
      * @dataProvider dataProviderTestGetSettingsByName
      */
-    public function testGetSettingsByName(array $domainNames, array $settingNames, array $expectedSettingsMap)
+    public function testGetSettingsByName(array $domainNames, array $settingNames, array $expectedSettingsMap): void
     {
         parent::testGetSettingsByName($domainNames, $settingNames, $expectedSettingsMap);
 
@@ -157,7 +165,7 @@ class DecoratingCacheSettingsProviderTest extends DecoratingPredisSettingsProvid
     /**
      * @dataProvider dataProviderTestGetSettingsByTag
      */
-    public function testGetSettingsByTag(array $domainNames, string $tagName, array $expectedSettingsMap)
+    public function testGetSettingsByTag(array $domainNames, string $tagName, array $expectedSettingsMap): void
     {
         parent::testGetSettingsByTag($domainNames, $tagName, $expectedSettingsMap);
 

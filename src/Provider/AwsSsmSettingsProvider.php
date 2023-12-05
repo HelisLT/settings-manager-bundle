@@ -72,7 +72,7 @@ class AwsSsmSettingsProvider extends SimpleSettingsProvider
     {
         $result = $this->ssmClient->getParameters(['Names' => $this->parameterNames]);
         foreach ($result->get('Parameters') as $parameter) {
-            $value = @json_decode((string)$parameter['Value'], true);
+            $value = @json_decode((string) $parameter['Value'], true);
             if ($value === null) {
                 $value = $parameter['Value'];
             }

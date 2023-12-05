@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Helis\SettingsManagerBundle\Model;
 
-enum Type : string
+enum Type: string
 {
     case STRING = 'string';
     case BOOL = 'bool';

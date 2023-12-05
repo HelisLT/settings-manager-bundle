@@ -11,7 +11,7 @@ trait SettingsIntegrationTrait
     /**
      * @after
      */
-    public function tearDownSettings()
+    public function tearDownSettings(): void
     {
         SettingsProviderMock::clear();
     }

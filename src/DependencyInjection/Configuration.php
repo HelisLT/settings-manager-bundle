@@ -42,7 +42,7 @@ class Configuration implements ConfigurationInterface
                     ->addDefaultsIfNotSet()
                     ->canBeEnabled()
                     ->validate()
-                        ->ifTrue(fn($v) => $v['enabled'] && !isset($v['service_id']))
+                        ->ifTrue(fn ($v) => $v['enabled'] && !isset($v['service_id']))
                         ->thenInvalid('logger service_id is missing')
                     ->end()
                     ->children()
@@ -90,7 +90,7 @@ class Configuration implements ConfigurationInterface
                     ->addDefaultsIfNotSet()
                     ->beforeNormalization()
                         ->ifString()
-                        ->then(fn($v) => [
+                        ->then(fn ($v) => [
                             'name' => $v,
                             'enabled' => true, // domains from config are enabled by default
                             'read_only' => true, // all config domains are read only
@@ -106,7 +106,7 @@ class Configuration implements ConfigurationInterface
                     ->arrayPrototype()
                         ->beforeNormalization()
                         ->ifString()
-                        ->then(fn($v) => ['name' => $v])
+                        ->then(fn ($v) => ['name' => $v])
                         ->end()
                         ->children()
                             ->scalarNode('name')->end()
@@ -120,7 +120,7 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('data')
                     ->beforeNormalization()
                     ->always()
-                    ->then(function($v) {
+                    ->then(function ($v) {
                         if (is_string($v) || is_int($v) || is_float($v)) {
                             return ['value' => $v];
                         }

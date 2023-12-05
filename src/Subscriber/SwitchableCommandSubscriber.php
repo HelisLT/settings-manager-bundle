@@ -18,7 +18,9 @@ class SwitchableCommandSubscriber implements EventSubscriberInterface
 
     public static function getSubscribedEvents(): array
     {
-        return [ConsoleEvents::COMMAND => ['onConsoleCommand']];
+        return [
+            ConsoleEvents::COMMAND => ['onConsoleCommand'],
+        ];
     }
 
     public function onConsoleCommand(ConsoleCommandEvent $event): void

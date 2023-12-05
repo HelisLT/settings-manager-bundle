@@ -17,22 +17,23 @@ use Helis\SettingsManagerBundle\Settings\SettingsManager;
  */
 class SettingsManagerTest extends AbstractWebTestCase
 {
-    /**
-     * @var SettingsManager
-     */
-    private $settingsManager;
+    private ?SettingsManager $settingsManager = null;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->settingsManager = $this->getContainer()->get(SettingsManager::class);
+        $this->settingsManager = static::getContainer()->get(SettingsManager::class);
     }
 
-    public function testGetProviders()
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        $this->settingsManager = null;
+    }
+
+    public function testGetProviders(): void
     {
         $this->loadFixtures([]);
         $providers = $this->settingsManager->getProviders();
@@ -41,7 +42,7 @@ class SettingsManagerTest extends AbstractWebTestCase
         $this->assertInstanceOf(SettingsProviderInterface::class, reset($providers));
     }
 
-    public function testGetDomains()
+    public function testGetDomains(): void
     {
         $this->loadFixtures([LoadSettingsData::class]);
         $domains = $this->settingsManager->getDomains();
@@ -55,7 +56,7 @@ class SettingsManagerTest extends AbstractWebTestCase
         }
     }
 
-    public function testGetEnabledDomains()
+    public function testGetEnabledDomains(): void
     {
         $this->loadFixtures([LoadSettingsData::class]);
         $domains = $this->settingsManager->getDomains(null, true);
@@ -68,7 +69,7 @@ class SettingsManagerTest extends AbstractWebTestCase
         }
     }
 
-    public static function getSettingsByDomainDataProvider()
+    public static function getSettingsByDomainDataProvider(): iterable
     {
         yield [LoadSettingsData::DOMAIN_NAME_1, 7, ['foo', 'baz', 'tuna', 'wth_yaml', 'choice', 'integer', 'bazinga']];
 
@@ -82,7 +83,7 @@ class SettingsManagerTest extends AbstractWebTestCase
         string $domainName,
         int $expectedSettingCount,
         array $expectedSettingKeys
-    ) {
+    ): void {
         $this->loadFixtures([LoadSettingsData::class]);
         $settings = $this->settingsManager->getSettingsByDomain([$domainName]);
         $this->assertCount($expectedSettingCount, $settings);
@@ -94,7 +95,7 @@ class SettingsManagerTest extends AbstractWebTestCase
         }
     }
 
-    public static function getSettingsByTagDataProvider(): \Generator
+    public static function getSettingsByTagDataProvider(): iterable
     {
         yield [
             [LoadSettingsData::DOMAIN_NAME_1],
@@ -146,7 +147,7 @@ class SettingsManagerTest extends AbstractWebTestCase
         }
     }
 
-    public function testSave()
+    public function testSave(): void
     {
         $this->loadFixtures([LoadSettingsData::class]);
         $settings = $this->settingsManager->getSettingsByName(['default'], ['baz']);
@@ -159,7 +160,7 @@ class SettingsManagerTest extends AbstractWebTestCase
         $this->assertTrue($this->settingsManager->save($setting));
 
         // assert from orm
-        $doctrine = $this->getContainer()->get('doctrine');
+        $doctrine = static::getContainer()->get('doctrine');
         $settingEntity = $doctrine
             ->getRepository(Setting::class)
             ->findOneBy(['domain.name' => 'test_save', 'name' => 'baz']);
@@ -173,7 +174,7 @@ class SettingsManagerTest extends AbstractWebTestCase
         $this->assertEquals('test_save', $settings['baz']->getDomain()->getName());
     }
 
-    public function testDelete()
+    public function testDelete(): void
     {
         $this->loadFixtures([LoadSettingsData::class]);
 
@@ -198,7 +199,7 @@ class SettingsManagerTest extends AbstractWebTestCase
         $this->assertArrayNotHasKey(LoadSettingsData::DOMAIN_NAME_2, $domains);
     }
 
-    public function testCopyDomainToProvider()
+    public function testCopyDomainToProvider(): void
     {
         $this->loadFixtures([]);
         $this->settingsManager->copyDomainToProvider('omg', 'orm');
@@ -209,7 +210,7 @@ class SettingsManagerTest extends AbstractWebTestCase
         $this->assertEquals('orm', $setting->getProviderName());
     }
 
-    public function testUpdateDomain()
+    public function testUpdateDomain(): void
     {
         $this->loadFixtures([LoadSettingsData::class]);
         $settings = $this->settingsManager->getSettingsByName(
@@ -232,7 +233,7 @@ class SettingsManagerTest extends AbstractWebTestCase
         $this->assertTrue($setting->getDomain()->isEnabled());
     }
 
-    public function testDeleteDomain()
+    public function testDeleteDomain(): void
     {
         $this->loadFixtures([LoadSettingsData::class]);
         $domains = $this->settingsManager->getDomains();
@@ -244,7 +245,7 @@ class SettingsManagerTest extends AbstractWebTestCase
         $this->assertArrayNotHasKey('sea', $domains);
     }
 
-    public function testGetSettingsByNameWithHigherPriorityDomain()
+    public function testGetSettingsByNameWithHigherPriorityDomain(): void
     {
         $this->loadFixtures([LoadSettingsData::class]);
 

@@ -6,8 +6,8 @@ namespace App;
 use Doctrine\Common\DataFixtures\Executor\AbstractExecutor;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
-use Liip\FunctionalTestBundle\Test\WebTestCase;
 use Liip\TestFixturesBundle\Services\DatabaseToolCollection;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 abstract class AbstractWebTestCase extends WebTestCase
 {
@@ -15,13 +15,16 @@ abstract class AbstractWebTestCase extends WebTestCase
     {
         $this->createSchemaIfMissing();
 
-        return $this->getContainer()->get(DatabaseToolCollection::class)->get()->loadFixtures($groups);
+        return static::getContainer()
+            ->get(DatabaseToolCollection::class)
+            ->get()
+            ->loadFixtures($groups);
     }
 
-    private function createSchemaIfMissing()
+    private function createSchemaIfMissing(): void
     {
         /** @var EntityManagerInterface $om */
-        $om = $this->getContainer()->get('doctrine')->getManager();
+        $om = static::getContainer()->get('doctrine')->getManager();
         $om->getConnection()->setNestTransactionsWithSavepoints(true);
 
         if (!$om->getConnection()->createSchemaManager()->tablesExist(['settings_test_setting'])) {

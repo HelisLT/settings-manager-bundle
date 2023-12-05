@@ -9,24 +9,24 @@ use App\DataFixtures\ORM\LoadSwitchableControllerData;
 
 class SwitchableControllerSubscriberTest extends AbstractWebTestCase
 {
-    public function testControllerDisabled()
+    public function testControllerDisabled(): void
     {
-        $client = self::createClient();
+        $client = static::createClient();
         $this->loadFixtures([]);
 
         $client->request('GET', '/print/batman');
 
-        $this->assertStatusCode(404, $client);
+        $this->assertResponseStatusCodeSame(404);
     }
 
-    public function testControllerEnabled()
+    public function testControllerEnabled(): void
     {
-        $client = self::createClient();
+        $client = static::createClient();
         $this->loadFixtures([LoadSwitchableControllerData::class]);
 
         $client->request('GET', '/print/batman');
 
-        $this->assertStatusCode(200, $client);
+        $this->assertResponseStatusCodeSame(200);
         $this->assertEquals('batman', $client->getResponse()->getContent());
     }
 }

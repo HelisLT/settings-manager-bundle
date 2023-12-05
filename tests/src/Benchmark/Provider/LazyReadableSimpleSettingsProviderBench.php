@@ -1,13 +1,13 @@
 <?php
 declare(strict_types=1);
 
-namespace Helis\SettingsManagerBundle\Benchmarks\Provider;
+namespace Helis\SettingsManagerBundle\Tests\Benchmark\Provider;
 
-use Helis\SettingsManagerBundle\Benchmarks\AbstractBench;
 use Helis\SettingsManagerBundle\Provider\LazyReadableSimpleSettingsProvider;
 use Helis\SettingsManagerBundle\Serializer\Normalizer\DomainModelNormalizer;
 use Helis\SettingsManagerBundle\Serializer\Normalizer\SettingModelNormalizer;
 use Helis\SettingsManagerBundle\Serializer\Normalizer\TagModelNormalizer;
+use Helis\SettingsManagerBundle\Tests\Benchmark\AbstractBench;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Serializer;

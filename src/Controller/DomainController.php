@@ -6,24 +6,32 @@ namespace Helis\SettingsManagerBundle\Controller;
 
 use Helis\SettingsManagerBundle\Form\DomainFormType;
 use Helis\SettingsManagerBundle\Settings\SettingsManager;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Twig\Environment;
 
-class DomainController extends AbstractController
+class DomainController
 {
-    public function __construct(private readonly SettingsManager $settingsManager)
-    {
+    public function __construct(
+        private readonly Environment $twig,
+        private readonly FormFactoryInterface $formFactory,
+        private readonly UrlGeneratorInterface $urlGenerator,
+        private readonly SettingsManager $settingsManager
+    ) {
     }
 
     public function indexAction(): Response
     {
-        return $this->render('@HelisSettingsManager/Domain/index.html.twig', [
+        return new Response($this->twig->render('@HelisSettingsManager/Domain/index.html.twig', [
             'domains' => $this->settingsManager->getDomains(),
             'providers' => $this->settingsManager->getProviders(),
-        ]);
+        ]));
     }
 
     public function quickEditAction(Request $request, string $domainName, string $providerName): Response
@@ -35,7 +43,7 @@ class DomainController extends AbstractController
 
         $domains = $this->settingsManager->getDomains($providerName);
         if (!isset($domains[$domainName])) {
-            throw $this->createNotFoundException("Domain named {$domainName} not found");
+            throw new NotFoundHttpException("Domain named {$domainName} not found");
         }
 
         $domain = $domains[$domainName];
@@ -51,22 +59,22 @@ class DomainController extends AbstractController
         $domains = $this->settingsManager->getDomains($providerName);
 
         if (!isset($domains[$domainName])) {
-            throw $this->createNotFoundException("Domain {$domainName} not found");
+            throw new NotFoundHttpException("Domain {$domainName} not found");
         }
 
-        $form = $this->createForm(DomainFormType::class, $domains[$domainName]);
+        $form = $this->formFactory->create(DomainFormType::class, $domains[$domainName]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $this->settingsManager->updateDomain($form->getData(), $providerName);
 
-            return $this->redirectToRoute('settings_domain_index');
+            return new RedirectResponse($this->urlGenerator->generate('settings_domain_index'));
         }
 
-        return $this->render('@HelisSettingsManager/Domain/edit.html.twig', [
+        return new Response($this->twig->render('@HelisSettingsManager/Domain/edit.html.twig', [
             'form' => $form->createView(),
             'domainName' => $domainName,
-        ]);
+        ]));
     }
 
     public function copyAction(string $domainName, string $providerName): Response

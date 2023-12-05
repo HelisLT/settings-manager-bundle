@@ -18,7 +18,7 @@ class SettingsCollector implements DataCollectorInterface
     {
     }
 
-    public function collect(Request $request, Response $response, Throwable $exception = null)
+    public function collect(Request $request, Response $response, Throwable $exception = null): void
     {
         $this->data = $this->settingsStore->getValues();
     }
@@ -28,7 +28,7 @@ class SettingsCollector implements DataCollectorInterface
         return 'settings_manager.settings_collector';
     }
 
-    public function reset()
+    public function reset(): void
     {
         $this->data = [];
     }

@@ -22,15 +22,8 @@ use Symfony\Component\Serializer\Serializer;
 
 class AwsSsmSettingsProviderTest extends TestCase
 {
-    /**
-     * @var SsmClient|MockObject
-     */
-    private $awsSsmClientMock;
-
-    /**
-     * @var Serializer
-     */
-    private $serializer;
+    private SsmClient|MockObject|null $awsSsmClientMock = null;
+    private ?Serializer $serializer = null;
 
     protected function setUp(): void
     {
@@ -50,6 +43,14 @@ class AwsSsmSettingsProviderTest extends TestCase
                 new JsonEncoder(),
             ]
         );
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        $this->awsSsmClientMock = null;
+        $this->serializer = null;
     }
 
     public function testGetSettingsWithNoParameters(): void
