@@ -12,8 +12,11 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 class SimpleSettingsProviderFactory implements ProviderFactoryInterface
 {
-    public function __construct(private readonly DenormalizerInterface $serializer, private readonly array $normalizedData, private readonly bool $readOnly = true)
-    {
+    public function __construct(
+        private readonly DenormalizerInterface $serializer,
+        private readonly array $normalizedData,
+        private readonly bool $readOnly = true
+    ) {
     }
 
     public function get(): SettingsProviderInterface
