@@ -520,7 +520,7 @@ User interface can be used to change setting values, enable or disable domains.
 # >=Symfony4, config/routes/settings_manager.yaml
 
 settings_manager:
-    resource: '@HelisSettingsManagerBundle/Resources/config/routing.yml'
+    resource: '@HelisSettingsManagerBundle/Resources/config/routing.yaml'
     prefix: /settings
 ```
 
