@@ -21,7 +21,7 @@ class LoadSwitchableControllerData extends Fixture
         $setting
             ->setName('switchable_controller_enabled')
             ->setDescription('Enables switchable controller')
-            ->setType(Type::BOOL())
+            ->setType(Type::BOOL)
             ->setDomain($domain)
             ->setData(true);
 

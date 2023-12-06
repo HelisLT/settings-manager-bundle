@@ -37,7 +37,7 @@ class LoadSettingsData extends Fixture
         $setting0
             ->setName(self::SETTING_NAME_0)
             ->setDescription('fixture bool baz setting')
-            ->setType(Type::BOOL())
+            ->setType(Type::BOOL)
             ->setDomain($domain1)
             ->setData(false)
             ->addTag($tag1);
@@ -49,7 +49,7 @@ class LoadSettingsData extends Fixture
         $setting1
             ->setName(self::SETTING_NAME_1)
             ->setDescription('fixture bool foo setting')
-            ->setType(Type::BOOL())
+            ->setType(Type::BOOL)
             ->setDomain($domain1)
             ->setData(true)
             ->addTag($tag1);
@@ -61,7 +61,7 @@ class LoadSettingsData extends Fixture
         $setting2
             ->setName(self::SETTING_NAME_2)
             ->setDescription('fixture bool tuna setting')
-            ->setType(Type::STRING())
+            ->setType(Type::STRING)
             ->setDomain($domain2)
             ->setData('fishing')
             ->addTag($tag1);

@@ -21,7 +21,7 @@ class LoadSwitchableCommandData extends Fixture
         $setting
             ->setName('switchable_command_enabled')
             ->setDescription('Enables switchable:print command')
-            ->setType(Type::BOOL())
+            ->setType(Type::BOOL)
             ->setDomain($domain)
             ->setData(true);
 

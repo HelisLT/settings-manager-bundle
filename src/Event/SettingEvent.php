@@ -9,11 +9,8 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class SettingEvent extends Event
 {
-    protected $setting;
-
-    public function __construct(SettingModel $setting)
+    public function __construct(protected SettingModel $setting)
     {
-        $this->setting = $setting;
     }
 
     public function getSetting(): SettingModel

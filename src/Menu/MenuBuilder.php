@@ -12,13 +12,10 @@ use Knp\Menu\ItemInterface;
 
 class MenuBuilder
 {
-    private $factory;
-    private $eventManager;
-
-    public function __construct(FactoryInterface $factory, EventManager $eventManager)
-    {
-        $this->factory = $factory;
-        $this->eventManager = $eventManager;
+    public function __construct(
+        private readonly FactoryInterface $factory,
+        private readonly EventManager $eventManager
+    ) {
     }
 
     public function createTopMenu(array $options): ItemInterface

@@ -1,14 +1,21 @@
 framework:
-    secret: "supersecret"
-    test: ~
-    router:
-        resource: "%kernel.project_dir%/tests/app/config/routing_test.yml"
-        strict_requirements: "%kernel.debug%"
-    php_errors:
-        log: true
-    session:
-        storage_id: session.storage.mock_file
-    validation: ~
+  test: ~
+  secret: "supersecret"
+  router:
+      resource: "%kernel.project_dir%/tests/app/config/routing_test.yml"
+      strict_requirements: "%kernel.debug%"
+
+  php_errors:
+      log: true
+
+  validation:
+    email_validation_mode: html5
+
+  annotations:
+    enabled: false
+
+  http_method_override: false
+  handle_all_throwables: true
 
 security:
     providers:
@@ -18,10 +25,6 @@ security:
     firewalls:
         main:
             pattern: ^/
-            anonymous: ~
-
-liip_functional_test:
-    command_verbosity: normal
 
 liip_test_fixtures:
     keep_database_and_schema: true
@@ -43,12 +46,15 @@ doctrine:
         auto_generate_proxy_classes: '%kernel.debug%'
         naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
         auto_mapping: true
+        validate_xml_mapping: true
+        enable_lazy_ghost_objects: true
+        report_fields_where_declared: true
         mappings:
             AppBundle:
-                type: annotation
+                type: attribute
                 is_bundle: true
             HelisSettingsManagerBundle:
-                type: yml
+                type: xml
                 is_bundle: true
                 dir: "Resources/config/doctrine"
                 alias: HelisSettingsManagerBundle

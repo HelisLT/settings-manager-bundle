@@ -19,7 +19,7 @@ abstract class AbstractSettingsProviderTest extends AbstractReadableSettingsProv
         }
     }
 
-    public function testSave()
+    public function testSave(): void
     {
         $settings = $this->provider->getSettings(['sea']);
         $this->assertCount(1, $settings);
@@ -28,7 +28,7 @@ abstract class AbstractSettingsProviderTest extends AbstractReadableSettingsProv
         $newSetting = new SettingModel();
         $newSetting
             ->setName('whale')
-            ->setType(Type::BOOL())
+            ->setType(Type::BOOL)
             ->setData(false)
             ->setDomain(reset($settings)->getDomain());
 
@@ -47,12 +47,12 @@ abstract class AbstractSettingsProviderTest extends AbstractReadableSettingsProv
         /** @var SettingModel $setting */
         $setting = $map['whale'];
         $this->assertEquals('whale', $setting->getName());
-        $this->assertTrue($setting->getType()->equals(Type::BOOL()));
+        $this->assertTrue($setting->getType() === Type::BOOL);
         $this->assertFalse($setting->getData());
         $this->assertEquals('sea', $setting->getDomain()->getName());
     }
 
-    public function testSaveExistingSettingNameNewDomain()
+    public function testSaveExistingSettingNameNewDomain(): void
     {
         $settings = $this->provider->getSettings(['sea']);
         $this->assertCount(1, $settings);
@@ -75,7 +75,7 @@ abstract class AbstractSettingsProviderTest extends AbstractReadableSettingsProv
         $this->assertArrayHasKey('tuna', $settingMap['sea']);
     }
 
-    public function testSaveWithNewDomain()
+    public function testSaveWithNewDomain(): void
     {
         $settings = $this->provider->getSettings(['water']);
         $this->assertCount(0, $settings);
@@ -87,7 +87,7 @@ abstract class AbstractSettingsProviderTest extends AbstractReadableSettingsProv
         $newSetting = new SettingModel();
         $newSetting
             ->setName('whale')
-            ->setType(Type::BOOL())
+            ->setType(Type::BOOL)
             ->setData(false)
             ->setDomain($newDomain);
 
@@ -106,15 +106,15 @@ abstract class AbstractSettingsProviderTest extends AbstractReadableSettingsProv
         /** @var SettingModel $setting */
         $setting = $map['whale'];
         $this->assertEquals('whale', $setting->getName());
-        $this->assertTrue($setting->getType()->equals(Type::BOOL()));
+        $this->assertTrue($setting->getType() === Type::BOOL);
         $this->assertFalse($setting->getData());
         $this->assertEquals('water', $setting->getDomain()->getName());
         $this->assertTrue($setting->getDomain()->isEnabled());
     }
 
-    public function testDelete()
+    public function testDelete(): void
     {
-        $sortCallback = function(SettingModel $a, SettingModel $b) {
+        $sortCallback = function (SettingModel $a, SettingModel $b) {
             $v = $a->getName() <=> $b->getName();
 
             return $v !== 0 ? $v * -1 : $v;
@@ -140,7 +140,7 @@ abstract class AbstractSettingsProviderTest extends AbstractReadableSettingsProv
         $this->assertEquals('foo', $setting->getName());
     }
 
-    public function testDeleteLastSettingFromDomain()
+    public function testDeleteLastSettingFromDomain(): void
     {
         $settings = $this->provider->getSettings(['sea']);
         $this->assertCount(1, $settings);
@@ -153,7 +153,7 @@ abstract class AbstractSettingsProviderTest extends AbstractReadableSettingsProv
         $this->assertArrayNotHasKey('sea', $domains);
     }
 
-    public function testUpdateDomain()
+    public function testUpdateDomain(): void
     {
         $domains = $this->buildDomainMap(...$this->provider->getDomains());
 
@@ -191,10 +191,10 @@ abstract class AbstractSettingsProviderTest extends AbstractReadableSettingsProv
         }
     }
 
-    public function testDeleteDomain()
+    public function testDeleteDomain(): void
     {
         $domainNames = array_map(
-            function(DomainModel $model) {
+            function (DomainModel $model) {
                 return $model->getName();
             },
             $this->provider->getDomains()

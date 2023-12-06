@@ -20,25 +20,17 @@ class DecoratingRedisSettingsProvider implements ModificationAwareSettingsProvid
 
     private const DOMAIN_KEY = 'domain';
     private const HASHMAP_KEY = 'hashmap';
+    protected Redis $redis;
 
-    protected $decoratingProvider;
-    protected $redis;
-    protected $serializer;
-
-    protected $ttl;
-    protected $namespace;
+    protected int $ttl = 604800;
+    protected string $namespace = 'settings_provider_cache';
 
     public function __construct(
-        SettingsProviderInterface $decoratingProvider,
+        protected SettingsProviderInterface $decoratingProvider,
         Redis $redis,
-        SerializerInterface $serializer
+        protected SerializerInterface $serializer
     ) {
-        $this->decoratingProvider = $decoratingProvider;
         $this->redis = $redis;
-        $this->serializer = $serializer;
-
-        $this->ttl = 604800;
-        $this->namespace = 'settings_provider_cache';
     }
 
     public function setTtl(int $ttl): void
@@ -67,8 +59,8 @@ class DecoratingRedisSettingsProvider implements ModificationAwareSettingsProvid
         $result = $pipe->exec();
 
         $out = [];
-        foreach ($result as $d => $domainGroup) {
-            foreach ($domainGroup as $s => $item) {
+        foreach ($result as $domainGroup) {
+            foreach ($domainGroup as $item) {
                 if ($item !== null && $item !== false) {
                     $out[] = $this->serializer->deserialize($item, SettingModel::class, 'json');
                 }
@@ -89,8 +81,8 @@ class DecoratingRedisSettingsProvider implements ModificationAwareSettingsProvid
         $result = $pipe->exec();
         $out = [];
 
-        foreach ($result as $d => $domainGroup) {
-            foreach ($domainGroup as $s => $item) {
+        foreach ($result as $domainGroup) {
+            foreach ($domainGroup as $item) {
                 if ($item !== false && $item !== null) {
                     $out[] = $this->serializer->deserialize($item, SettingModel::class, 'json');
                 }
@@ -170,7 +162,7 @@ class DecoratingRedisSettingsProvider implements ModificationAwareSettingsProvid
 
         $domains = $this->decoratingProvider->getDomains($onlyEnabled);
 
-        if (count($domains) > 0) {
+        if ($domains !== []) {
             $dictionary = [];
             foreach ($domains as $domain) {
                 $dictionary[$domain->getName()] = $this->serializer->serialize($domain, 'json');
@@ -230,23 +222,19 @@ class DecoratingRedisSettingsProvider implements ModificationAwareSettingsProvid
         return sprintf('%s[%s]', $this->namespace, $key);
     }
 
-    protected function buildHashmap(bool $force = false, ?string $domainName = null): void
+    protected function buildHashmap(bool $force = false, string $domainName = null): void
     {
         $key = $this->getHashMapKey();
         $isBuilt = $this->redis->get($key);
-        if ((int)$isBuilt === 1 && $force === false) {
+        if ((int) $isBuilt === 1 && $force === false) {
             return;
         }
 
-        if ($domainName !== null) {
-            $domains = [$domainName];
-        } else {
-            $domains = $this->extractDomainNames($this->decoratingProvider->getDomains());
-        }
+        $domains = $domainName !== null ? [$domainName] : $this->extractDomainNames($this->decoratingProvider->getDomains());
 
         $settings = $this->decoratingProvider->getSettings($domains);
 
-        if (!empty($settings)) {
+        if ($settings !== []) {
             $pipe = $this->redis->multi(Redis::PIPELINE);
             foreach ($settings as $setting) {
                 $pipe->hSet(
@@ -255,17 +243,14 @@ class DecoratingRedisSettingsProvider implements ModificationAwareSettingsProvid
                     $this->serializer->serialize($setting, 'json')
                 );
             }
-
-            if ($isBuilt === false || (int)$isBuilt === 0) {
+            if ($isBuilt === false || (int) $isBuilt === 0) {
                 $pipe->setex($key, $this->ttl, 1);
             }
             $pipe->exec();
             $this->setModificationTime();
-        } else {
-            if ($isBuilt === false || (int)$isBuilt === 0) {
-                $this->redis->setex($key, $this->ttl, 1);
-                $this->setModificationTime();
-            }
+        } elseif ($isBuilt === false || (int) $isBuilt === 0) {
+            $this->redis->setex($key, $this->ttl, 1);
+            $this->setModificationTime();
         }
     }
 }

@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Helis\SettingsManagerBundle\Exception;
 
-class SettingNotFoundException extends \Exception implements SettingsException
+use Exception;
+
+class SettingNotFoundException extends Exception implements SettingsException
 {
     public function __construct(string $settingName)
     {

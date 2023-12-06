@@ -1,9 +1,17 @@
 parameters:
-    level: 2
+    level: 3
     paths:
         - %currentWorkingDirectory%/src
+        - %currentWorkingDirectory%/tests/src
     excludePaths:
         - %currentWorkingDirectory%/src/DependencyInjection/Configuration.php
+    ignoreErrors:
+        -
+            message: '#Method Helis\\SettingsManagerBundle\\Provider\\DecoratingRedisSettingsProvider::getDomains\(\) should return array<Helis\\SettingsManagerBundle\\Model\\DomainModel> but returns array<int, string>\.#'
+            path: src/Provider/DecoratingRedisSettingsProvider.php
+        -
+            message: '#Method Helis\\SettingsManagerBundle\\Settings\\SettingsManager::getDomains\(\) should return array<Helis\\SettingsManagerBundle\\Model\\DomainModel> but returns array<string, array<int, Helis\\SettingsManagerBundle\\Model\\DomainModel>>\.#'
+            path: src/Settings/SettingsManager.php
 
 includes:
     - vendor/phpstan/phpstan-phpunit/extension.neon

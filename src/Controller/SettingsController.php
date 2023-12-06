@@ -11,43 +11,43 @@ use Helis\SettingsManagerBundle\Model\Type;
 use Helis\SettingsManagerBundle\Settings\EventManagerInterface;
 use Helis\SettingsManagerBundle\Settings\SettingsManager;
 use Helis\SettingsManagerBundle\SettingsManagerEvents;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Twig\Environment;
 
-class SettingsController extends AbstractController
+class SettingsController
 {
-    private $settingsManager;
-    private $eventManager;
-    private $validator;
-
     public function __construct(
-        SettingsManager $settingsManager,
-        EventManagerInterface $eventManager,
-        ValidatorInterface $validator
+        private readonly Environment $twig,
+        private readonly FormFactoryInterface $formFactory,
+        private readonly UrlGeneratorInterface $urlGenerator,
+        private readonly SettingsManager $settingsManager,
+        private readonly EventManagerInterface $eventManager,
+        private readonly ValidatorInterface $validator
     ) {
-        $this->settingsManager = $settingsManager;
-        $this->eventManager = $eventManager;
-        $this->validator = $validator;
     }
 
     public function indexAction(string $domainName): Response
     {
         $settings = $this->settingsManager->getSettingsByDomain([$domainName]);
 
-        if ($domainName !== DomainModel::DEFAULT_NAME && count($settings) === 0) {
-            return $this->redirectToRoute('settings_index');
+        if ($domainName !== DomainModel::DEFAULT_NAME && $settings === []) {
+            return new RedirectResponse($this->urlGenerator->generate('settings_index'));
         }
 
-        return $this->render('@HelisSettingsManager/Settings/index.html.twig', [
+        return new Response($this->twig->render('@HelisSettingsManager/Settings/index.html.twig', [
             'settings' => $settings,
             'domains' => $this->settingsManager->getDomains(),
             'providers' => $this->settingsManager->getProviders(),
             'activeDomain' => $domainName,
-        ]);
+        ]));
     }
 
     public function quickEditAction(Request $request, string $domainName, string $settingName): Response
@@ -60,10 +60,10 @@ class SettingsController extends AbstractController
         $setting = $this->settingsManager->getSettingsByName([$domainName], [$settingName]);
         $setting = array_shift($setting);
         if ($setting === null) {
-            throw $this->createNotFoundException('Setting not found in '.$domainName.' domain');
+            throw new NotFoundHttpException('Setting not found in '.$domainName.' domain');
         }
 
-        if ($setting->getType()->equals(Type::BOOL())) {
+        if ($setting->getType() === Type::BOOL) {
             $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
         } else {
             throw new BadRequestHttpException('Quick edit is only allowed for setttings with type bool');
@@ -81,24 +81,26 @@ class SettingsController extends AbstractController
         $setting = array_shift($setting);
 
         if ($setting === null) {
-            throw $this->createNotFoundException('Setting not found in '.$domainName.' domain');
+            throw new NotFoundHttpException('Setting not found in '.$domainName.' domain');
         }
 
         $this->eventManager->dispatch(SettingsManagerEvents::PRE_EDIT_SETTING, new SettingChangeEvent($setting));
-        $form = $this->createForm(SettingFormType::class, $setting);
+        $form = $this->formFactory->create(SettingFormType::class, $setting);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $this->settingsManager->save($setting);
 
-            return $this->redirectToRoute('settings_index', ['domainName' => $domainName]);
+            return new RedirectResponse(
+                $this->urlGenerator->generate('settings_index', ['domainName' => $domainName])
+            );
         }
 
-        return $this->render('@HelisSettingsManager/Settings/edit.html.twig', [
+        return new Response($this->twig->render('@HelisSettingsManager/Settings/edit.html.twig', [
             'form' => $form->createView(),
-            'settingType' => $setting->getType()->getValue(),
+            'settingType' => $setting->getType()->value,
             'domainName' => $domainName,
-        ]);
+        ]));
     }
 
     public function deleteAction(string $domainName, string $settingName): Response
@@ -107,7 +109,7 @@ class SettingsController extends AbstractController
         $setting = array_shift($setting);
 
         if ($setting === null) {
-            throw $this->createNotFoundException('Setting not found in '.$domainName.' domain');
+            throw new NotFoundHttpException('Setting not found in '.$domainName.' domain');
         }
 
         $this->settingsManager->delete($setting);
@@ -121,7 +123,7 @@ class SettingsController extends AbstractController
         $setting = array_shift($setting);
 
         if ($setting === null) {
-            throw $this->createNotFoundException('Setting not found in '.$domainName.' domain');
+            throw new NotFoundHttpException('Setting not found in '.$domainName.' domain');
         }
 
         $setting = clone $setting;

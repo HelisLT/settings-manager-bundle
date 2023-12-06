@@ -8,13 +8,13 @@ use App\AbstractWebTestCase;
 
 class DomainControllerTest extends AbstractWebTestCase
 {
-    public function testIndexAction()
+    public function testIndexAction(): void
     {
-        $client = $this->makeClient();
+        $client = static::createClient();
         $this->loadFixtures([]);
 
         $client->request('GET', '/domains');
 
-        $this->assertStatusCode(200, $client);
+        $this->assertResponseStatusCodeSame(200);
     }
 }

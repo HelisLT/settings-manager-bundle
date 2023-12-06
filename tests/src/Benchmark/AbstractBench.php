@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Helis\SettingsManagerBundle\Benchmarks;
+namespace Helis\SettingsManagerBundle\Tests\Benchmark;
 
 /**
  * @BeforeMethods({"setUp"})

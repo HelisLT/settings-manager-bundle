@@ -8,26 +8,20 @@ use Helis\SettingsManagerBundle\Exception\SettingNotFoundException;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
+use Throwable;
 
 class SettingsAwareServiceFactory implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
-    private $settingsRouter;
-
-    public function __construct(SettingsRouter $settingsRouter)
+    public function __construct(private readonly SettingsRouter $settingsRouter)
     {
-        $this->settingsRouter = $settingsRouter;
     }
 
     /**
-     * @param mixed $object
-     *
-     * @return mixed
-     *
      * @throws SettingNotFoundException
      */
-    public function get(array $callMap, $object)
+    public function get(array $callMap, mixed $object): mixed
     {
         foreach ($callMap as $settingName => $callDetails) {
             $must = false;
@@ -43,12 +37,12 @@ class SettingsAwareServiceFactory implements LoggerAwareInterface
             } else {
                 try {
                     $setting = $this->settingsRouter->get($settingName, null);
-                } catch (\Throwable $e) {
+                } catch (Throwable $e) {
                     $this->logger && $this->logger->error('Failed to get setting', [
                         'exception' => $e,
                         'sSettingName' => $settingName,
                         'sObjectMethodName' => $setter,
-                        'sObjectClassName' => get_class($object),
+                        'sObjectClassName' => $object::class,
                     ]);
                     continue;
                 }
@@ -57,7 +51,7 @@ class SettingsAwareServiceFactory implements LoggerAwareInterface
                     $this->logger && $this->logger->notice('Setting was not found.', [
                         'sSettingName' => $settingName,
                         'sObjectMethodName' => $setter,
-                        'sObjectClassName' => get_class($object),
+                        'sObjectClassName' => $object::class,
                     ]);
                     continue;
                 }
@@ -66,7 +60,7 @@ class SettingsAwareServiceFactory implements LoggerAwareInterface
             if (method_exists($object, $setter)) {
                 $object->{$setter}($setting);
             } else {
-                throw new LogicException('Undefined method '.get_class($object)."::{$setter}().");
+                throw new LogicException('Undefined method '.$object::class.'::'.$setter.'().');
             }
         }
 

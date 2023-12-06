@@ -6,7 +6,7 @@ namespace Helis\SettingsManagerBundle\Model;
 
 class TagModel
 {
-    private $name;
+    private ?string $name = null;
 
     public function getName(): ?string
     {

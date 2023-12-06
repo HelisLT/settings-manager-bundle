@@ -11,12 +11,11 @@ jobs:
       - uses: php-actions/composer@v5
         with:
           version: 2
-          php_version: 7.4
+          php_version: 8.1
       - name: PHPStan Static Analysis
         uses: php-actions/phpstan@v3
         with:
           path: src/
           configuration: phpstan.neon.dist
-          version: 1.4.3
-          php_version: 7.4
+          php_version: 8.1
           memory_limit: 1G

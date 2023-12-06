@@ -4,24 +4,12 @@ declare(strict_types=1);
 
 namespace Helis\SettingsManagerBundle\Model;
 
-use MyCLabs\Enum\Enum;
-
-/**
- * Enum Type.
- *
- * @method static Type STRING()
- * @method static Type BOOL()
- * @method static Type INT()
- * @method static Type FLOAT()
- * @method static Type YAML()
- * @method static Type CHOICE()
- */
-class Type extends Enum
+enum Type: string
 {
-    public const STRING = 'string';
-    public const BOOL = 'bool';
-    public const INT = 'int';
-    public const FLOAT = 'float';
-    public const YAML = 'yaml';
-    public const CHOICE = 'choice';
+    case STRING = 'string';
+    case BOOL = 'bool';
+    case INT = 'int';
+    case FLOAT = 'float';
+    case YAML = 'yaml';
+    case CHOICE = 'choice';
 }

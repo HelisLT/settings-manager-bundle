@@ -10,11 +10,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class EventManager implements EventManagerInterface
 {
-    protected $eventDispatcher;
-
-    public function __construct(EventDispatcherInterface $eventDispatcher)
+    public function __construct(protected EventDispatcherInterface $eventDispatcher)
     {
-        $this->eventDispatcher = $eventDispatcher;
     }
 
     public function dispatch(string $eventName, SettingEvent $event): void

@@ -12,16 +12,15 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class SwitchableCommandSubscriber implements EventSubscriberInterface
 {
-    private $settingsRouter;
-
-    public function __construct(SettingsRouter $settingsRouter)
+    public function __construct(private readonly SettingsRouter $settingsRouter)
     {
-        $this->settingsRouter = $settingsRouter;
     }
 
     public static function getSubscribedEvents(): array
     {
-        return [ConsoleEvents::COMMAND => ['onConsoleCommand']];
+        return [
+            ConsoleEvents::COMMAND => ['onConsoleCommand'],
+        ];
     }
 
     public function onConsoleCommand(ConsoleCommandEvent $event): void

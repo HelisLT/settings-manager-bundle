@@ -1,0 +1,16 @@
+name: PhpCS
+
+on: [push]
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run PhpCS
+        uses: php-actions/composer@v6
+        with:
+          version: 2
+          php_version: 8.1
+          command: phpcs

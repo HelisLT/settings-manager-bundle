@@ -6,7 +6,7 @@ namespace Helis\SettingsManagerBundle\Settings\Switchable;
 
 trait SwitchableTrait
 {
-    protected $enabled = false;
+    protected bool $enabled = false;
 
     public function setEnabled(bool $enabled): void
     {

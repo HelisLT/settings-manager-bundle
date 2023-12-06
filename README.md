@@ -6,7 +6,6 @@ Provides a nice way to define variables and inject them into application parts.
  - Multiple providers.
  - User interface.
 
-[![Build Status](https://travis-ci.org/HelisLT/settings-manager-bundle.svg?branch=master)](https://travis-ci.org/HelisLT/settings-manager-bundle)
 [![Latest Stable Version](https://poser.pugx.org/helis/settings-manager-bundle/v/stable)](https://packagist.org/packages/helis/settings-manager-bundle)
 [![License](https://poser.pugx.org/helis/settings-manager-bundle/license)](https://packagist.org/packages/helis/settings-manager-bundle)
 
@@ -225,10 +224,8 @@ This is a provider which reads and saves settings using `EntityManagerInterface`
 Required libraries:
 
  - [doctrine/orm](https://github.com/doctrine/doctrine2)
- - [acelaya/doctrine-enum-type](https://github.com/acelaya/doctrine-enum-type)
 
- > I am guessing you already have it :open_mouth:  
- `composer require doctrine/orm acelaya/doctrine-enum-type`
+> `composer require doctrine/orm`
 
 Configuration example:
 
@@ -241,7 +238,7 @@ doctrine:
     orm:
         mappings:
             HelisSettingsManagerBundle:
-                type: yml
+                type: xml
                 is_bundle: true
                 dir: "Resources/config/doctrine"
                 alias: HelisSettingsManagerBundle
@@ -259,20 +256,14 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Helis\SettingsManagerBundle\Model\SettingModel;
 
-/**
- * @ORM\Entity()
- * @ORM\Table(name="setting")
- */
+#[ORM\Entity()]
+#[ORM\Table(name: "setting")]
 class Setting extends SettingModel
-{
-    /**
-     * @var int
-     *
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
-    protected $id;
+{     
+     #[ORM\Id]
+     #[ORM\GeneratedValue]
+     #[ORM\Column(type: "integer")]
+    protected int $id;
 }
 ```
 
@@ -402,7 +393,7 @@ Required extensions:
 
  - [phpredis](https://github.com/phpredis/phpredis)
 
- > `pecl install redis-3.1.6`
+ > `pecl install redis-5.3.7`
 
 Configuration example:
 
@@ -439,9 +430,7 @@ Required libraries and extensions:
 - [symfony/cache](https://symfony.com/doc/current/components/cache.html)
 - [symfony/lock](https://symfony.com/doc/current/components/lock.html)
 
-> `composer require symfony/cache`
-> 
-> `composer require symfony/lock`
+> `composer require symfony/cache symfony/lock`
 
 Configuration example:
 
@@ -522,13 +511,13 @@ User interface can be used to change setting values, enable or disable domains.
 
  1. Bundled user interface requires [knp-menu-bundle](https://github.com/KnpLabs/KnpMenu), [jsrouting-bundle](https://github.com/FriendsOfSymfony/FOSJsRoutingBundle).
 
-    `composer require symfony/translation symfony/twig-bundle symfony/asset knplabs/knp-menu-bundle friendsofsymfony/jsrouting-bundle`
+    `composer require symfony/form symfony/validator symfony/translation symfony/twig-bundle symfony/asset knplabs/knp-menu-bundle friendsofsymfony/jsrouting-bundle`
 
  2. Include routing file.
 
 ```yaml
-# Symfony3, app/config/routing.yml 
-# Symfony4, config/routes/settings_manager.yaml
+# <=Symfony3, app/config/routing.yml 
+# >=Symfony4, config/routes/settings_manager.yaml
 
 settings_manager:
     resource: '@HelisSettingsManagerBundle/Resources/config/routing.yml'

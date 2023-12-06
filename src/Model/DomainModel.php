@@ -6,12 +6,12 @@ namespace Helis\SettingsManagerBundle\Model;
 
 class DomainModel
 {
-    public const DEFAULT_NAME = 'default';
+    final public const DEFAULT_NAME = 'default';
 
-    protected $name;
-    protected $priority = 0;
-    protected $enabled = false;
-    protected $readOnly = false;
+    protected ?string $name = null;
+    protected int $priority = 0;
+    protected bool $enabled = false;
+    protected bool $readOnly = false;
 
     public function getName(): ?string
     {

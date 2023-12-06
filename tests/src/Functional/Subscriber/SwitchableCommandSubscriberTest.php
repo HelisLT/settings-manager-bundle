@@ -6,30 +6,42 @@ namespace Helis\SettingsManagerBundle\Tests\Functional\Subscriber;
 
 use App\AbstractWebTestCase;
 use App\DataFixtures\ORM\LoadSwitchableCommandData;
+use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\StreamOutput;
+use Symfony\Component\Console\Tester\CommandTester;
 
 class SwitchableCommandSubscriberTest extends AbstractWebTestCase
 {
-    public function testSkippedCommand()
+    public function testSkippedCommand(): void
     {
-        $this->markTestSkipped('CommandTester do not dispatch events.');
-
         $this->loadFixtures([]);
 
-        $output = $this->runCommand('switchable:print', ['value' => 'batman']);
+        $input = new ArrayInput([
+            'command' => 'switchable:print',
+            'value' => 'batman',
+        ]);
+        $output = new StreamOutput(fopen('php://memory', 'w', false));
 
-        $this->assertEquals(0, $output->getStatusCode());
-        $this->assertContains("Command is disabled\n", $output->getDisplay());
+        $application = new Application(static::$kernel);
+        $statusCode = $application->doRun($input, $output);
+        $this->assertEquals(113, $statusCode);
+
+        rewind($output->getStream());
+        $display = stream_get_contents($output->getStream());
+        $this->assertStringContainsString('Command is disabled', $display);
     }
 
-    public function testRunCommand()
+    public function testRunCommand(): void
     {
-        $this->markTestSkipped('CommandTester do not dispatch events.');
-
         $this->loadFixtures([LoadSwitchableCommandData::class]);
 
-        $output = $this->runCommand('switchable:print', ['value' => 'batman']);
+        $application = new Application(static::$kernel);
+        $command = $application->find('switchable:print');
+        $commandTester = new CommandTester($command);
+        $commandTester->execute(['value' => 'batman']);
 
-        $this->assertEquals(0, $output->getStatusCode());
-        $this->assertContains('batman', $output->getDisplay(), 'Enabled command output does not match');
+        $commandTester->assertCommandIsSuccessful();
+        $this->assertStringContainsString('batman', $commandTester->getDisplay(), 'Enabled command output does not match');
     }
 }

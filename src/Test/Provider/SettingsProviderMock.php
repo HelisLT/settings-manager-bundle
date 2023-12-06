@@ -14,9 +14,9 @@ final class SettingsProviderMock implements SettingsProviderInterface
     use ReadOnlyProviderTrait;
     use TagFilteringTrait;
 
-    private static $settings = [];
+    private static array $settings = [];
 
-    public static function addSetting(SettingModel $setting)
+    public static function addSetting(SettingModel $setting): void
     {
         foreach (SettingsProviderMock::$settings as $key => $existingSetting) {
             if ($existingSetting->getDomain()->getName() === $setting->getDomain()->getName()
@@ -34,12 +34,12 @@ final class SettingsProviderMock implements SettingsProviderInterface
     /**
      * @param SettingModel[] $settings
      */
-    public static function setSettings(array $settings)
+    public static function setSettings(array $settings): void
     {
         SettingsProviderMock::$settings = $settings;
     }
 
-    public static function clear()
+    public static function clear(): void
     {
         SettingsProviderMock::$settings = [];
     }

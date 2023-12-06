@@ -8,9 +8,9 @@ use Symfony\Component\Validator\Constraint;
 
 class UniqueSetting extends Constraint
 {
-    public $message = '{{ domainName }} domain already has setting named {{ settingName }}';
+    public string $message = '{{ domainName }} domain already has setting named {{ settingName }}';
 
-    public function getTargets()
+    public function getTargets(): string
     {
         return Constraint::CLASS_CONSTRAINT;
     }

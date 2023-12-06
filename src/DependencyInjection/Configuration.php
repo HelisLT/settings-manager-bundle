@@ -42,9 +42,7 @@ class Configuration implements ConfigurationInterface
                     ->addDefaultsIfNotSet()
                     ->canBeEnabled()
                     ->validate()
-                        ->ifTrue(function($v) {
-                            return $v['enabled'] && !isset($v['service_id']);
-                        })
+                        ->ifTrue(fn ($v) => $v['enabled'] && !isset($v['service_id']))
                         ->thenInvalid('logger service_id is missing')
                     ->end()
                     ->children()
@@ -92,13 +90,11 @@ class Configuration implements ConfigurationInterface
                     ->addDefaultsIfNotSet()
                     ->beforeNormalization()
                         ->ifString()
-                        ->then(function($v) {
-                            return [
-                                'name' => $v,
-                                'enabled' => true, // domains from config are enabled by default
-                                'read_only' => true, // all config domains are read only
-                            ];
-                        })
+                        ->then(fn ($v) => [
+                            'name' => $v,
+                            'enabled' => true, // domains from config are enabled by default
+                            'read_only' => true, // all config domains are read only
+                        ])
                     ->end()
                     ->children()
                         ->scalarNode('name')->defaultValue(DomainModel::DEFAULT_NAME)->end()
@@ -110,9 +106,7 @@ class Configuration implements ConfigurationInterface
                     ->arrayPrototype()
                         ->beforeNormalization()
                         ->ifString()
-                        ->then(function($v) {
-                            return ['name' => $v];
-                        })
+                        ->then(fn ($v) => ['name' => $v])
                         ->end()
                         ->children()
                             ->scalarNode('name')->end()
@@ -120,13 +114,13 @@ class Configuration implements ConfigurationInterface
                     ->end()
                 ->end()
                 ->enumNode('type')
-                    ->values(array_values(Type::toArray()))
+                    ->values(array_column(Type::cases(), 'value'))
                     ->isRequired()
                 ->end()
                 ->arrayNode('data')
                     ->beforeNormalization()
                     ->always()
-                    ->then(function($v) {
+                    ->then(function ($v) {
                         if (is_string($v) || is_int($v) || is_float($v)) {
                             return ['value' => $v];
                         }

@@ -14,7 +14,7 @@ class SettingsAwarePassTest extends AbstractWebTestCase
     {
         $this->loadFixtures([]);
 
-        $service = $this->getContainer()->get(ImportantService::class);
+        $service = static::getContainer()->get(ImportantService::class);
 
         $this->assertTrue($service->isEnabled());
     }
@@ -23,7 +23,7 @@ class SettingsAwarePassTest extends AbstractWebTestCase
     {
         $this->loadFixtures([]);
 
-        $service = $this->getContainer()->get(FinalImportantService::class);
+        $service = static::getContainer()->get(FinalImportantService::class);
 
         $this->assertTrue($service->isEnabled());
     }

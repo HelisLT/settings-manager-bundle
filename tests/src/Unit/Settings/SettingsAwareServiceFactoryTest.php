@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Helis\SettingsManagerBundle\Tests\Unit\Settings;
 
+use App\Controller\MockController;
 use Helis\SettingsManagerBundle\Exception\SettingNotFoundException;
 use Helis\SettingsManagerBundle\Settings\SettingsAwareServiceFactory;
 use Helis\SettingsManagerBundle\Settings\SettingsRouter;
@@ -17,9 +18,6 @@ class SettingsAwareServiceFactoryTest extends TestCase
      */
     private $settingsRouter;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         parent::setUp();
@@ -34,8 +32,8 @@ class SettingsAwareServiceFactoryTest extends TestCase
     {
         $factory = new SettingsAwareServiceFactory($this->settingsRouter);
         $object = $this
-            ->getMockBuilder(\stdClass::class)
-            ->setMethods(['setEnabled', 'setGGCount'])
+            ->getMockBuilder(MockController::class)
+            ->onlyMethods(['setEnabled', 'setGGCount'])
             ->getMock();
 
         $object->expects($this->once())->method('setEnabled')->with(false);
@@ -45,8 +43,12 @@ class SettingsAwareServiceFactoryTest extends TestCase
             ->settingsRouter
             ->expects($this->exactly(2))
             ->method('get')
-            ->withConsecutive(['zomg_active'], ['gg_count'])
-            ->willReturnOnConsecutiveCalls(false, 69);
+            ->willReturnMap([
+                ['zomg_active', null, false],
+                ['gg_count', null, 69],
+            ])
+            /*->withConsecutive(['zomg_active'], ['gg_count'])
+            ->willReturnOnConsecutiveCalls(false, 69)*/;
 
         $factory->get(['zomg_active' => 'setEnabled', 'gg_count' => 'setGGCount'], $object);
     }
@@ -55,8 +57,8 @@ class SettingsAwareServiceFactoryTest extends TestCase
     {
         $factory = new SettingsAwareServiceFactory($this->settingsRouter);
         $object = $this
-            ->getMockBuilder(\stdClass::class)
-            ->setMethods(['setEnabled', 'setGGCount'])
+            ->getMockBuilder(MockController::class)
+            ->onlyMethods(['setEnabled', 'setGGCount'])
             ->getMock();
 
         $object->expects($this->once())->method('setEnabled')->with(false);
@@ -66,8 +68,12 @@ class SettingsAwareServiceFactoryTest extends TestCase
             ->settingsRouter
             ->expects($this->exactly(2))
             ->method('mustGet')
-            ->withConsecutive(['zomg_active'], ['gg_count'])
-            ->willReturnOnConsecutiveCalls(false, 69);
+            ->willReturnMap([
+                ['zomg_active', false],
+                ['gg_count', 69],
+            ])
+            /*->withConsecutive(['zomg_active'], ['gg_count'])
+            ->willReturnOnConsecutiveCalls(false, 69)*/;
 
         $factory->get([
             'zomg_active' => ['setter' => 'setEnabled', 'must' => true],
@@ -81,8 +87,8 @@ class SettingsAwareServiceFactoryTest extends TestCase
 
         $factory = new SettingsAwareServiceFactory($this->settingsRouter);
         $object = $this
-            ->getMockBuilder(\stdClass::class)
-            ->setMethods(['setEnabled'])
+            ->getMockBuilder(MockController::class)
+            ->onlyMethods(['setEnabled'])
             ->getMock();
 
         $this

@@ -22,15 +22,8 @@ use Symfony\Component\Serializer\Serializer;
 
 class AwsSsmSettingsProviderTest extends TestCase
 {
-    /**
-     * @var SsmClient|MockObject
-     */
-    private $awsSsmClientMock;
-
-    /**
-     * @var Serializer
-     */
-    private $serializer;
+    private SsmClient|MockObject|null $awsSsmClientMock = null;
+    private ?Serializer $serializer = null;
 
     protected function setUp(): void
     {
@@ -50,6 +43,14 @@ class AwsSsmSettingsProviderTest extends TestCase
                 new JsonEncoder(),
             ]
         );
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        $this->awsSsmClientMock = null;
+        $this->serializer = null;
     }
 
     public function testGetSettingsWithNoParameters(): void
@@ -104,7 +105,7 @@ class AwsSsmSettingsProviderTest extends TestCase
 
         $this->assertSame('Parameter A Name', $settings[0]->getName());
         $this->assertSame(DomainModel::DEFAULT_NAME, $settings[0]->getDomain()->getName());
-        $this->assertSame(Type::STRING, $settings[0]->getType()->getValue());
+        $this->assertSame(Type::STRING, $settings[0]->getType());
         $this->assertSame('a_value', $settings[0]->getData());
     }
 
@@ -151,22 +152,22 @@ class AwsSsmSettingsProviderTest extends TestCase
 
         $this->assertSame('Parameter A Name', $settings[0]->getName());
         $this->assertSame(DomainModel::DEFAULT_NAME, $settings[0]->getDomain()->getName());
-        $this->assertSame(Type::STRING, $settings[0]->getType()->getValue());
+        $this->assertSame(Type::STRING, $settings[0]->getType());
         $this->assertSame('a_value', $settings[0]->getData());
 
         $this->assertSame('Parameter B Name', $settings[1]->getName());
         $this->assertSame(DomainModel::DEFAULT_NAME, $settings[1]->getDomain()->getName());
-        $this->assertSame(Type::STRING, $settings[1]->getType()->getValue());
+        $this->assertSame(Type::STRING, $settings[1]->getType());
         $this->assertSame('b_value', $settings[1]->getData());
 
         $this->assertSame('Parameter C Name', $settings[2]->getName());
         $this->assertSame(DomainModel::DEFAULT_NAME, $settings[2]->getDomain()->getName());
-        $this->assertSame(Type::STRING, $settings[2]->getType()->getValue());
+        $this->assertSame(Type::STRING, $settings[2]->getType());
         $this->assertSame('c_value', $settings[2]->getData());
 
         $this->assertSame('Parameter D Name', $settings[3]->getName());
         $this->assertSame(DomainModel::DEFAULT_NAME, $settings[3]->getDomain()->getName());
-        $this->assertSame(Type::YAML, $settings[3]->getType()->getValue());
+        $this->assertSame(Type::YAML, $settings[3]->getType());
         $this->assertSame(['parameter_d_1', 'parameter_d_2', 'parameter_d_3'], $settings[3]->getData());
     }
 

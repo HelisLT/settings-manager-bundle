@@ -10,3 +10,4 @@ composer.phar
 php-cs-fixer.phar
 /.phpbench_storage
 .phpunit.result.cache
+/.phpunit.cache/

@@ -13,15 +13,11 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 class PasetoCookieSettingsProvider extends AbstractPasetoCookieSettingsProvider
 {
-    protected $symmetricKeyMaterial;
-
     public function __construct(
         SerializerInterface $serializer,
-        string $symmetricKeyMaterial = 'GuxH2igWOvGBSk3cpeL300Fzv9JiAtvC',
+        protected string $symmetricKeyMaterial = 'GuxH2igWOvGBSk3cpeL300Fzv9JiAtvC',
         string $cookieName = 'stn'
     ) {
-        $this->symmetricKeyMaterial = $symmetricKeyMaterial;
-
         parent::__construct($serializer, $cookieName);
     }
 

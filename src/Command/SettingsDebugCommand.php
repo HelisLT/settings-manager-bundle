@@ -7,6 +7,7 @@ namespace Helis\SettingsManagerBundle\Command;
 use Helis\SettingsManagerBundle\Model\SettingModel;
 use Helis\SettingsManagerBundle\Model\TagModel;
 use Helis\SettingsManagerBundle\Settings\SettingsManager;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -14,28 +15,28 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
+#[AsCommand(
+    name: 'debug:settings',
+    description: 'Displays current settings for an application'
+)]
 class SettingsDebugCommand extends Command
 {
-    protected static $defaultName = 'debug:settings';
-
-    protected $settingsManager;
-
-    public function __construct(SettingsManager $settingsManager)
+    public function __construct(protected SettingsManager $settingsManager)
     {
         parent::__construct();
-
-        $this->settingsManager = $settingsManager;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
-        $this->setDefinition([
-            new InputArgument('name', InputArgument::OPTIONAL, 'A setting name'),
-            new InputOption('domain', null, InputOption::VALUE_REQUIRED, 'Displays settings for a specific domain'),
-            new InputOption('domains', null, InputOption::VALUE_NONE, 'Displays all configured domains'),
-            new InputOption('tag', null, InputOption::VALUE_REQUIRED, 'Shows all settings with a specific tag'),
-        ])->setDescription('Displays current settings for an application')->setHelp(
-            <<<'EOF'
+        $this
+            ->setDefinition([
+                new InputArgument('name', InputArgument::OPTIONAL, 'A setting name'),
+                new InputOption('domain', null, InputOption::VALUE_REQUIRED, 'Displays settings for a specific domain'),
+                new InputOption('domains', null, InputOption::VALUE_NONE, 'Displays all configured domains'),
+                new InputOption('tag', null, InputOption::VALUE_REQUIRED, 'Shows all settings with a specific tag'),
+            ])
+            ->setHelp(
+                <<<'EOF'
 The <info>%command.name%</info> command displays all available settings:
 
   <info>php %command.full_name%</info>
@@ -53,7 +54,7 @@ Find all settings with a specific tag by specifying the tag name with the <info>
   <info>php %command.full_name% --tag=foo</info>
 
 EOF
-        );
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -64,7 +65,7 @@ EOF
         if ($input->getOption('domains')) {
             $tableHeaders = ['Name', 'Priority', 'Enabled', 'Read only'];
             $tableRows = [];
-            foreach ($this->settingsManager->getDomains() as $key => $domain) {
+            foreach ($this->settingsManager->getDomains() as $domain) {
                 $tableRows[] = [
                     $domain->getName(),
                     $domain->getPriority(),
@@ -115,11 +116,12 @@ EOF
             $tableRows = [];
 
             if ($setting !== null) {
+                /* @var SettingModel $setting */
                 $tableRows[] = ['Name', $setting->getName()];
                 $tableRows[] = ['Description', $setting->getDescription() ?? '-'];
                 $tableRows[] = ['Domain', $setting->getDomain()->getName()];
                 $tableRows[] = ['Provider Name', $setting->getProviderName() ?? 'config'];
-                $tableRows[] = ['Type', $setting->getType()->getValue()];
+                $tableRows[] = ['Type', $setting->getType()->value];
                 $tableRows[] = ['Tags', $this->implodeTags($setting)];
                 $tableRows[] = ['Choices', $this->dataToScalar($setting->getChoices())];
                 $tableRows[] = ['Data', $this->dataToScalar($setting->getData())];
@@ -137,21 +139,21 @@ EOF
             $settingModel->getName(),
             $settingModel->getDescription(),
             $settingModel->getDomain()->getName(),
-            $settingModel->getType()->getValue(),
+            $settingModel->getType()->value,
             $this->dataToScalar($settingModel->getData()),
             $settingModel->getProviderName() ?? 'config',
             $this->implodeTags($settingModel),
         ];
     }
 
-    private function dataToScalar($data)
+    private function dataToScalar($data): float|bool|int|string
     {
         if (is_array($data)) {
-            $data = empty($data) ? '-' : var_export($data, true);
+            $data = $data === [] ? '-' : var_export($data, true);
         }
 
         if (is_bool($data)) {
-            $data = $data === true ? 'true' : 'false';
+            $data = $data ? 'true' : 'false';
         }
 
         return is_scalar($data) ? $data : '-';
@@ -161,9 +163,7 @@ EOF
     {
         $tags = $model
             ->getTags()
-            ->map(function(TagModel $tagModel) {
-                return $tagModel->getName();
-            })
+            ->map(fn (TagModel $tagModel) => $tagModel->getName())
             ->toArray();
 
         return empty($tags) ? '-' : implode("\n", $tags);

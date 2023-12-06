@@ -11,14 +11,11 @@ use Symfony\Component\Validator\ConstraintValidator;
 
 class UniqueSettingValidator extends ConstraintValidator
 {
-    private $settingManager;
-
-    public function __construct(SettingsManager $settingManager)
+    public function __construct(private readonly SettingsManager $settingManager)
     {
-        $this->settingManager = $settingManager;
     }
 
-    public function validate($value, Constraint $constraint)
+    public function validate($value, Constraint $constraint): void
     {
         if (!$value instanceof SettingModel || !$constraint instanceof UniqueSetting) {
             return;
@@ -26,7 +23,7 @@ class UniqueSettingValidator extends ConstraintValidator
 
         $settings = $this->settingManager->getSettingsByName([$value->getDomain()->getName()], [$value->getName()]);
 
-        if (count($settings) > 0) {
+        if ($settings !== []) {
             $this
                 ->context
                 ->buildViolation($constraint->message)

@@ -18,32 +18,33 @@ use Helis\SettingsManagerBundle\Settings\SettingsStore;
  */
 class SettingsRouterTest extends AbstractWebTestCase
 {
-    /**
-     * @var SettingsRouter
-     */
-    private $settingsRouter;
+    private ?SettingsRouter $settingsRouter = null;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->settingsRouter = $this->getContainer()->get(SettingsRouter::class);
+        $this->settingsRouter = static::getContainer()->get(SettingsRouter::class);
     }
 
-    public function getSettingDataProvider(): array
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        $this->settingsRouter = null;
+    }
+
+    public static function getSettingDataProvider(): array
     {
         return [
-            ['foo', 'fixture bool foo setting', [], Type::BOOL(), true, 'orm'],
-            ['baz', 'baz desc', ['experimental', 'poo'], Type::BOOL(), true, 'config'],
-            ['tuna', 'tuna desc', [], Type::STRING(), 'fish', 'config'],
+            ['foo', 'fixture bool foo setting', [], Type::BOOL, true, 'orm'],
+            ['baz', 'baz desc', ['experimental', 'poo'], Type::BOOL, true, 'config'],
+            ['tuna', 'tuna desc', [], Type::STRING, 'fish', 'config'],
             [
                 'wth_yaml',
                 'ohohoho',
                 [],
-                Type::YAML(),
+                Type::YAML,
                 ['amazing' => ['foo', 'foo', 'foo', 'yee'], 'cool' => ['yes' => ['yes', 'no']], 'damn' => 5],
                 'config',
             ],
@@ -51,8 +52,6 @@ class SettingsRouterTest extends AbstractWebTestCase
     }
 
     /**
-     * @param mixed $expectedData
-     *
      * @dataProvider getSettingDataProvider
      */
     public function testGetSetting(
@@ -62,21 +61,21 @@ class SettingsRouterTest extends AbstractWebTestCase
         Type $expectedType,
         $expectedData,
         string $expectedProvider
-    ) {
+    ): void {
         $this->loadFixtures([LoadSettingsData::class]);
         $setting = $this->settingsRouter->getSetting($settingName);
 
         $this->assertNotFalse($settingName, 'Setting not found');
         $this->assertEquals($expectedDescription, $setting->getDescription());
-        $this->assertTrue($setting->getType()->equals($expectedType));
+        $this->assertTrue($setting->getType() === $expectedType);
         $this->assertEquals($expectedData, $setting->getData());
         $this->assertEquals($expectedProvider, $setting->getProviderName());
 
-        if ($expectedType->equals(Type::STRING())) {
+        if ($expectedType === Type::STRING) {
             $this->assertEquals($expectedData, $this->settingsRouter->getString($settingName));
-        } elseif ($expectedType->equals(Type::BOOL())) {
+        } elseif ($expectedType === Type::BOOL) {
             $this->assertEquals($expectedData, $this->settingsRouter->getBool($settingName));
-        } elseif ($expectedType->equals(Type::YAML())) {
+        } elseif ($expectedType === Type::YAML) {
             $this->assertEquals($expectedData, $this->settingsRouter->getArray($settingName));
         }
 
@@ -85,18 +84,18 @@ class SettingsRouterTest extends AbstractWebTestCase
         }
     }
 
-    public function mustGetSettingDataProvider(): array
+    public static function mustGetSettingDataProvider(): array
     {
         return [
             ['non-existing', '', [], null, null, '', SettingNotFoundException::class],
-            ['foo', 'fixture bool foo setting', [], Type::BOOL(), true, 'orm', null],
-            ['baz', 'baz desc', ['experimental', 'poo'], Type::BOOL(), true, 'config', SettingNotFoundException::class],
-            ['tuna', 'tuna desc', [], Type::STRING(), 'fish', 'config', SettingNotFoundException::class],
+            ['foo', 'fixture bool foo setting', [], Type::BOOL, true, 'orm', null],
+            ['baz', 'baz desc', ['experimental', 'poo'], Type::BOOL, true, 'config', SettingNotFoundException::class],
+            ['tuna', 'tuna desc', [], Type::STRING, 'fish', 'config', SettingNotFoundException::class],
             [
                 'wth_yaml',
                 'ohohoho',
                 [],
-                Type::YAML(),
+                Type::YAML,
                 ['amazing' => ['foo', 'foo', 'foo', 'yee'], 'cool' => ['yes' => ['yes', 'no']], 'damn' => 5],
                 'config',
                 SettingNotFoundException::class,
@@ -105,9 +104,6 @@ class SettingsRouterTest extends AbstractWebTestCase
     }
 
     /**
-     * @param Type  $expectedType
-     * @param mixed $expectedData
-     *
      * @dataProvider mustGetSettingDataProvider
      */
     public function testMustGetSetting(
@@ -115,10 +111,10 @@ class SettingsRouterTest extends AbstractWebTestCase
         string $expectedDescription,
         array $expectedTags,
         ?Type $expectedType,
-        $expectedData,
+        mixed $expectedData,
         string $expectedProvider,
         ?string $expectedException
-    ) {
+    ): void {
         $this->loadFixtures([LoadSettingsData::class]);
 
         if ($expectedException) {
@@ -130,15 +126,15 @@ class SettingsRouterTest extends AbstractWebTestCase
 
             $this->assertNotFalse($settingName, 'Setting not found');
             $this->assertEquals($expectedDescription, $setting->getDescription());
-            $this->assertTrue($setting->getType()->equals($expectedType));
+            $this->assertTrue($setting->getType() === $expectedType);
             $this->assertEquals($expectedData, $setting->getData());
             $this->assertEquals($expectedProvider, $setting->getProviderName());
 
-            if ($expectedType->equals(Type::STRING())) {
+            if ($expectedType === Type::STRING) {
                 $this->assertEquals($expectedData, $this->settingsRouter->getString($settingName));
-            } elseif ($expectedType->equals(Type::BOOL())) {
+            } elseif ($expectedType === Type::BOOL) {
                 $this->assertEquals($expectedData, $this->settingsRouter->getBool($settingName));
-            } elseif ($expectedType->equals(Type::YAML())) {
+            } elseif ($expectedType === Type::YAML) {
                 $this->assertEquals($expectedData, $this->settingsRouter->getArray($settingName));
             }
 
@@ -148,7 +144,7 @@ class SettingsRouterTest extends AbstractWebTestCase
         }
     }
 
-    public function getSettingsByTagDataProvider(): array
+    public static function getSettingsByTagDataProvider(): array
     {
         return [
             ['experimental', 1, ['baz']],
@@ -178,7 +174,7 @@ class SettingsRouterTest extends AbstractWebTestCase
         }
     }
 
-    public function mustGetSettingsByTagDataProvider(): array
+    public static function mustGetSettingsByTagDataProvider(): array
     {
         return [
             ['experimental', 1, ['baz'], null],
@@ -215,7 +211,7 @@ class SettingsRouterTest extends AbstractWebTestCase
         }
     }
 
-    public function warmUpClearDataProvider(): array
+    public static function warmUpClearDataProvider(): array
     {
         return [
             ['fixture', 'bazinga'],
@@ -228,7 +224,7 @@ class SettingsRouterTest extends AbstractWebTestCase
     public function testWarmUpClear(string $tagName, string $settingName): void
     {
         $this->loadFixtures([LoadSettingsData::class]);
-        $settingsStore = $this->getContainer()->get(SettingsStore::class);
+        $settingsStore = static::getContainer()->get(SettingsStore::class);
         $settings = $this->settingsRouter->getSettingsByTag($tagName);
 
         $this->assertArrayHasKey($settingName, $settings);
@@ -257,7 +253,7 @@ class SettingsRouterTest extends AbstractWebTestCase
         $this->assertFalse($this->settingsRouter->isWarm());
     }
 
-    public function testWarmupWithoutSave()
+    public function testWarmupWithoutSave(): void
     {
         $this->loadFixtures([]);
 
@@ -270,7 +266,7 @@ class SettingsRouterTest extends AbstractWebTestCase
         $this->assertFalse($value);
     }
 
-    public function testWarmupWithSave()
+    public function testWarmupWithSave(): void
     {
         $this->loadFixtures([]);
 
@@ -278,7 +274,7 @@ class SettingsRouterTest extends AbstractWebTestCase
         $setting = $this->settingsRouter->getSetting('foo');
         $this->assertFalse($setting->getData());
 
-        $settingsManager = $this->getContainer()->get(SettingsManager::class);
+        $settingsManager = static::getContainer()->get(SettingsManager::class);
         $setting->setData(true);
         $settingsManager->save($setting);
 

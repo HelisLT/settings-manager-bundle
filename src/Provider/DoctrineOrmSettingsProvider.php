@@ -12,32 +12,29 @@ use Helis\SettingsManagerBundle\Model\SettingModel;
 use Helis\SettingsManagerBundle\Model\TagModel;
 use Helis\SettingsManagerBundle\Provider\Traits\TagFilteringTrait;
 use Helis\SettingsManagerBundle\Provider\Traits\WritableProviderTrait;
+use UnexpectedValueException;
 
 class DoctrineOrmSettingsProvider implements SettingsProviderInterface
 {
     use TagFilteringTrait;
     use WritableProviderTrait;
-
-    protected $entityManager;
-    protected $settingsEntityClass;
-    protected $tagEntityClass;
+    protected string $settingsEntityClass;
+    protected string $tagEntityClass;
 
     public function __construct(
-        EntityManagerInterface $entityManager,
+        protected EntityManagerInterface $entityManager,
         string $settingsEntityClass,
         string $tagEntityClass = null
     ) {
-        $this->entityManager = $entityManager;
-
         if (!is_subclass_of($settingsEntityClass, SettingModel::class)) {
-            throw new \UnexpectedValueException($settingsEntityClass.' is not part of the model '.SettingModel::class);
+            throw new UnexpectedValueException($settingsEntityClass.' is not part of the model '.SettingModel::class);
         }
 
         $this->settingsEntityClass = $settingsEntityClass;
 
         if ($tagEntityClass !== null) {
             if (!is_subclass_of($tagEntityClass, TagModel::class)) {
-                throw new \UnexpectedValueException($tagEntityClass.' is not part of the model '.TagModel::class);
+                throw new UnexpectedValueException($tagEntityClass.' is not part of the model '.TagModel::class);
             }
 
             $this->tagEntityClass = $tagEntityClass;
@@ -54,8 +51,8 @@ class DoctrineOrmSettingsProvider implements SettingsProviderInterface
             ->setParameter('domainNames', $domainNames);
 
         $out = [];
-        foreach ($qb->getQuery()->iterate() as $row) {
-            $out[] = reset($row);
+        foreach ($qb->getQuery()->toIterable() as $row) {
+            $out[] = $row;
         }
 
         return $out;
@@ -75,8 +72,8 @@ class DoctrineOrmSettingsProvider implements SettingsProviderInterface
             ->setParameter('settingNames', $settingNames);
 
         $out = [];
-        foreach ($qb->getQuery()->iterate() as $row) {
-            $out[] = reset($row);
+        foreach ($qb->getQuery()->toIterable() as $row) {
+            $out[] = $row;
         }
 
         return $out;
@@ -108,8 +105,7 @@ class DoctrineOrmSettingsProvider implements SettingsProviderInterface
         }
 
         $out = [];
-        foreach ($qb->getQuery()->iterate(null, AbstractQuery::HYDRATE_ARRAY) as $row) {
-            $row = reset($row);
+        foreach ($qb->getQuery()->toIterable([], AbstractQuery::HYDRATE_ARRAY) as $row) {
             $model = new DomainModel();
             $model->setName($row['name']);
             $model->setPriority($row['priority']);
@@ -163,7 +159,7 @@ class DoctrineOrmSettingsProvider implements SettingsProviderInterface
                 'dname' => $settingModel->getDomain()->getName(),
             ]);
 
-        $success = ((int)$qb->getQuery()->getSingleScalarResult()) > 0;
+        $success = ((int) $qb->getQuery()->getSingleScalarResult()) > 0;
 
         if ($success) {
             $this->entityManager->clear();
@@ -184,7 +180,7 @@ class DoctrineOrmSettingsProvider implements SettingsProviderInterface
             ->setParameter('priority', $domainModel->getPriority())
             ->setParameter('dname', $domainModel->getName());
 
-        $success = ((int)$qb->getQuery()->getSingleScalarResult()) > 0;
+        $success = ((int) $qb->getQuery()->getSingleScalarResult()) > 0;
 
         if ($success) {
             $this->entityManager->clear();
@@ -201,7 +197,7 @@ class DoctrineOrmSettingsProvider implements SettingsProviderInterface
             ->where($qb->expr()->eq('s.domain.name', ':dname'))
             ->setParameter('dname', $domainName);
 
-        $success = ((int)$qb->getQuery()->getSingleScalarResult()) > 0;
+        $success = ((int) $qb->getQuery()->getSingleScalarResult()) > 0;
 
         if ($success) {
             $this->entityManager->clear();
@@ -243,7 +239,7 @@ class DoctrineOrmSettingsProvider implements SettingsProviderInterface
                 }
             }
 
-            if (count($tagNamesToFetch) > 0) {
+            if ($tagNamesToFetch !== []) {
                 /** @var TagModel[] $fetchedTags */
                 $fetchedTags = $this
                     ->entityManager

@@ -20,43 +20,47 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\DependencyInjection\Loader;
+use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Yaml\Yaml;
 
 class HelisSettingsManagerExtension extends Extension
 {
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
-        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
-        $loader->load('services.yml');
-        $loader->load('serializer.yml');
-        $loader->load('validators.yml');
-        $loader->load('command.yml');
+        $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader->load('command.yaml');
+        $loader->load('services.yaml');
+        $loader->load('serializer.yaml');
 
         $bundles = $container->getParameter('kernel.bundles');
 
         if (isset($bundles['TwigBundle'])) {
-            $loader->load('twig.yml');
+            $loader->load('twig.yaml');
         }
 
         if (isset($bundles['KnpMenuBundle'])) {
-            $loader->load('menu.yml');
+            $loader->load('menu.yaml');
         }
 
         if ($config['profiler']['enabled']) {
-            $this->loadDataCollector($config, $container);
+            $this->loadDataCollector($container);
         }
 
         if ($config['logger']['enabled']) {
             $container->setAlias('settings_manager.logger', $config['logger']['service_id']);
         }
 
-        $this->loadSettingsManager($config, $container);
+        if (interface_exists(ValidatorInterface::class)) {
+            $loader->load('validators.yaml');
+        }
+
+        $this->loadSettingsManager($container);
         $this->loadSettingsRouter($config, $container);
         $this->loadSimpleProvider($config, $container);
         $this->loadListeners($config['listeners'], $container);
@@ -87,7 +91,7 @@ class HelisSettingsManagerExtension extends Extension
             ->addTag('enqueue.transport.consumption_extension', ['priority' => $config['priority'], 'transport' => 'all']);
     }
 
-    private function loadSettingsManager(array $config, ContainerBuilder $container): void
+    private function loadSettingsManager(ContainerBuilder $container): void
     {
         $container
             ->register(SettingsManager::class, SettingsManager::class)
@@ -181,7 +185,7 @@ class HelisSettingsManagerExtension extends Extension
         return $settings;
     }
 
-    private function loadDataCollector(array $config, ContainerBuilder $container): void
+    private function loadDataCollector(ContainerBuilder $container): void
     {
         $container
             ->register(SettingsCollector::class, SettingsCollector::class)

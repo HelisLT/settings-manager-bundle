@@ -63,7 +63,7 @@ class JwtCookieSettingsProviderTest extends AbstractCookieSettingsProviderTest
         $settingStub = $this->createMock(SettingModel::class);
         $settingStub->method('getDomain')->willReturn($domainStub);
 
-        $eventMock->expects($this->once())->method('isMasterRequest')->willReturn(true);
+        $eventMock->expects($this->once())->method('isMainRequest')->willReturn(true);
         $eventMock->expects($this->once())->method('getRequest')->willReturn($request);
 
         $provider->onKernelRequest($eventMock);

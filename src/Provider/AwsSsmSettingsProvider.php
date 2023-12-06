@@ -26,17 +26,9 @@ class AwsSsmSettingsProvider extends SimpleSettingsProvider
         'choice' => Type::CHOICE,
     ];
 
-    private $ssmClient;
-    private $denormalizer;
-    private $parameterNames;
-
-    public function __construct(SsmClient $ssmClient, DenormalizerInterface $denormalizer, array $parameterNames)
+    public function __construct(private readonly SsmClient $ssmClient, private readonly DenormalizerInterface $denormalizer, private readonly array $parameterNames)
     {
         parent::__construct([]);
-
-        $this->ssmClient = $ssmClient;
-        $this->denormalizer = $denormalizer;
-        $this->parameterNames = $parameterNames;
     }
 
     public function getSettings(array $domainNames): array
@@ -63,7 +55,7 @@ class AwsSsmSettingsProvider extends SimpleSettingsProvider
     public function save(SettingModel $settingModel): bool
     {
         if (!in_array($settingModel->getName(), $this->parameterNames)) {
-            throw new ReadOnlyProviderException(get_class($this));
+            throw new ReadOnlyProviderException(static::class);
         }
 
         $this->ssmClient->putParameter([
@@ -80,7 +72,7 @@ class AwsSsmSettingsProvider extends SimpleSettingsProvider
     {
         $result = $this->ssmClient->getParameters(['Names' => $this->parameterNames]);
         foreach ($result->get('Parameters') as $parameter) {
-            $value = @json_decode($parameter['Value'], true);
+            $value = @json_decode((string) $parameter['Value'], true);
             if ($value === null) {
                 $value = $parameter['Value'];
             }
@@ -103,12 +95,12 @@ class AwsSsmSettingsProvider extends SimpleSettingsProvider
         }
     }
 
-    private function resolveType($value): string
+    private function resolveType(mixed $value): string
     {
         $type = gettype($value);
 
         if (isset(self::TYPE_MAP[$type])) {
-            return self::TYPE_MAP[$type];
+            return self::TYPE_MAP[$type]->value;
         }
 
         throw new UnknownTypeException($type);

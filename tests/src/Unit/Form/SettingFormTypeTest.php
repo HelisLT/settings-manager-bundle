@@ -12,11 +12,11 @@ use Symfony\Component\Form\Test\TypeTestCase;
 
 class SettingFormTypeTest extends TypeTestCase
 {
-    public function submitValidDataProvider()
+    public static function submitValidDataProvider()
     {
         // test bool submit
         $data1 = new SettingModel();
-        $data1->setType(Type::BOOL());
+        $data1->setType(Type::BOOL);
 
         $formData1 = [
             'name' => 'foo',
@@ -28,7 +28,7 @@ class SettingFormTypeTest extends TypeTestCase
         $object1
             ->setDescription('lorem ipsum')
             ->setDomain(new DomainModel())
-            ->setType(Type::BOOL())
+            ->setType(Type::BOOL)
             ->setData(true);
 
         // 0: bool as bool
@@ -36,7 +36,7 @@ class SettingFormTypeTest extends TypeTestCase
 
         // test string submit
         $data2 = new SettingModel();
-        $data2->setType(Type::STRING());
+        $data2->setType(Type::STRING);
 
         $formData2 = [
             'name' => 'foo',
@@ -45,7 +45,7 @@ class SettingFormTypeTest extends TypeTestCase
 
         $object2 = new SettingModel();
         $object2
-            ->setType(Type::STRING())
+            ->setType(Type::STRING)
             ->setDomain(new DomainModel())
             ->setData('2.5678');
 
@@ -54,7 +54,7 @@ class SettingFormTypeTest extends TypeTestCase
 
         // test float submit
         $data3 = new SettingModel();
-        $data3->setType(Type::FLOAT());
+        $data3->setType(Type::FLOAT);
 
         $formData3 = [
             'name' => 'foo',
@@ -63,7 +63,7 @@ class SettingFormTypeTest extends TypeTestCase
 
         $object3 = new SettingModel();
         $object3
-            ->setType(Type::FLOAT())
+            ->setType(Type::FLOAT)
             ->setDomain(new DomainModel())
             ->setData(2.57);
 

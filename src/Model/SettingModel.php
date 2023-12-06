@@ -9,14 +9,14 @@ use Doctrine\Common\Collections\Collection;
 
 class SettingModel
 {
-    protected $name;
-    protected $description;
-    protected $domain;
-    protected $tags;
-    protected $type;
-    protected $data = [];
-    protected $providerName;
-    protected $choices = [];
+    protected ?string $name = null;
+    protected ?string $description = null;
+    protected ?DomainModel $domain;
+    protected Collection $tags;
+    protected ?Type $type;
+    protected array $data = [];
+    protected ?string $providerName;
+    protected array $choices = [];
 
     public function __construct()
     {
@@ -119,9 +119,9 @@ class SettingModel
     /**
      * @return mixed|null
      */
-    public function getData()
+    public function getData(): mixed
     {
-        return isset($this->data['value']) ? $this->data['value'] : null;
+        return $this->data['value'] ?? null;
     }
 
     public function setData($data): SettingModel

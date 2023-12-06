@@ -1,24 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/6.5/phpunit.xsd"
-         colors="true"
-         bootstrap="vendor/autoload.php"
->
-    <php>
-        <env name="SYMFONY_DEPRECATIONS_HELPER" value="max[self]=0"/>
-        <env name="REDIS_HOST" value="redis"/>
-        <env name="REDIS_PORT" value="6379"/>
-        <server name="KERNEL_CLASS" value="AppKernel" />
-    </php>
-
-    <testsuites>
-        <testsuite name="HelisSettingsManagerBundle Test Suite">
-            <directory>./tests/</directory>
-        </testsuite>
-    </testsuites>
-
-    <listeners>
-        <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener"/>
-    </listeners>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.4/phpunit.xsd" colors="true" bootstrap="vendor/autoload.php" cacheDirectory=".phpunit.cache">
+  <php>
+    <env name="SYMFONY_DEPRECATIONS_HELPER" value="max[self]=0"/>
+    <env name="REDIS_HOST" value="redis"/>
+    <env name="REDIS_PORT" value="6379"/>
+    <server name="KERNEL_CLASS" value="AppKernel"/>
+  </php>
+  <testsuites>
+    <testsuite name="HelisSettingsManagerBundle Test Suite">
+      <directory>./tests/</directory>
+      <exclude>./tests/src/Functional/Provider/AbstractReadableSettingsProviderTest.php</exclude>
+      <exclude>./tests/src/Functional/Provider/AbstractSettingsProviderTest.php</exclude>
+      <exclude>./tests/src/Unit/Provider/AbstractCookieSettingsProviderTest.php</exclude>
+    </testsuite>
+  </testsuites>
 </phpunit>

@@ -17,21 +17,21 @@ trait ReadOnlyProviderTrait
 
     public function save(SettingModel $settingModel): bool
     {
-        throw new ReadOnlyProviderException(get_class($this));
+        throw new ReadOnlyProviderException($this::class);
     }
 
     public function delete(SettingModel $settingModel): bool
     {
-        throw new ReadOnlyProviderException(get_class($this));
+        throw new ReadOnlyProviderException($this::class);
     }
 
     public function updateDomain(DomainModel $domainModel): bool
     {
-        throw new ReadOnlyProviderException(get_class($this));
+        throw new ReadOnlyProviderException($this::class);
     }
 
     public function deleteDomain(string $domainName): bool
     {
-        throw new ReadOnlyProviderException(get_class($this));
+        throw new ReadOnlyProviderException($this::class);
     }
 }

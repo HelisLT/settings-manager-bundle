@@ -6,27 +6,27 @@ namespace Helis\SettingsManagerBundle\Command;
 
 use Helis\SettingsManagerBundle\Provider\SettingsProviderInterface;
 use Helis\SettingsManagerBundle\Settings\ProvidersManager;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
+#[AsCommand(
+    name: 'helis:settings:warm-up-providers',
+    description: 'Warm ups settings providers'
+)]
 class WarmUpProvidersCommand extends Command
 {
-    private $providersManager;
-
-    public function __construct(ProvidersManager $providersManager)
+    public function __construct(private readonly ProvidersManager $providersManager)
     {
         parent::__construct();
-
-        $this->providersManager = $providersManager;
     }
 
     protected function configure(): void
     {
         $this
-            ->setName('helis:settings:warm-up-providers')
             ->addOption(
                 'domains',
                 'd',
@@ -47,8 +47,7 @@ class WarmUpProvidersCommand extends Command
                 InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL,
                 'Providers to copy to',
                 []
-            )
-            ->setDescription('Warm ups settings providers');
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

@@ -21,7 +21,7 @@ class DoctrineOrmSettingsProviderTest extends AbstractSettingsProviderTest
     protected function createProvider(): SettingsProviderInterface
     {
         return new DoctrineOrmSettingsProvider(
-            $this->getContainer()->get('doctrine.orm.default_entity_manager'),
+            static::getContainer()->get('doctrine.orm.default_entity_manager'),
             Setting::class,
             Tag::class
         );

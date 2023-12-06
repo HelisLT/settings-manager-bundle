@@ -17,64 +17,56 @@
     "autoload-dev": {
         "psr-4": {
             "Helis\\SettingsManagerBundle\\Tests\\": "tests/src/",
-            "Helis\\SettingsManagerBundle\\Benchmarks\\": "benchmarks/",
             "App\\": "tests/bundle/"
         },
         "classmap": ["tests/app/AppKernel.php"]
     },
     "require": {
-        "php": ">=7.4",
+        "php": "^8.1",
         "ext-json": "*",
         "doctrine/collections": "^1.5",
-        "myclabs/php-enum": "^1.5",
-        "symfony/config": "^4.4|^5.3",
-        "symfony/console": "^4.4|^5.3",
-        "symfony/dependency-injection": "^4.4|^5.3",
-        "symfony/form": "^4.4|^5.3",
-        "symfony/http-foundation": "^4.4|^5.3",
-        "symfony/http-kernel": "^4.4|^5.3",
-        "symfony/options-resolver": "^4.4|^5.3",
-        "symfony/proxy-manager-bridge": "^4.4|^5.3",
-        "symfony/serializer": "^4.4|^5.3",
-        "symfony/validator": "^4.4|^5.3",
-        "symfony/yaml": "^4.4|^5.3"
+        "symfony/config": "^5.4|^6.3",
+        "symfony/console": "^5.4|^6.3",
+        "symfony/dependency-injection": "^5.4|^6.3",
+        "symfony/http-kernel": "^5.4|^6.3",
+        "symfony/serializer": "^5.4|^6.3",
+        "symfony/yaml": "^5.4|^6.3"
     },
     "require-dev": {
-        "acelaya/doctrine-enum-type": "^2.0",
         "aws/aws-sdk-php": "^3.48",
         "doctrine/doctrine-bundle": "^1.8|^2.0",
         "doctrine/doctrine-fixtures-bundle": "^3.0",
         "doctrine/orm": "^2.6",
         "enqueue/enqueue": "^0.10",
-        "friendsofphp/php-cs-fixer": "^2.11",
-        "friendsofsymfony/jsrouting-bundle": "^2.1",
-        "knplabs/knp-menu-bundle": "^3.1",
+        "friendsofsymfony/jsrouting-bundle": "^3",
+        "knplabs/knp-menu-bundle": "^3.2",
         "lcobucci/jwt": "^4.0",
-        "liip/functional-test-bundle": "^4.0.0",
         "liip/test-fixtures-bundle": "^2.0.0",
         "paragonie/paseto": "^1.0",
         "phpbench/phpbench": "^1.0",
         "phpstan/phpstan": "^1.0",
         "phpstan/phpstan-phpunit": "^1.0",
-        "phpunit/phpunit": "^8.5|^9.5",
+        "phpunit/phpunit": "^10.0",
         "predis/predis": "^1.1",
-        "symfony/asset": "^4.4|^5.3",
-        "symfony/framework-bundle": "^4.4|^5.3.15",
-        "symfony/lock": "^5.3",
+        "rector/rector": "^0.18",
+        "symfony/asset": "^5.4|^6.3",
+        "symfony/browser-kit": "^5.4|^6.3",
+        "symfony/form": "^5.4|^6.3",
+        "symfony/framework-bundle": "^5.4|^6.3",
+        "symfony/http-foundation": "^5.4|^6.3",
+        "symfony/lock": "^5.4|^6.3",
         "symfony/monolog-bundle": "~3.7.0",
-        "symfony/phpunit-bridge": "^4.4|^5.3",
-        "symfony/security-bundle": "^4.4|^5.3",
-        "symfony/stopwatch": "^4.4|^5.3",
-        "symfony/twig-bundle": "^4.4|^5.3",
-        "symfony/web-profiler-bundle": "^4.4|^5.3"
+        "symfony/phpunit-bridge": "^5.4|^6.3",
+        "symfony/security-bundle": "^5.4|^6.3",
+        "symfony/twig-bundle": "^5.4|^6.3",
+        "symfony/validator": "^5.4|^6.3",
+        "symfony/web-profiler-bundle": "^5.4|^6.3"
     },
     "suggest": {
         "symfony/cache": "Required by some settings providers",
         "symfony/lock": "Required by some settings providers",
         "symfony/monolog-bundle": "Allows more advanced logging",
         "doctrine/orm": "Allows to use orm setting provider",
-        "acelaya/doctrine-enum-type": "Required if using doctrine orm, for persisting enum's",
-        "paragonie/past": "Allows to use cookie setting provider. php >=7.2 for better performance",
         "friendsofsymfony/jsrouting-bundle": "Required to fully use provided user interface",
         "knplabs/knp-menu-bundle": "Required to fully use provided user interface",
         "aws/aws-sdk-php": "Allows to use aws ssm setting provider",
@@ -85,15 +77,22 @@
         "sort-packages": true
     },
     "scripts": {
-        "install-phpcs": "test -f php-cs-fixer.phar || wget https://github.com/FriendsOfPHP/PHP-CS-Fixer/releases/download/v3.5.0/php-cs-fixer.phar -O php-cs-fixer.phar",
+        "phpcs-install": [
+            "test -f php-cs-fixer.phar || wget https://cs.symfony.com/download/php-cs-fixer-v3.phar -O php-cs-fixer.phar",
+            "test -f php-cs-fixer.phar && php php-cs-fixer.phar self-update"
+        ],
         "phpcs": [
-            "@install-phpcs",
+            "@phpcs-install",
             "@php php-cs-fixer.phar fix --dry-run --diff -v --allow-risky=yes --ansi"
         ],
         "phpcs-fix": [
-            "@install-phpcs",
+            "@phpcs-install",
             "@php php-cs-fixer.phar fix --diff -v --allow-risky=yes --ansi"
         ],
-        "phpstan": "phpstan analyse --ansi"
+        "phpstan": "phpstan analyse --ansi",
+        "rector": "rector process --dry-run",
+        "rector-fix": "rector process",
+        "phpunit": "phpunit -c .",
+        "benchmark": "./vendor/bin/phpbench run --progress=dots"
     }
 }
