@@ -23,7 +23,7 @@ class SettingTypeValidatorTest extends TestCase
         parent::setUp();
 
         $builder = new ValidatorBuilder();
-        $builder->disableAnnotationMapping();
+        $builder->disableAttributeMapping();
         $this->validator = $builder->getValidator();
     }
 

@@ -48,6 +48,7 @@ doctrine:
         auto_mapping: true
         validate_xml_mapping: true
         enable_lazy_ghost_objects: true
+        report_fields_where_declared: true
         mappings:
             AppBundle:
                 type: attribute

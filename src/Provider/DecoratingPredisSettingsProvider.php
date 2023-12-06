@@ -34,7 +34,7 @@ class DecoratingPredisSettingsProvider implements ModificationAwareSettingsProvi
         $this->redis = $redis;
     }
 
-    public function setTtl(int $ttl)
+    public function setTtl(int $ttl): void
     {
         $this->ttl = $ttl;
     }

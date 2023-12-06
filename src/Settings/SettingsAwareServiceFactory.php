@@ -60,7 +60,7 @@ class SettingsAwareServiceFactory implements LoggerAwareInterface
             if (method_exists($object, $setter)) {
                 $object->{$setter}($setting);
             } else {
-                throw new LogicException('Undefined method '.$object::class."::{$setter}().");
+                throw new LogicException('Undefined method '.$object::class.'::'.$setter.'().');
             }
         }
 

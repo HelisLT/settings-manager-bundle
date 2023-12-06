@@ -43,7 +43,7 @@ class DomainController
 
         $domains = $this->settingsManager->getDomains($providerName);
         if (!isset($domains[$domainName])) {
-            throw new NotFoundHttpException("Domain named {$domainName} not found");
+            throw new NotFoundHttpException('Domain named '.$domainName.' not found');
         }
 
         $domain = $domains[$domainName];
@@ -59,7 +59,7 @@ class DomainController
         $domains = $this->settingsManager->getDomains($providerName);
 
         if (!isset($domains[$domainName])) {
-            throw new NotFoundHttpException("Domain {$domainName} not found");
+            throw new NotFoundHttpException('Domain '.$domainName.' not found');
         }
 
         $form = $this->formFactory->create(DomainFormType::class, $domains[$domainName]);

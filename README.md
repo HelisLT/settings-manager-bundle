@@ -225,6 +225,8 @@ Required libraries:
 
  - [doctrine/orm](https://github.com/doctrine/doctrine2)
 
+> `composer require doctrine/orm`
+
 Configuration example:
 
  1. Doctrine configuration
@@ -391,7 +393,7 @@ Required extensions:
 
  - [phpredis](https://github.com/phpredis/phpredis)
 
- > `pecl install redis-3.1.6`
+ > `pecl install redis-5.3.7`
 
 Configuration example:
 
@@ -428,9 +430,7 @@ Required libraries and extensions:
 - [symfony/cache](https://symfony.com/doc/current/components/cache.html)
 - [symfony/lock](https://symfony.com/doc/current/components/lock.html)
 
-> `composer require symfony/cache`
-> 
-> `composer require symfony/lock`
+> `composer require symfony/cache symfony/lock`
 
 Configuration example:
 
@@ -511,13 +511,13 @@ User interface can be used to change setting values, enable or disable domains.
 
  1. Bundled user interface requires [knp-menu-bundle](https://github.com/KnpLabs/KnpMenu), [jsrouting-bundle](https://github.com/FriendsOfSymfony/FOSJsRoutingBundle).
 
-    `composer require symfony/translation symfony/twig-bundle symfony/asset knplabs/knp-menu-bundle friendsofsymfony/jsrouting-bundle`
+    `composer require symfony/form symfony/validator symfony/translation symfony/twig-bundle symfony/asset knplabs/knp-menu-bundle friendsofsymfony/jsrouting-bundle`
 
  2. Include routing file.
 
 ```yaml
-# Symfony3, app/config/routing.yml 
-# Symfony4, config/routes/settings_manager.yaml
+# <=Symfony3, app/config/routing.yml 
+# >=Symfony4, config/routes/settings_manager.yaml
 
 settings_manager:
     resource: '@HelisSettingsManagerBundle/Resources/config/routing.yml'

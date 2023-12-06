@@ -15,7 +15,10 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-#[AsCommand(name: 'debug:settings')]
+#[AsCommand(
+    name: 'debug:settings',
+    description: 'Displays current settings for an application'
+)]
 class SettingsDebugCommand extends Command
 {
     public function __construct(protected SettingsManager $settingsManager)
@@ -25,13 +28,15 @@ class SettingsDebugCommand extends Command
 
     protected function configure(): void
     {
-        $this->setDefinition([
-            new InputArgument('name', InputArgument::OPTIONAL, 'A setting name'),
-            new InputOption('domain', null, InputOption::VALUE_REQUIRED, 'Displays settings for a specific domain'),
-            new InputOption('domains', null, InputOption::VALUE_NONE, 'Displays all configured domains'),
-            new InputOption('tag', null, InputOption::VALUE_REQUIRED, 'Shows all settings with a specific tag'),
-        ])->setDescription('Displays current settings for an application')->setHelp(
-            <<<'EOF'
+        $this
+            ->setDefinition([
+                new InputArgument('name', InputArgument::OPTIONAL, 'A setting name'),
+                new InputOption('domain', null, InputOption::VALUE_REQUIRED, 'Displays settings for a specific domain'),
+                new InputOption('domains', null, InputOption::VALUE_NONE, 'Displays all configured domains'),
+                new InputOption('tag', null, InputOption::VALUE_REQUIRED, 'Shows all settings with a specific tag'),
+            ])
+            ->setHelp(
+                <<<'EOF'
 The <info>%command.name%</info> command displays all available settings:
 
   <info>php %command.full_name%</info>
@@ -49,7 +54,7 @@ Find all settings with a specific tag by specifying the tag name with the <info>
   <info>php %command.full_name% --tag=foo</info>
 
 EOF
-        );
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

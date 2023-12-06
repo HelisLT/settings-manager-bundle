@@ -12,7 +12,10 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-#[AsCommand(name: 'helis:settings:generate-keys')]
+#[AsCommand(
+    name: 'helis:settings:generate-keys',
+    description: 'Generate asymmetric private and public keys'
+)]
 class GenerateKeysCommand extends Command
 {
     protected function configure(): void
@@ -27,8 +30,7 @@ class GenerateKeysCommand extends Command
                 'public_key_path',
                 InputArgument::REQUIRED,
                 'Public key path to store'
-            )
-            ->setDescription('Generate asymmetric private and public keys.');
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

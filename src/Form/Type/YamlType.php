@@ -11,7 +11,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class YamlType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addModelTransformer(new CallbackTransformer(
             fn ($array) => $array !== null ? json_encode($array) : $array,

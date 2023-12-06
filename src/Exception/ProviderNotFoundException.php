@@ -10,6 +10,6 @@ class ProviderNotFoundException extends LogicException implements SettingsExcept
 {
     public function __construct(string $providerName)
     {
-        parent::__construct("Settings provider named '{$providerName}' not found");
+        parent::__construct("Settings provider named '$providerName' not found");
     }
 }

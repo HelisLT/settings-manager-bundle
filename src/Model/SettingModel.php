@@ -119,9 +119,9 @@ class SettingModel
     /**
      * @return mixed|null
      */
-    public function getData()
+    public function getData(): mixed
     {
-        return isset($this->data['value']) ? $this->data['value'] : null;
+        return $this->data['value'] ?? null;
     }
 
     public function setData($data): SettingModel
