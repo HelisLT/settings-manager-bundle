@@ -222,7 +222,7 @@ class DecoratingRedisSettingsProvider implements ModificationAwareSettingsProvid
         return sprintf('%s[%s]', $this->namespace, $key);
     }
 
-    protected function buildHashmap(bool $force = false, string $domainName = null): void
+    protected function buildHashmap(bool $force = false, ?string $domainName = null): void
     {
         $key = $this->getHashMapKey();
         $isBuilt = $this->redis->get($key);

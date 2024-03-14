@@ -36,7 +36,7 @@ class SettingsManager implements LoggerAwareInterface
     /**
      * @return DomainModel[]
      */
-    public function getDomains(string $providerName = null, bool $onlyEnabled = false): array
+    public function getDomains(?string $providerName = null, bool $onlyEnabled = false): array
     {
         $domains = [];
         $providers = $providerName !== null ? [$providerName => $this->getProvider($providerName)] : $this->providers;
@@ -241,7 +241,7 @@ class SettingsManager implements LoggerAwareInterface
         ]);
     }
 
-    public function updateDomain(DomainModel $domainModel, string $providerName = null): void
+    public function updateDomain(DomainModel $domainModel, ?string $providerName = null): void
     {
         if ($providerName !== null) {
             $provider = $this->getProvider($providerName);
@@ -262,7 +262,7 @@ class SettingsManager implements LoggerAwareInterface
         ]);
     }
 
-    public function deleteDomain(string $domainName, string $providerName = null): void
+    public function deleteDomain(string $domainName, ?string $providerName = null): void
     {
         if ($providerName !== null) {
             $provider = $this->getProvider($providerName);
