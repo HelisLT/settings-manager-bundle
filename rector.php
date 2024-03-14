@@ -1,35 +1,19 @@
 <?php
 
 use Rector\Caching\ValueObject\Storage\FileCacheStorage;
-use Rector\CodeQuality\Rector\Empty_\SimplifyEmptyCheckOnEmptyArrayRector;
-use Rector\Core\ValueObject\PhpVersion;
+use Rector\ValueObject\PhpVersion;
 use Rector\Config\RectorConfig;
-use Rector\Php81\Rector\Array_\FirstClassCallableRector;
-use Rector\Set\ValueObject\SetList;
 
-return static function (RectorConfig $rectorConfig): void {
-    $rectorConfig->cacheClass(FileCacheStorage::class);
-    $rectorConfig->cacheDirectory(__DIR__.'/tests/app/var/cache/rector');
-
-    $rectorConfig->paths([
-        __DIR__.'/src',
-    ]);
-
-    $rectorConfig->phpVersion(PhpVersion::PHP_81);
-    $rectorConfig->phpstanConfig(__DIR__.'/phpstan.neon.dist');
-
-    $rectorConfig->sets([
-        SetList::CODE_QUALITY,
-        SetList::DEAD_CODE,
-        SetList::PHP_80,
-        SetList::PHP_81,
-    ]);
-
-    $rectorConfig->skip([
-        SimplifyEmptyCheckOnEmptyArrayRector::class,
-        FirstClassCallableRector::class,
-    ]);
-
-    $rectorConfig->importNames();
-    $rectorConfig->importShortClasses();
-};
+return RectorConfig::configure()
+    ->withCache(__DIR__.'/tests/app/var/cache/rector', FileCacheStorage::class)
+    ->withPaths([__DIR__.'/src'])
+    ->withPhpVersion(PhpVersion::PHP_81)
+    ->withPHPStanConfigs([__DIR__.'/phpstan.neon.dist'])
+    ->withPhpSets(php81: true)
+    ->withPreparedSets(deadCode: true, codeQuality: true)
+    ->withSkip([
+        \Rector\CodeQuality\Rector\Empty_\SimplifyEmptyCheckOnEmptyArrayRector::class,
+        \Rector\Php55\Rector\Class_\ClassConstantToSelfClassRector::class,
+        \Rector\Php81\Rector\Array_\FirstClassCallableRector::class,
+    ])
+    ->withImportNames(removeUnusedImports: true);
