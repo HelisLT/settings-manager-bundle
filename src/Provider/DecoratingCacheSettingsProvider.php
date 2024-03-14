@@ -18,7 +18,7 @@ class DecoratingCacheSettingsProvider implements ModificationAwareSettingsProvid
     use DomainNameExtractTrait;
 
     private const LOCK_RETRY_INTERVAL_MS = 50000; // microseconds
-    private const LOCK_RESOURCE = self::class.'settings-cache';
+    private const LOCK_RESOURCE = __CLASS__.'settings-cache';
     private const LOCK_MAX_READER_FAILED_ACQUIRES = 2;
     private string $modificationTimeKey = 'settings_modification_time';
 

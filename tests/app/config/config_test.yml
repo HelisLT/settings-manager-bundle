@@ -15,7 +15,6 @@ framework:
     enabled: false
 
   http_method_override: false
-  handle_all_throwables: true
 
 security:
     providers:
