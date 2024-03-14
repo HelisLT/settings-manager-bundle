@@ -11,11 +11,11 @@ class SettingModel
 {
     protected ?string $name = null;
     protected ?string $description = null;
-    protected ?DomainModel $domain;
+    protected ?DomainModel $domain = null;
     protected Collection $tags;
-    protected ?Type $type;
+    protected ?Type $type = null;
     protected array $data = [];
-    protected ?string $providerName;
+    protected ?string $providerName = null;
     protected array $choices = [];
 
     public function __construct()
