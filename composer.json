@@ -48,7 +48,7 @@
         "phpstan/phpstan-phpunit": "^1.0",
         "phpunit/phpunit": "^10.0",
         "predis/predis": "^1.1",
-        "rector/rector": "^0.18",
+        "rector/rector": "^0.19",
         "symfony/asset": "^5.4|^6.3",
         "symfony/browser-kit": "^5.4|^6.3",
         "symfony/form": "^5.4|^6.3",

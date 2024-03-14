@@ -17,7 +17,7 @@ class EventManager implements EventManagerInterface
     public function dispatch(string $eventName, SettingEvent $event): void
     {
         $this->eventDispatcher->dispatch($event, $eventName);
-        $this->eventDispatcher->dispatch($event, $eventName.'.'.strtolower($event->getSetting()->getName()));
+        $this->eventDispatcher->dispatch($event, $eventName.'.'.strtolower((string) $event->getSetting()->getName()));
     }
 
     public function dispatchConfigureMenu(string $eventName, ConfigureMenuEvent $event): void
