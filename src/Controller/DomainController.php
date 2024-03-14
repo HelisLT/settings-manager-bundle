@@ -84,7 +84,7 @@ class DomainController
         return new JsonResponse();
     }
 
-    public function deleteAction(string $domainName, string $providerName = null): Response
+    public function deleteAction(string $domainName, ?string $providerName = null): Response
     {
         $this->settingsManager->deleteDomain($domainName, $providerName);
 

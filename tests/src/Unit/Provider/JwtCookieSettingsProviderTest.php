@@ -84,7 +84,7 @@ class JwtCookieSettingsProviderTest extends AbstractCookieSettingsProviderTest
         $this->provider = $previousProvider;
     }
 
-    private function createProviderWithKeys(string $publicKey, string $privateKey = null): JwtCookieSettingsProvider
+    private function createProviderWithKeys(string $publicKey, ?string $privateKey = null): JwtCookieSettingsProvider
     {
         return new JwtCookieSettingsProvider(
             $this->serializer,

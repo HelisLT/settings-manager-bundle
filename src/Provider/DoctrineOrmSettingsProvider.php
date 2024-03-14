@@ -24,7 +24,7 @@ class DoctrineOrmSettingsProvider implements SettingsProviderInterface
     public function __construct(
         protected EntityManagerInterface $entityManager,
         string $settingsEntityClass,
-        string $tagEntityClass = null
+        ?string $tagEntityClass = null
     ) {
         if (!is_subclass_of($settingsEntityClass, SettingModel::class)) {
             throw new UnexpectedValueException($settingsEntityClass.' is not part of the model '.SettingModel::class);
