@@ -10,6 +10,7 @@ services:
             $formFactory: '@form.factory'
             $urlGenerator: '@router'
             $settingsManager: '@Helis\SettingsManagerBundle\Settings\SettingsManager'
+        public: true
 
     Helis\SettingsManagerBundle\Controller\SettingsController:
         arguments:
@@ -19,6 +20,7 @@ services:
             $settingsManager: '@Helis\SettingsManagerBundle\Settings\SettingsManager'
             $eventManager: '@Helis\SettingsManagerBundle\Settings\EventManagerInterface'
             $validator: '@validator'
+        public: true
 
     Helis\SettingsManagerBundle\Settings\SettingsAwareServiceFactory:
         arguments:
