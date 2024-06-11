@@ -41,6 +41,7 @@ class HelisSettingsManagerExtension extends Extension
         $bundles = $container->getParameter('kernel.bundles');
 
         if (isset($bundles['TwigBundle'])) {
+            $loader->load('controller.yaml');
             $loader->load('twig.yaml');
         }
 

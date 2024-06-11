@@ -4,24 +4,6 @@ services:
         autowire: false
         autoconfigure: false
 
-    Helis\SettingsManagerBundle\Controller\DomainController:
-        arguments:
-            $twig: '@twig'
-            $formFactory: '@form.factory'
-            $urlGenerator: '@router'
-            $settingsManager: '@Helis\SettingsManagerBundle\Settings\SettingsManager'
-        public: true
-
-    Helis\SettingsManagerBundle\Controller\SettingsController:
-        arguments:
-            $twig: '@twig'
-            $formFactory: '@form.factory'
-            $urlGenerator: '@router'
-            $settingsManager: '@Helis\SettingsManagerBundle\Settings\SettingsManager'
-            $eventManager: '@Helis\SettingsManagerBundle\Settings\EventManagerInterface'
-            $validator: '@validator'
-        public: true
-
     Helis\SettingsManagerBundle\Settings\SettingsAwareServiceFactory:
         arguments:
             $settingsRouter: '@Helis\SettingsManagerBundle\Settings\SettingsRouter'
