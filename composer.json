@@ -71,7 +71,11 @@
         "knplabs/knp-menu-bundle": "Required to fully use provided user interface",
         "aws/aws-sdk-php": "Allows to use aws ssm setting provider",
         "enqueue/enqueue": "Allows to use consumption extension for warming up settings during messages",
-        "predis/predis": "Allows to use decorating predis settings provider"
+        "predis/predis": "Allows to use decorating predis settings provider",
+        "symfony/framework-bundle": "Required for CRUD to work",
+        "symfony/twig-bundle": "Required for CRUD to work",
+        "symfony/form": "Required for CRUD to work",
+        "symfony/validator": "Required for CRUD to work"
     },
     "config": {
         "sort-packages": true
