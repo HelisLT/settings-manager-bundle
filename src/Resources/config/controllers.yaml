@@ -1,0 +1,21 @@
+services:
+    _defaults:
+        public: true
+        autowire: false
+        autoconfigure: false
+
+    Helis\SettingsManagerBundle\Controller\DomainController:
+        arguments:
+            $twig: '@twig'
+            $formFactory: '@form.factory'
+            $urlGenerator: '@router'
+            $settingsManager: '@Helis\SettingsManagerBundle\Settings\SettingsManager'
+
+    Helis\SettingsManagerBundle\Controller\SettingsController:
+        arguments:
+            $twig: '@twig'
+            $formFactory: '@form.factory'
+            $urlGenerator: '@router'
+            $settingsManager: '@Helis\SettingsManagerBundle\Settings\SettingsManager'
+            $eventManager: '@Helis\SettingsManagerBundle\Settings\EventManagerInterface'
+            $validator: '@validator'

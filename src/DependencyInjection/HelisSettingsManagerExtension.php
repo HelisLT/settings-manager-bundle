@@ -22,7 +22,9 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Form\Form;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\Validator\Validation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Yaml\Yaml;
 
@@ -39,6 +41,13 @@ class HelisSettingsManagerExtension extends Extension
         $loader->load('serializer.yaml');
 
         $bundles = $container->getParameter('kernel.bundles');
+
+        if (isset($bundles['TwigBundle'])
+            && isset($bundles['FrameworkBundle'])
+            && class_exists(Form::class)
+            && class_exists(Validation::class)) {
+            $loader->load('controllers.yaml');
+        }
 
         if (isset($bundles['TwigBundle'])) {
             $loader->load('twig.yaml');
