@@ -60,7 +60,7 @@ class SettingsRouterTest extends AbstractWebTestCase
         array $expectedTags,
         Type $expectedType,
         $expectedData,
-        string $expectedProvider
+        string $expectedProvider,
     ): void {
         $this->loadFixtures([LoadSettingsData::class]);
         $setting = $this->settingsRouter->getSetting($settingName);
@@ -113,7 +113,7 @@ class SettingsRouterTest extends AbstractWebTestCase
         ?Type $expectedType,
         mixed $expectedData,
         string $expectedProvider,
-        ?string $expectedException
+        ?string $expectedException,
     ): void {
         $this->loadFixtures([LoadSettingsData::class]);
 
@@ -162,7 +162,7 @@ class SettingsRouterTest extends AbstractWebTestCase
     public function testGetSettingsByTag(
         string $tagName,
         int $expectedSettingCount,
-        array $expectedSettingKeys
+        array $expectedSettingKeys,
     ): void {
         $this->loadFixtures([LoadSettingsData::class]);
         $settings = $this->settingsRouter->getSettingsByTag($tagName);
@@ -193,7 +193,7 @@ class SettingsRouterTest extends AbstractWebTestCase
         string $tagName,
         int $expectedSettingCount,
         array $expectedSettingKeys,
-        ?string $expectedException
+        ?string $expectedException,
     ): void {
         $this->loadFixtures([LoadSettingsData::class]);
         if ($expectedException) {

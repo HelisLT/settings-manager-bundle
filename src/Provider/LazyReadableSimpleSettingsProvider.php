@@ -19,7 +19,7 @@ class LazyReadableSimpleSettingsProvider extends ReadableSimpleSettingsProvider
         private array $normDomains,
         private array $normSettings,
         private readonly array $settingsKeyMap,
-        private readonly array $domainsKeyMap
+        private readonly array $domainsKeyMap,
     ) {
         parent::__construct([]);
     }

@@ -22,7 +22,7 @@ class DomainController
         private readonly Environment $twig,
         private readonly FormFactoryInterface $formFactory,
         private readonly UrlGeneratorInterface $urlGenerator,
-        private readonly SettingsManager $settingsManager
+        private readonly SettingsManager $settingsManager,
     ) {
     }
 

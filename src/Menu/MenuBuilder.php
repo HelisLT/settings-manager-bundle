@@ -14,7 +14,7 @@ class MenuBuilder
 {
     public function __construct(
         private readonly FactoryInterface $factory,
-        private readonly EventManager $eventManager
+        private readonly EventManager $eventManager,
     ) {
     }
 

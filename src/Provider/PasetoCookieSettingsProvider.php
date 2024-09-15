@@ -16,7 +16,7 @@ class PasetoCookieSettingsProvider extends AbstractPasetoCookieSettingsProvider
     public function __construct(
         SerializerInterface $serializer,
         protected string $symmetricKeyMaterial = 'GuxH2igWOvGBSk3cpeL300Fzv9JiAtvC',
-        string $cookieName = 'stn'
+        string $cookieName = 'stn',
     ) {
         parent::__construct($serializer, $cookieName);
     }
