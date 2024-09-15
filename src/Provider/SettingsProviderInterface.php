@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Helis\SettingsManagerBundle\Provider;
 
+use Helis\SettingsManagerBundle\Exception\ProviderUnavailableException;
 use Helis\SettingsManagerBundle\Exception\ReadOnlyProviderException;
 use Helis\SettingsManagerBundle\Model\DomainModel;
 use Helis\SettingsManagerBundle\Model\SettingModel;
@@ -27,6 +28,8 @@ interface SettingsProviderInterface
      * @param string[] $domainNames Domains names to check
      *
      * @return SettingModel[]
+     *
+     * @throws ProviderUnavailableException
      */
     public function getSettings(array $domainNames): array;
 
@@ -37,6 +40,8 @@ interface SettingsProviderInterface
      * @param string[] $settingNames Settings to check in those domains
      *
      * @return SettingModel[]
+     *
+     * @throws ProviderUnavailableException
      */
     public function getSettingsByName(array $domainNames, array $settingNames): array;
 
@@ -47,6 +52,8 @@ interface SettingsProviderInterface
      * @param string   $tagName     Tag name to filter by
      *
      * @return SettingModel[]
+     *
+     * @throws ProviderUnavailableException
      */
     public function getSettingsByTag(array $domainNames, string $tagName): array;
 
@@ -70,6 +77,8 @@ interface SettingsProviderInterface
      * Collects all domain models.
      *
      * @return DomainModel[]
+     *
+     * @throws ProviderUnavailableException
      */
     public function getDomains(bool $onlyEnabled = false): array;
 
