@@ -12,7 +12,7 @@ class ConfigureMenuEvent extends Event
 {
     public function __construct(
         private readonly FactoryInterface $factory,
-        private readonly ItemInterface $menu
+        private readonly ItemInterface $menu,
     ) {
     }
 

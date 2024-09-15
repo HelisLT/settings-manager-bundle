@@ -17,7 +17,7 @@ class SettingsRouter
         private readonly SettingsManager $settingsManager,
         private readonly SettingsStore $settingsStore,
         private readonly EventManagerInterface $eventManager,
-        private readonly array $treatAsDefaultProviders = []
+        private readonly array $treatAsDefaultProviders = [],
     ) {
     }
 

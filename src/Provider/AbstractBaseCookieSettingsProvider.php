@@ -31,7 +31,7 @@ abstract class AbstractBaseCookieSettingsProvider extends SimpleSettingsProvider
         protected int $ttl = 86400,
         protected string $issuer = 'settings_manager',
         protected string $subject = 'settings',
-        protected string $cookiePath = '/'
+        protected string $cookiePath = '/',
     ) {
         parent::__construct([]);
     }

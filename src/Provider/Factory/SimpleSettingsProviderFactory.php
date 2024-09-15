@@ -15,7 +15,7 @@ class SimpleSettingsProviderFactory implements ProviderFactoryInterface
     public function __construct(
         private readonly DenormalizerInterface $serializer,
         private readonly array $normalizedData,
-        private readonly bool $readOnly = true
+        private readonly bool $readOnly = true,
     ) {
     }
 

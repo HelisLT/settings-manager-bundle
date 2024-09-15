@@ -30,7 +30,7 @@ class SettingsController
         private readonly UrlGeneratorInterface $urlGenerator,
         private readonly SettingsManager $settingsManager,
         private readonly EventManagerInterface $eventManager,
-        private readonly ValidatorInterface $validator
+        private readonly ValidatorInterface $validator,
     ) {
     }
 

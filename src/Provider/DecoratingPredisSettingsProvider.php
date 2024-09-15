@@ -29,7 +29,7 @@ class DecoratingPredisSettingsProvider implements ModificationAwareSettingsProvi
     public function __construct(
         protected SettingsProviderInterface $decoratingProvider,
         Client $redis,
-        protected SerializerInterface $serializer
+        protected SerializerInterface $serializer,
     ) {
         $this->redis = $redis;
     }

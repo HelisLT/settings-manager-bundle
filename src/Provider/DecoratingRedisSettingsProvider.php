@@ -28,7 +28,7 @@ class DecoratingRedisSettingsProvider implements ModificationAwareSettingsProvid
     public function __construct(
         protected SettingsProviderInterface $decoratingProvider,
         Redis $redis,
-        protected SerializerInterface $serializer
+        protected SerializerInterface $serializer,
     ) {
         $this->redis = $redis;
     }

@@ -31,7 +31,7 @@ class JwtCookieSettingsProvider extends AbstractBaseCookieSettingsProvider
         SerializerInterface $serializer,
         private readonly string $publicKey,
         private readonly ?string $privateKey = null,
-        string $cookieName = 'stn'
+        string $cookieName = 'stn',
     ) {
         parent::__construct($serializer, $cookieName);
     }
