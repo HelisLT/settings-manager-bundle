@@ -48,7 +48,7 @@ class SettingsManager implements LoggerAwareInterface
                     $domains[$domainModel->getName()][$domainModel->getPriority()] = $domainModel;
                 }
             } catch (ProviderUnavailableException $e) {
-                $this->logger && $this->logger->error(sprintf('SettingsManager:%s(): Settings provider "%s" is unavailable, skipping.', __METHOD__, get_class($provider)), ['exception' => $e]);
+                $this->logger && $this->logger->error(sprintf('SettingsManager:%s(): Settings provider "%s" is unavailable, skipping.', __METHOD__, $provider::class), ['exception' => $e]);
             }
         }
 
@@ -75,7 +75,7 @@ class SettingsManager implements LoggerAwareInterface
             try {
                 $settingsByName = $provider->getSettingsByName($domainNames, $settingNames);
             } catch (ProviderUnavailableException $e) {
-                $this->logger && $this->logger->error(sprintf('SettingsManager:%s(): Settings provider "%s" is unavailable, skipping.', __METHOD__, get_class($provider)), ['exception' => $e]);
+                $this->logger && $this->logger->error(sprintf('SettingsManager:%s(): Settings provider "%s" is unavailable, skipping.', __METHOD__, $provider::class), ['exception' => $e]);
                 continue;
             }
 
@@ -124,7 +124,7 @@ class SettingsManager implements LoggerAwareInterface
             try {
                 $settings[] = $this->collectSettings($provider->getSettings($domainNames), $pName);
             } catch (ProviderUnavailableException $e) {
-                $this->logger && $this->logger->error(sprintf('SettingsManager:%s(): Settings provider "%s" is unavailable, skipping.', __METHOD__, get_class($provider)), ['exception' => $e]);
+                $this->logger && $this->logger->error(sprintf('SettingsManager:%s(): Settings provider "%s" is unavailable, skipping.', __METHOD__, $provider::class), ['exception' => $e]);
             }
         }
 
@@ -144,7 +144,7 @@ class SettingsManager implements LoggerAwareInterface
             try {
                 $settings[] = $this->collectSettings($provider->getSettingsByTag($domainNames, $tagName), $pName);
             } catch (ProviderUnavailableException $e) {
-                $this->logger && $this->logger->error(sprintf('SettingsManager:%s(): Settings provider "%s" is unavailable, skipping.', __METHOD__, get_class($provider)), ['exception' => $e]);
+                $this->logger && $this->logger->error(sprintf('SettingsManager:%s(): Settings provider "%s" is unavailable, skipping.', __METHOD__, $provider::class), ['exception' => $e]);
             }
         }
 

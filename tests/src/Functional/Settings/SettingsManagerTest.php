@@ -82,7 +82,7 @@ class SettingsManagerTest extends AbstractWebTestCase
     public function testGetSettingsByDomain(
         string $domainName,
         int $expectedSettingCount,
-        array $expectedSettingKeys
+        array $expectedSettingKeys,
     ): void {
         $this->loadFixtures([LoadSettingsData::class]);
         $settings = $this->settingsManager->getSettingsByDomain([$domainName]);
@@ -135,7 +135,7 @@ class SettingsManagerTest extends AbstractWebTestCase
         array $domainNames,
         string $tagName,
         int $expectedSettingCount,
-        array $expectedSettingKeys
+        array $expectedSettingKeys,
     ): void {
         $this->loadFixtures([LoadSettingsData::class]);
         $settings = $this->settingsManager->getSettingsByTag($domainNames, $tagName);
