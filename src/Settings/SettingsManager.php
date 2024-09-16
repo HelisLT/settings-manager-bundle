@@ -6,6 +6,7 @@ namespace Helis\SettingsManagerBundle\Settings;
 
 use Helis\SettingsManagerBundle\Event\SettingChangeEvent;
 use Helis\SettingsManagerBundle\Exception\ProviderNotFoundException;
+use Helis\SettingsManagerBundle\Exception\ProviderUnavailableException;
 use Helis\SettingsManagerBundle\Exception\ReadOnlyProviderException;
 use Helis\SettingsManagerBundle\Model\DomainModel;
 use Helis\SettingsManagerBundle\Model\SettingModel;
@@ -42,8 +43,12 @@ class SettingsManager implements LoggerAwareInterface
         $providers = $providerName !== null ? [$providerName => $this->getProvider($providerName)] : $this->providers;
 
         foreach ($providers as $provider) {
-            foreach ($provider->getDomains($onlyEnabled) as $domainModel) {
-                $domains[$domainModel->getName()][$domainModel->getPriority()] = $domainModel;
+            try {
+                foreach ($provider->getDomains($onlyEnabled) as $domainModel) {
+                    $domains[$domainModel->getName()][$domainModel->getPriority()] = $domainModel;
+                }
+            } catch (ProviderUnavailableException $e) {
+                $this->logger && $this->logger->error(sprintf('SettingsManager:%s(): Settings provider "%s" is unavailable, skipping.', __METHOD__, $provider::class), ['exception' => $e]);
             }
         }
 
@@ -67,7 +72,14 @@ class SettingsManager implements LoggerAwareInterface
         /** @var SettingsProviderInterface $provider */
         foreach (array_reverse($this->providers) as $pName => $provider) {
             $providerSettings = [];
-            foreach ($provider->getSettingsByName($domainNames, $settingNames) as $settingModel) {
+            try {
+                $settingsByName = $provider->getSettingsByName($domainNames, $settingNames);
+            } catch (ProviderUnavailableException $e) {
+                $this->logger && $this->logger->error(sprintf('SettingsManager:%s(): Settings provider "%s" is unavailable, skipping.', __METHOD__, $provider::class), ['exception' => $e]);
+                continue;
+            }
+
+            foreach ($settingsByName as $settingModel) {
                 if ($settingModel instanceof SettingModel) {
                     $settingModel->setProviderName($pName);
 
@@ -109,7 +121,11 @@ class SettingsManager implements LoggerAwareInterface
         $settings = [[]];
 
         foreach ($this->providers as $pName => $provider) {
-            $settings[] = $this->collectSettings($provider->getSettings($domainNames), $pName);
+            try {
+                $settings[] = $this->collectSettings($provider->getSettings($domainNames), $pName);
+            } catch (ProviderUnavailableException $e) {
+                $this->logger && $this->logger->error(sprintf('SettingsManager:%s(): Settings provider "%s" is unavailable, skipping.', __METHOD__, $provider::class), ['exception' => $e]);
+            }
         }
 
         return array_replace(...$settings);
@@ -125,7 +141,11 @@ class SettingsManager implements LoggerAwareInterface
         $settings = [[]];
 
         foreach ($this->providers as $pName => $provider) {
-            $settings[] = $this->collectSettings($provider->getSettingsByTag($domainNames, $tagName), $pName);
+            try {
+                $settings[] = $this->collectSettings($provider->getSettingsByTag($domainNames, $tagName), $pName);
+            } catch (ProviderUnavailableException $e) {
+                $this->logger && $this->logger->error(sprintf('SettingsManager:%s(): Settings provider "%s" is unavailable, skipping.', __METHOD__, $provider::class), ['exception' => $e]);
+            }
         }
 
         return array_replace(...$settings);
