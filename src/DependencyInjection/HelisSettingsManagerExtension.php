@@ -123,14 +123,18 @@ class HelisSettingsManagerExtension extends Extension
         );
 
         if (!$config['settings_config']['lazy']) {
-            $container
-                ->register('settings_manager.provider.config', SimpleSettingsProviderFactory::class)
+            $container->register('settings_manager.provider.config.factory', SimpleSettingsProviderFactory::class)
                 ->setArguments([new Reference('settings_manager.serializer'), $settings, true])
                 ->setPublic(false)
                 ->addTag('settings_manager.provider_factory', [
                     'provider' => SettingsProviderInterface::DEFAULT_PROVIDER,
                     'priority' => $config['settings_config']['priority'],
                 ]);
+            ;
+
+            $container
+                ->register('settings_manager.provider.config', SettingsProviderInterface::class)
+                ->setFactory(new Reference('settings_manager.provider.config.factory'));
         } else {
             $normDomains = [];
             $normSettings = [];
