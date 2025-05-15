@@ -22,7 +22,7 @@ class LoadSettingsData extends Fixture
     /**
      * {@inheritdoc}
      */
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $tag1 = new Tag();
         $tag1->setName('fixture');
