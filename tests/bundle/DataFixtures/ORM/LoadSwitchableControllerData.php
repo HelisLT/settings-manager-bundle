@@ -12,7 +12,7 @@ use Helis\SettingsManagerBundle\Model\Type;
 
 class LoadSwitchableControllerData extends Fixture
 {
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $domain = new DomainModel();
         $domain->setName('default');
