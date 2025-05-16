@@ -9,10 +9,10 @@ use PHPUnit\Framework\Attributes\After;
 
 trait SettingsIntegrationTrait
 {
-    #[After]
     /**
      * @after
      */
+    #[After]
     public function tearDownSettings(): void
     {
         SettingsProviderMock::clear();
