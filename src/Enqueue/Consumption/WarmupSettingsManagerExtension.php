@@ -9,6 +9,10 @@ use Enqueue\Consumption\MessageReceivedExtensionInterface;
 use Helis\SettingsManagerBundle\Settings\SettingsRouter;
 use Helis\SettingsManagerBundle\Settings\Traits\SettingsRouterAwareTrait;
 
+/**
+ * @deprecated
+ * @see SettingsStore::reset()
+ */
 class WarmupSettingsManagerExtension implements MessageReceivedExtensionInterface
 {
     use SettingsRouterAwareTrait;

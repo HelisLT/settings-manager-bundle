@@ -7,8 +7,9 @@ namespace Helis\SettingsManagerBundle\Settings;
 use Doctrine\Common\Collections\ArrayCollection;
 use Helis\SettingsManagerBundle\Model\SettingModel;
 use LogicException;
+use Symfony\Contracts\Service\ResetInterface;
 
-class SettingsStore extends ArrayCollection
+class SettingsStore extends ArrayCollection implements ResetInterface
 {
     /**
      * @var SettingModel[][]
@@ -140,5 +141,10 @@ class SettingsStore extends ArrayCollection
         $this->settingsByTag = [];
 
         parent::clear();
+    }
+
+    public function reset(): void
+    {
+        $this->clear();
     }
 }
