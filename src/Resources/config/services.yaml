@@ -10,7 +10,9 @@ services:
         calls:
             - [setLogger, ['@?settings_manager.logger']]
 
-    Helis\SettingsManagerBundle\Settings\SettingsStore: ~
+    Helis\SettingsManagerBundle\Settings\SettingsStore:
+      tags:
+        - { name: kernel.reset, method: 'reset' }
 
     Helis\SettingsManagerBundle\Settings\ProvidersManager:
         arguments:
