@@ -74,7 +74,7 @@ class SettingsManagerTest extends AbstractWebTestCase
         yield [
             LoadSettingsData::DOMAIN_NAME_1,
             8,
-            ['foo', 'baz', 'tuna', 'wth_yaml', 'choice', 'integer', 'overridden_setting', 'bazinga']
+            ['foo', 'baz', 'tuna', 'wth_yaml', 'choice', 'integer', 'overridden_setting', 'bazinga'],
         ];
 
         yield [LoadSettingsData::DOMAIN_NAME_2, 1, ['tuna']];
