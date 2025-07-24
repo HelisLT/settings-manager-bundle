@@ -48,6 +48,7 @@ class SettingsRouterTest extends AbstractWebTestCase
                 ['amazing' => ['foo', 'foo', 'foo', 'yee'], 'cool' => ['yes' => ['yes', 'no']], 'damn' => 5],
                 'config',
             ],
+            ['overridden_setting', 'Setting that is overridden', [], Type::STRING, 'overridden_value', 'config'],
         ];
     }
 
