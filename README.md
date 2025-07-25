@@ -2,9 +2,9 @@
 
 Provides a nice way to define variables and inject them into application parts.
 
- - Supporting `bool`, `string`, `int`, `float`, `array` as setting values.
- - Multiple providers.
- - User interface.
+ - Supporting `bool`, `string`, `int`, `float`, `array` as setting values
+ - Multiple providers
+ - User interface
 
 [![Latest Stable Version](https://poser.pugx.org/helis/settings-manager-bundle/v/stable)](https://packagist.org/packages/helis/settings-manager-bundle)
 [![License](https://poser.pugx.org/helis/settings-manager-bundle/license)](https://packagist.org/packages/helis/settings-manager-bundle)
