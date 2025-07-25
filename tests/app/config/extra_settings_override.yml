@@ -1,0 +1,5 @@
+-   name: overridden_setting
+    description: 'Setting that is overridden'
+    domain: default
+    type: string
+    data: 'overridden_value'

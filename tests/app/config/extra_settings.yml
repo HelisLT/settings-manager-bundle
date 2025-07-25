@@ -1,8 +1,15 @@
-- name: fix
-  description: 'fix desc'
-  domain:
-      name: omg
-      enabled: false
-      read_only: true
-  type: bool
-  data: true
+-   name: fix
+    description: 'fix desc'
+    domain:
+        name: omg
+        enabled: false
+        read_only: true
+    type: bool
+    data: true
+
+
+-   name: overridden_setting
+    description: 'Setting that is overridden'
+    domain: default
+    type: string
+    data: 'initial_value'

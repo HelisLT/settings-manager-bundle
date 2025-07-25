@@ -117,7 +117,7 @@ class HelisSettingsManagerExtension extends Extension
 
     private function loadSimpleProvider(array $config, ContainerBuilder $container): void
     {
-        $settings = array_merge(
+        $settings = $this->mergeSettings(
             $config['settings'],
             $this->loadSettingsFromFiles($config['settings_files'], $container)
         );
@@ -186,7 +186,7 @@ class HelisSettingsManagerExtension extends Extension
                     ['helis_settings_manager' => ['settings' => $fileContents]]
                 );
 
-                $settings = array_merge($settings, $processedContents['settings']);
+                $settings = $this->mergeSettings($settings, $processedContents['settings']);
                 $container->addResource(new FileResource($file));
             }
         }
@@ -223,5 +223,14 @@ class HelisSettingsManagerExtension extends Extension
                 ->setPublic(false)
                 ->addTag('kernel.event_subscriber');
         }
+    }
+
+    private function mergeSettings(array $settingsA, array $settingsB): array
+    {
+        $settingsA = array_column($settingsA, null, 'name');
+        $settingsB = array_column($settingsB, null, 'name');
+        $settings = array_merge($settingsA, $settingsB);
+
+        return array_values($settings);
     }
 }
