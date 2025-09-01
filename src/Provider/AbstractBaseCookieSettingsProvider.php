@@ -17,11 +17,13 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
-abstract class AbstractBaseCookieSettingsProvider extends SimpleSettingsProvider implements EventSubscriberInterface, LoggerAwareInterface
+abstract class AbstractBaseCookieSettingsProvider extends SimpleSettingsProvider implements EventSubscriberInterface, LoggerAwareInterface, ResetInterface
 {
     use LoggerAwareTrait;
     use WritableProviderTrait;
+
     protected ?string $cookieDomain = null;
     protected bool $changed = false;
 
@@ -77,7 +79,7 @@ abstract class AbstractBaseCookieSettingsProvider extends SimpleSettingsProvider
 
         if ($token === '') {
             $this->logger && $this->logger->error(
-                sprintf('%s: failed to build token', (new ReflectionObject($this))->getShortName())
+                sprintf('%s: failed to build token', (new ReflectionObject($this))->getShortName()),
             );
 
             return;
@@ -86,17 +88,19 @@ abstract class AbstractBaseCookieSettingsProvider extends SimpleSettingsProvider
         $event
             ->getResponse()
             ->headers
-            ->setCookie(new Cookie(
-                $this->cookieName,
-                $token,
-                time() + $this->ttl,
-                $this->cookiePath,
-                $this->cookieDomain,
-                false,
-                true,
-                false,
-                null
-            ));
+            ->setCookie(
+                new Cookie(
+                    $this->cookieName,
+                    $token,
+                    time() + $this->ttl,
+                    $this->cookiePath,
+                    $this->cookieDomain,
+                    false,
+                    true,
+                    false,
+                    null,
+                ),
+            );
     }
 
     public function save(SettingModel $settingModel): bool
@@ -145,6 +149,12 @@ abstract class AbstractBaseCookieSettingsProvider extends SimpleSettingsProvider
             KernelEvents::REQUEST => [['onKernelRequest', 15]],
             KernelEvents::RESPONSE => ['onKernelResponse'],
         ];
+    }
+
+    public function reset(): void
+    {
+        $this->settings = [];
+        $this->changed = false;
     }
 
     public function setTtl(int $ttl): void

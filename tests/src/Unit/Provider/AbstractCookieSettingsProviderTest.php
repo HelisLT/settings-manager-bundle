@@ -34,9 +34,14 @@ abstract class AbstractCookieSettingsProviderTest extends TestCase
 
     abstract protected function createProvider(): AbstractBaseCookieSettingsProvider;
 
-    public function testOnKernelResponseNothingChanged()
+    public function testOnKernelResponseNothingChanged(): void
     {
-        $event = new ResponseEvent($this->createMock(HttpKernelInterface::class), new Request(), 1, $response = new Response());
+        $event = new ResponseEvent(
+            $this->createMock(HttpKernelInterface::class),
+            new Request(),
+            1,
+            $response = new Response(),
+        );
 
         $this->provider->onKernelResponse($event);
         $this->assertCount(0, $response->headers->getCookies());
@@ -44,7 +49,12 @@ abstract class AbstractCookieSettingsProviderTest extends TestCase
 
     public function testOnKernelResponse(): Cookie
     {
-        $event = new ResponseEvent($this->createMock(HttpKernelInterface::class), new Request(), 1, $response = new Response());
+        $event = new ResponseEvent(
+            $this->createMock(HttpKernelInterface::class),
+            new Request(),
+            1,
+            $response = new Response(),
+        );
 
         $settingStub = $this->createMock(SettingModel::class);
 
@@ -71,7 +81,7 @@ abstract class AbstractCookieSettingsProviderTest extends TestCase
     /**
      * @depends testOnKernelResponse
      */
-    public function testOnKernelRequest(Cookie $cookie)
+    public function testOnKernelRequest(Cookie $cookie): void
     {
         $eventMock = $this
             ->getMockBuilder(RequestEvent::class)
@@ -102,7 +112,7 @@ abstract class AbstractCookieSettingsProviderTest extends TestCase
         $this->assertEquals('woo', $domains[0]->getName());
     }
 
-    public function testOnKernelRequestWithoutCookie()
+    public function testOnKernelRequestWithoutCookie(): void
     {
         $eventMock = $this
             ->getMockBuilder(RequestEvent::class)
@@ -114,5 +124,22 @@ abstract class AbstractCookieSettingsProviderTest extends TestCase
         $this->serializer->expects($this->never())->method('deserialize');
 
         $this->provider->onKernelRequest($eventMock);
+    }
+
+    public function testReset(): void
+    {
+        $domainStub = $this->createMock(DomainModel::class);
+        $domainStub->method('getName')->willReturn('woo');
+        $domainStub->method('isEnabled')->willReturn(true);
+
+        $settingStub = $this->createMock(SettingModel::class);
+        $settingStub->method('getDomain')->willReturn($domainStub);
+        $this->provider->save($settingStub);
+
+        $this->assertNotEmpty($this->provider->getDomains(), 'Provider should have domains before reset');
+
+        $this->provider->reset();
+
+        $this->assertEmpty($this->provider->getDomains(), 'Provider domains should be empty after reset');
     }
 }
