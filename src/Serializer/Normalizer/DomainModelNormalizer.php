@@ -13,7 +13,7 @@ class DomainModelNormalizer implements NormalizerInterface, DenormalizerInterfac
 {
     use ObjectToPopulateTrait;
 
-    public function denormalize($data, $type, $format = null, array $context = [])
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
     {
         $object = $this->extractObjectToPopulate($type, $context) ?? new $type();
 
@@ -33,7 +33,7 @@ class DomainModelNormalizer implements NormalizerInterface, DenormalizerInterfac
         return $object;
     }
 
-    public function supportsDenormalization($data, $type, $format = null): bool
+    public function supportsDenormalization($data, $type, $format = null, array $context = []): bool
     {
         return is_a($type, DomainModel::class, true);
     }
@@ -51,7 +51,7 @@ class DomainModelNormalizer implements NormalizerInterface, DenormalizerInterfac
         ];
     }
 
-    public function supportsNormalization($data, $format = null): bool
+    public function supportsNormalization($data, $format = null, array $context = []): bool
     {
         return $data instanceof DomainModel;
     }

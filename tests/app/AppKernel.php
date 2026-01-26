@@ -34,25 +34,25 @@ class AppKernel extends Kernel
 
     public function getCacheDir(): string
     {
-        return dirname(__DIR__).'/app/var/cache/'.$this->getEnvironment();
+        return __DIR__.'/var/cache/'.$this->getEnvironment();
     }
 
     public function getLogDir(): string
     {
-        return dirname(__DIR__).'/app/var/logs';
+        return __DIR__.'/var/logs';
     }
 
-    public function registerContainerConfiguration(LoaderInterface $loader)
+    public function registerContainerConfiguration(LoaderInterface $loader): void
     {
         $loader->load($this->getRootDir().'/config/config_'.$this->getEnvironment().'.yml');
     }
 
-    protected function build(ContainerBuilder $container)
+    protected function build(ContainerBuilder $container): void
     {
         parent::build($container);
 
         $container->addCompilerPass(new class implements CompilerPassInterface {
-            public function process(ContainerBuilder $container)
+            public function process(ContainerBuilder $container): void
             {
                 foreach ($container->getDefinitions() as $id => $definition) {
                     if ($this->supports($id)) {

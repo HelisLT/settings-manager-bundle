@@ -31,6 +31,6 @@ class SettingTypeValidator extends ConstraintValidator
             ->context
             ->getValidator()
             ->inContext($this->context)
-            ->validate($value->getData(), new Type(['type' => $type, 'message' => $constraint->message]));
+            ->validate($value->getData(), new Type($type, $constraint->message));
     }
 }

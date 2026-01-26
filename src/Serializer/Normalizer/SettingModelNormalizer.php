@@ -56,7 +56,7 @@ class SettingModelNormalizer implements NormalizerInterface, DenormalizerInterfa
         return $object;
     }
 
-    public function supportsDenormalization($data, $type, $format = null): bool
+    public function supportsDenormalization($data, $type, $format = null, array $context = []): bool
     {
         return is_a($type, SettingModel::class, true);
     }
@@ -77,7 +77,7 @@ class SettingModelNormalizer implements NormalizerInterface, DenormalizerInterfa
         ];
     }
 
-    public function supportsNormalization($data, $format = null): bool
+    public function supportsNormalization($data, $format = null, array $context = []): bool
     {
         return $data instanceof SettingModel;
     }

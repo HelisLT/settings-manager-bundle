@@ -10,6 +10,7 @@ use Helis\SettingsManagerBundle\Settings\SettingsManager;
 use Helis\SettingsManagerBundle\Validator\Constraints\UniqueSetting;
 use Helis\SettingsManagerBundle\Validator\Constraints\UniqueSettingValidator;
 use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class UniqueSettingValidatorTest extends ConstraintValidatorTestCase
@@ -19,7 +20,7 @@ class UniqueSettingValidatorTest extends ConstraintValidatorTestCase
      */
     protected $settingsManager;
 
-    protected function createValidator()
+    protected function createValidator(): ConstraintValidatorInterface
     {
         $this->settingsManager = $this->createMock(SettingsManager::class);
 

@@ -11,9 +11,6 @@ framework:
   validation:
     email_validation_mode: html5
 
-  annotations:
-    enabled: false
-
   http_method_override: false
   handle_all_throwables: true
 
@@ -43,12 +40,9 @@ doctrine:
                 driver: pdo_sqlite
                 path: '%kernel.cache_dir%/test.db'
     orm:
-        auto_generate_proxy_classes: '%kernel.debug%'
         naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
         auto_mapping: true
         validate_xml_mapping: true
-        enable_lazy_ghost_objects: true
-        report_fields_where_declared: true
         mappings:
             AppBundle:
                 type: attribute

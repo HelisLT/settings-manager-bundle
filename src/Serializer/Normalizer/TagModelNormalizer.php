@@ -27,7 +27,7 @@ class TagModelNormalizer implements NormalizerInterface, DenormalizerInterface, 
         return $object;
     }
 
-    public function supportsDenormalization($data, $type, $format = null): bool
+    public function supportsDenormalization($data, $type, $format = null, array $context = []): bool
     {
         return is_a($type, TagModel::class, true);
     }
@@ -42,7 +42,7 @@ class TagModelNormalizer implements NormalizerInterface, DenormalizerInterface, 
         ];
     }
 
-    public function supportsNormalization($data, $format = null): bool
+    public function supportsNormalization($data, $format = null, array $context = []): bool
     {
         return $data instanceof TagModel;
     }

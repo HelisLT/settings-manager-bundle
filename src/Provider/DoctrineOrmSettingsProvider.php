@@ -154,10 +154,9 @@ class DoctrineOrmSettingsProvider implements SettingsProviderInterface
             ->where($qb->expr()->andX(
                 $qb->expr()->eq('s.name', ':sname'),
                 $qb->expr()->eq('s.domain.name', ':dname')
-            ))->setParameters([
-                'sname' => $settingModel->getName(),
-                'dname' => $settingModel->getDomain()->getName(),
-            ]);
+            ))
+            ->setParameter('sname', $settingModel->getName())
+            ->setParameter('dname', $settingModel->getDomain()->getName());
 
         $success = ((int) $qb->getQuery()->getSingleScalarResult()) > 0;
 
